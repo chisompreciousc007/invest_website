@@ -224,10 +224,12 @@ function Home() {
                   <p>
                     SplashCash247 is a P2P online investment platform for
                     financial growth. We offer you a smart and easy way to
-                    invest your money, by funding other investors.We can
-                    guarantee that your investment will make constant profits
-                    because we have the best money management system. Join our
-                    platform for a journey of financial freedom.
+                    invest your money, by funding other investors and you inturn
+                    get funded on/before 48 hours with 50% return on your
+                    investment amount.We can guarantee that your investment will
+                    make constant profits because we have the best money
+                    management system. Join our platform for a journey of
+                    financial freedom.
                   </p>
                 </div>
               </div>
@@ -240,7 +242,7 @@ function Home() {
                     <li>
                       <h4>
                         INVESTMENT PLAN <br />
-                        <h2>Earn 50% of your investment in 2 days.</h2>
+                        <h2>Earn 50% ROI every 48 hours.</h2>
                       </h4>
                       <br />
                       <h4 style={{ marginLeft: "106px" }}>
@@ -492,15 +494,7 @@ function Home() {
                   </ul>
                 </div>
               </div>
-              <div className="col-sm-2">
-                <div className="footer_logo">
-                  <img
-                    src="images/logo.png"
-                    alt="footer_logo"
-                    className="img-responsive"
-                  />
-                </div>
-              </div>
+              <div className="col-sm-2"></div>
             </div>
           </div>
         </div>
@@ -508,7 +502,7 @@ function Home() {
           <div className="container">
             <div className="row">
               <div className="col-sm-12">
-                <h6>© 2020 Tesla Mining Limited.ltd. All Rights Reserved.</h6>
+                <h6>© 2020 SplashCash247 Ltd. All Rights Reserved.</h6>
               </div>
             </div>
           </div>

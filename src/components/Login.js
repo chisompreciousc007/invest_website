@@ -344,16 +344,7 @@ function Login() {
         <div className="footer_top">
           <div className="container">
             <div className="row">
-              <div className="col-sm-2">
-                <div className="payment">
-                  <img
-                    src="images/bitcoin_logo.png"
-                    alt="bitcoin_logo"
-                    className="img-responsive"
-                  />
-                  <span>Accepted Here</span>
-                </div>
-              </div>
+              <div className="col-sm-2"></div>
               <div className="col-sm-8">
                 <div className="footer_menu">
                   <ul>
@@ -375,15 +366,7 @@ function Login() {
                   </ul>
                 </div>
               </div>
-              <div className="col-sm-2">
-                <div className="footer_logo">
-                  <img
-                    src="images/logo.png"
-                    alt="footer_logo"
-                    className="img-responsive"
-                  />
-                </div>
-              </div>
+              <div className="col-sm-2"></div>
             </div>
           </div>
         </div>
@@ -391,7 +374,7 @@ function Login() {
           <div className="container">
             <div className="row">
               <div className="col-sm-12">
-                <h6>© 2020 Tesla Mining Limited. All Rights Reserved.</h6>
+                <h6>© 2020 SplashCash247 Ltd. All Rights Reserved.</h6>
               </div>
             </div>
           </div>

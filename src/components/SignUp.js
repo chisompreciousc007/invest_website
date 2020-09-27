@@ -204,7 +204,7 @@ function SignUp({ match }) {
                           <span>
                             <i className="fa fa-user" aria-hidden="true"></i>
                             <input
-                              pattern="[a-zA-Z]+"
+                              pattern="[a-zA-Z]"
                               minLength="8"
                               maxLength="50"
                               required
@@ -251,6 +251,7 @@ function SignUp({ match }) {
                               className="inpts"
                               size="30"
                               onChange={inputHandler}
+                              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                             />
                           </span>
                         </div>
@@ -386,7 +387,7 @@ function SignUp({ match }) {
                           <span>
                             <i className="fa fa-user" aria-hidden="true"></i>
                             <input
-                              pattern="[a-zA-Z0-9]+"
+                              pattern="[a-zA-Z0-9]"
                               minLength="4"
                               maxLength="15"
                               required
@@ -531,16 +532,7 @@ function SignUp({ match }) {
           <div className="footer_top">
             <div className="container">
               <div className="row">
-                <div className="col-sm-2">
-                  <div className="payment">
-                    <img
-                      src="images/bitcoin_logo.png"
-                      alt="bitcoin_logo"
-                      className="img-responsive"
-                    />
-                    <span>Accepted Here</span>
-                  </div>
-                </div>
+                <div className="col-sm-2"></div>
                 <div className="col-sm-8">
                   <div className="footer_menu">
                     <ul>
@@ -562,15 +554,7 @@ function SignUp({ match }) {
                     </ul>
                   </div>
                 </div>
-                <div className="col-sm-2">
-                  <div className="footer_logo">
-                    <img
-                      src="images/logo.png"
-                      alt="footer_logo"
-                      className="img-responsive"
-                    />
-                  </div>
-                </div>
+                <div className="col-sm-2"></div>
               </div>
             </div>
           </div>
@@ -578,7 +562,7 @@ function SignUp({ match }) {
             <div className="container">
               <div className="row">
                 <div className="col-sm-12">
-                  <h6>© 2020 Tesla Mining Limited. All Rights Reserved.</h6>
+                  <h6>© 2020 SplashCash247 Ltd. All Rights Reserved.</h6>
                 </div>
               </div>
             </div>

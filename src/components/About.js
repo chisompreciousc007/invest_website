@@ -107,33 +107,22 @@ function About() {
             <div className="index_about_inner">
               <div className="row">
                 <div className="col-sm-12">
-                  <h2 className="common_heading">
-                    Welcome to Tesla Mining Limited
-                  </h2>
+                  <h2 className="common_heading">Welcome to Splashcash</h2>
                 </div>
                 <div className="col-sm-7">
                   <div className="about_left">
                     <p>
-                      Tesla Mining Limited was born in 2020 to give users an
-                      amazing, safe and reliable cloud mining platform. The ease
-                      and features of the website have enhanced our customer
-                      base to significant level which became our inspiration to
-                      open up new mining farms lately. We are dealing with
-                      cryptocurrency from the time concept of Bitcoin was
-                      introduced in the market. Our company is managed by the
-                      proficient personnel comprising brilliant programmers and
-                      engineers. Watchword of our team is to believe
-                      cryptocurrency is the future of global economy. With the
-                      experience of total five years in mining of cryptos, we
-                      have realized the need of safe, effective and prompt cloud
-                      mining servers in the industry. Consequently, we came up
-                      with the advanced technology to make mining accessible to
-                      all regardless of their age, location, budget or technical
-                      knowledge. Being a part of this evolving reality is the
-                      thing that drives us to establish ourselves as the leader
-                      keeps us going in providing our customers with the best
-                      cryptocurrency mining service. Try the future digital
-                      currency now.
+                      SplashCash247 was born in 2020 to give users an amazing,
+                      safe and reliable P2P platform. The ease and features of
+                      the website have enhanced our customer base to significant
+                      level. Our company is managed by proficient personnels
+                      comprising brilliant programmers and engineers. With our
+                      experience in Money Management, we have realized the need
+                      of safe, effective and prompt P2P system. Consequently, we
+                      came up with the advanced technology to make P2P
+                      Investment Secure and accessible to all regardless of
+                      their age, location, budget or technical knowledge. Try
+                      the future digital investment with us now.
                     </p>
                   </div>
                 </div>
@@ -159,11 +148,11 @@ function About() {
                       alt="wrkprcsicn1"
                       className="img-responsive"
                     />
-                    <h5>Cloud based GHS</h5>
+                    <h5>Dedicated and Secure Server</h5>
                     <p>
-                      An innovative method to earn Bitcoins through collective{" "}
+                      We have dedicated servers to ensure the security of your
                       <br />
-                      mining...
+                      funds...
                     </p>
                   </div>
                 </div>
@@ -176,10 +165,11 @@ function About() {
                       alt="wrkprcsicn1"
                       className="img-responsive"
                     />
-                    <h5>Get Easy GH/S</h5>
+                    <h5>Easy GH/PH</h5>
                     <p>
-                      Buy easily Hash Power, get your
-                      <br /> GH/S and start to <br /> earn...
+                      It is easy to PH and GH with our simple web design
+                      <br />
+                      One Click and start <br /> earning...
                     </p>
                   </div>
                 </div>
@@ -192,11 +182,11 @@ function About() {
                       alt="wrkprcsicn1"
                       className="img-responsive"
                     />
-                    <h5>Real-Time Earnings</h5>
+                    <h5>24/7 Support</h5>
                     <p>
-                      You can check the status of your earnings from your panel,
-                      they
-                      <br />{" "}
+                      We are always available through all our channels
+                      <br />
+                      to answer any questions...
                     </p>
                   </div>
                 </div>
@@ -209,10 +199,10 @@ function About() {
                       alt="wrkprcsicn1"
                       className="img-responsive"
                     />
-                    <h5>Withdraw Bitcoins</h5>
+                    <h5>Fast and Reliable Matching</h5>
                     <p>
-                      You can withdraw the profit received in accordance with
-                      the contracts instantly.
+                      Our matching is fast and reliable and runs round the
+                      clock.
                     </p>
                   </div>
                 </div>
@@ -221,7 +211,7 @@ function About() {
           </div>
         </section>
 
-        <section className="services" style={{ marginBottom: "60px" }}>
+        {/* <section className="services" style={{ marginBottom: "60px" }}>
           <div className="container">
             <div className="row">
               <div className="col-md-6 col-sm-12">
@@ -291,7 +281,7 @@ function About() {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         <section className="secure">
           <div className="container">
@@ -380,16 +370,7 @@ function About() {
           <div className="footer_top">
             <div className="container">
               <div className="row">
-                <div className="col-sm-2">
-                  <div className="payment">
-                    <img
-                      src="images/bitcoin_logo.png"
-                      alt="bitcoin_logo"
-                      className="img-responsive"
-                    />
-                    <span>Accepted Here</span>
-                  </div>
-                </div>
+                <div className="col-sm-2"></div>
                 <div className="col-sm-8">
                   <div className="footer_menu">
                     <ul>
@@ -411,15 +392,7 @@ function About() {
                     </ul>
                   </div>
                 </div>
-                <div className="col-sm-2">
-                  <div className="footer_logo">
-                    <img
-                      src="images/logo.png"
-                      alt="footer_logo"
-                      className="img-responsive"
-                    />
-                  </div>
-                </div>
+                <div className="col-sm-2"></div>
               </div>
             </div>
           </div>
@@ -427,7 +400,7 @@ function About() {
             <div className="container">
               <div className="row">
                 <div className="col-sm-12">
-                  <h6>© 2020 Tesla Mining Limited. All Rights Reserved.</h6>
+                  <h6>© 2020 SplashCash247 Ltd. All Rights Reserved.</h6>
                 </div>
               </div>
             </div>

@@ -470,16 +470,7 @@ function Home() {
         <div className="footer_top">
           <div className="container">
             <div className="row">
-              <div className="col-sm-2">
-                <div className="payment">
-                  <img
-                    src="images/bitcoin_logo.png"
-                    alt="bitcoin_logo"
-                    className="img-responsive"
-                  />
-                  <span>Accepted Here</span>
-                </div>
-              </div>
+              <div className="col-sm-2"></div>
               <div className="col-sm-8">
                 <div className="footer_menu">
                   <ul>

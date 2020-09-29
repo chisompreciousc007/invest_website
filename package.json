@@ -1,38 +1,40 @@
 {
   "name": "btcsitewithreact",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
-    "axios": "^0.20.0",
-    "bootswatch": "^4.5.2",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-router": "^5.2.0",
-    "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.3"
-  },
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "nodemon server.js"
   },
-  "eslintConfig": {
-    "extends": "react-app"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/novaprecious/obyno.git"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/novaprecious/obyno/issues"
+  },
+  "homepage": "https://github.com/novaprecious/obyno#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.4",
+    "@hapi/joi": "^17.1.1",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express-fileupload": "^1.1.7-alpha.4",
+    "express-jwt": "^6.0.0",
+    "gh-pages": "^3.1.0",
+    "js-cookie": "^2.2.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.20",
+    "mongoose-unique-validator": "^2.0.3",
+    "mongoose-validator": "^2.1.0",
+    "multer": "^1.4.2",
+    "uuid": "^8.2.0"
   }
 }

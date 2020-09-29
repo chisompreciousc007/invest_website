@@ -1,0 +1,166 @@
+
+@media only screen and (max-width: 1199px){
+.header_top_right ul li a{ min-width:92px !important;}
+.header_top_middle h4:nth-child(1){ width:210px;}
+.header_top_middle h4:nth-child(2){ width:155px;}
+.logo > ul{ margin:48px 0;}
+.index_banner_content h2{ font-size:25px; line-height:40px; margin:0;}
+.index_banner_content h2 span{ font-size:25px;}
+.index_banner_content p{ padding:0; margin-bottom:10px;}
+.index_banner_inner{ top:230px;}
+.package_box ul{ padding:20px 12px;}
+.packages_inner{ margin-top:-80px;}
+.about_right ul li img { margin: 25px 15px;}
+.payment span{ letter-spacing:0;}
+.footer_menu ul li{ padding:0 15px;}
+.admin_menu ul li{ margin:5px 0;}
+.currency_hashrate_inner h3{ font-size:20px;}
+.select_currency h3{ font-size:16px;}
+.currency_hashrate_inner h3 { font-size: 16px;}
+.work_process_box{ width:100%;}
+
+}
+
+@media only screen and (max-width: 991px){
+header{ position:inherit; background:#000;} 
+.packages_inner{ margin-top:30px;}
+.calc_input span { padding: 0 30px 0 0;}
+.package_box h2{ margin:0; font-size:25px;}
+.package_box{ text-align:center;}
+.package_box h2 { margin: 18px 0;}
+.package_box ul { padding: 0 12px;}
+.index_banner_inner { /*top: 100px;*/}
+.calc_input { padding: 11px 0;}
+.calc_output > h4 span { font-size: 15px; line-height: 24px;}
+.about_right ul li img { margin: 30px 15px;}
+.about_right ul li{ margin:20px 0;}
+.services_left ul li img{ float:left;}
+.services_left ul li h4{ text-align:left;}
+.video_img_1{ display:none;}
+.video_img_2{ display: inline-block;}
+.services_right{ text-align:center;}
+.footer_menu ul li { padding: 0 8px;}
+.footer_menu ul li a{ font-size:12px;}
+.admin_head_left{ text-align:center; margin-bottom:15px;}
+.admin_head_left h4{ width:100%;}
+.referral_link{ text-align:center;}
+.currency_hashrate_inner img{ float:none; margin:0;}
+.currency_hashrate_inner h3{ text-align:center; border-radius:5px; margin-top: -18px; padding-top: 15px;}
+.currency_hashrate_inner{ text-align:center;}
+.mining_exp_left{ margin-bottom:20px;}
+.hashpower_range {margin: 49px 0;}
+.summary_box h3{ font-size:16px;}
+#header-image2 {background-position:center;background-size:auto;}
+}
+
+@media only screen and (max-width: 767px){
+	.spend_sec .calc_input {
+  margin-bottom: 0;
+}
+.header_top_middle{ font-size:0;}
+.header_top_middle h4{ width:50% !important;}
+.header_top_right{ text-align:left;}
+.header_top_right ul li a { margin: 0 10px 0 0;}
+.header_top_middle{ padding: 12px 0;}
+.logo > ul{ vertical-align:middle; float:none;}
+
+.headermenu .navbar-inverse .navbar-toggle .icon-bar{ background-color:#fff;}
+.headermenu .navbar-inverse .navbar-toggle{ border-color:#fff; margin: 8px 0; border-radius:0;}
+.headermenu .navbar-inverse .navbar-toggle:focus, 
+.headermenu .navbar-inverse .navbar-toggle:hover{ background:none; border-color:#ffae00;}
+.headermenu .navbar-nav{ width:100%; margin:0;}
+.headermenu .navbar-nav > li > a{ border:none !important;}
+.navbar-inverse .navbar-nav .open .dropdown-menu > li > a { text-align: center;}
+/*.index_banner_inner { top: 50px;}*/
+.packages_inner{ border-radius:0; background:none; box-shadow:none;}
+.packages_inner .package_box{ border-radius:0 !important; }
+.package_box{-webkit-box-shadow: 0px 10px 20px 3px rgba(0,0,0,0.5);
+-moz-box-shadow: 0px 10px 20px 3px rgba(0,0,0,0.5);
+box-shadow: 0px 10px 20px 3px rgba(0,0,0,0.5); 
+margin-bottom:30px;}
+.packages_inner .col-sm-4:last-child .package_box{-webkit-box-shadow: 0px 10px 20px 3px rgba(0,0,0,0.5) !important;
+-moz-box-shadow: 0px 10px 20px 3px rgba(0,0,0,0.5) !important;
+box-shadow: 0px 10px 20px 3px rgba(0,0,0,0.5) !important;}
+.calculator_inner{ text-align:center;}
+.calc_input span { padding: 0 10px;}
+.calc_output{ padding:0;}
+.calc_input{ margin-bottom:65px;}
+.calc_output{ margin-top:30px;}
+.about_right ul li img { margin: 10px 15px;}
+.about_right ul li { margin: 8px 0;}
+.footer_bottom{ text-align:center;}
+.footer_top{ text-align:center;}
+.payment span{ display:block;}
+.hashpower_left{text-align: left; margin-bottom:20px;}
+.hashpower_left img{ float:left;}
+.hashpower_left, .hashpower_right{ width:390px; display:inline-block;}
+.hash_power_content{ text-align:center;}
+.hashpower_range { margin: 10px 0;}
+.payment_type h4{ line-height:28px;}
+.payment_type h4 span{ font-size:16px;}
+.search_box{ text-align:left;}
+.table_search select{ margin-bottom:20px;}
+.inner_page_heading{ text-align:center;}
+.inner_page_breadcrumb{ text-align: center;}
+.pulse{ width:100px; height:100px;}
+
+}
+
+@media only screen and (max-width:600px){
+.index_banner_content p{ display:none;}
+.index_banner_content h2{ margin-bottom:8px;}
+.about_right ul li img{ float:left !important;}
+.about_right ul li:nth-child(2n){ text-align:left;}
+.about_right ul li img { margin: 20px 15px;}
+.footer_menu ul li { margin: 8px 0;}
+
+}
+
+@media only screen and (max-width: 520px){
+.header_top_middle h4 { width: 100% !important; padding:8px 0;}
+.calc_input span{ width:100%; margin-bottom:20px;}
+.calculator_inner > span{ margin: 160px auto 0;}
+.calc_output{ margin:0;}
+.calculator_inner{ padding:25px 12px;}
+.about_right ul li img { margin: 30px 15px;}
+.currency_hashrate .col-xs-6{ width:100%;}
+.mining_allocations .col-xs-6{ width:100%;}
+.work_process .col-xs-6{ width:100%;}
+.common_heading{ font-size:25px;}
+
+}
+
+@media only screen and (max-width: 420px){
+.index_banner_inner { top: 20px;}
+.about_right ul li img{ float:none !important; margin:0 0 10px 0;}
+.index_about_inner{ padding:30px 15px;}
+.services_left ul li{ text-align:center;}
+.services_left ul li img { float: none;}
+.services_left ul li h4{ padding:0; text-align:center;} 
+.hashpower_left h2, .hashpower_right h2{ font-size:20px;}
+.hashpower_left{ margin-bottom:20px;}
+.hashpower_left, .hashpower_right{ width:100%; text-align:center;}
+.hashpower_left img,
+.hashpower_right img{ float:none;}
+.currency_hashrate_inner{ margin-bottom:20px;}
+.payment_type ul li{ margin-bottom:10px;}
+.register_form_inner .col-xs-6{ width:100%;}
+
+}
+
+@media only screen and (max-width: 360px){
+.index_banner_content h2,
+.index_banner_content h2 span{ font-size:18px;}
+.index_banner_content h2{ line-height:24px;}
+.index_banner_content span a{ margin:0 5px;}
+.allocation .col-xs-6{ width:100%;}
+.allocation_left{ margin-bottom:20px;}
+.allocation_left, .allocation_right{ text-align:center;}
+
+}
+
+@media only screen and (max-width: 320px){
+.pagination a{ width:35px; height:35px; margin:0 3px;}
+.pagination a i{ line-height:35px; font-size:12px;}
+
+}

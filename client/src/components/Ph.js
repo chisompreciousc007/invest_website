@@ -20,9 +20,10 @@ function PhComponent({
           "linear-gradient(45deg, rgba(248,186,18,1) 0%,rgba(167,80,37,1) 100%",
         // backgroundColor: "#b58900",
         textAlign: "left",
-        color: "#fff",
+        color: "black",
         margin: "5px",
         borderRadius: "5px",
+        fontWeight: "bold",
       }}
     >
       <h4>{title}</h4>
@@ -62,6 +63,7 @@ function PhComponent({
                 </div>
                 <div class="input-group-append">
                   <button
+                    style={{ color: "black" }}
                     type="button"
                     className="btn btn-default"
                     id=""

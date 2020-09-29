@@ -44,7 +44,7 @@ function Referals({ match }) {
         <div className="header_top">
           <div className="container">
             <div className="row">
-              <div className="col-md-4 col-sm-6 col-xs-6">
+              <div className="col-md-4 col-sm-6 col-xs-5">
                 <div className="logo">
                   <a href="/dashboard">
                     <img
@@ -56,23 +56,10 @@ function Referals({ match }) {
                   <ul></ul>
                 </div>
               </div>
-              <div className="col-md-5 col-sm-8 col-xs-8">
-                <div className="header_top_middle">
-                  <a
-                    href="https://t.me/teslamininglimited"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <img
-                      src="images/tel.png"
-                      alt="telegram icon"
-                      className="face"
-                    />
-                    &nbsp; Telegram{" "}
-                  </a>
-                </div>
+              <div className="col-md-5 col-sm-8 col-xs-3">
+                <div className="header_top_middle"></div>
               </div>
-              <div className="col-md-3 col-sm-4 col-xs-8">
+              <div className="col-md-3 col-sm-4 col-xs-3">
                 <div className="header_top_right">
                   <ul>
                     <li>
@@ -128,49 +115,36 @@ function Referals({ match }) {
         </div>
 
         <section className="admin_body">
-          <div className="container admin_menu">
+          <div className="container admin_menu" style={{ padding: "0px 0" }}>
             <div className="row">
               <div className="col-sm-12">
                 <ul>
                   <li>
-                    <a href="/dashboard">
+                    <a href="/dashboard" style={{ width: "80px" }}>
                       <i className="ti-dashboard"></i>
                       <span>Dashboard</span>
                     </a>
                   </li>
                   <li>
-                    <a href="/deposit">
+                    <a href="/deposit" style={{ width: "80px" }}>
                       <i className="ti-cloud"></i>
-                      <span>Make Deposit</span>
+                      <span>Deposit</span>
                     </a>
                   </li>
-                  {/* <li><a href="/deposit_list"><i className="ti-server"></i><span>Deposit List</span></a>
-                                        </li> */}
+
                   <li>
-                    <a href="/transactions">
+                    <a href="/transactions" style={{ width: "80px" }}>
                       <i className="ti-briefcase"></i>
                       <span>Transactions</span>
                     </a>
                   </li>
+
                   <li>
-                    <a href="/withdraw">
-                      <i className="ti-download"></i>
-                      <span>Withdraw</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/referals">
-                      <i className="ti-user"></i>
-                      <span>Your Refferals</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/edit_account">
+                    <a href="/edit_account" style={{ width: "80px" }}>
                       <i className="ti-lock"></i>
-                      <span>Edit Account</span>
+                      <span>Account</span>
                     </a>
                   </li>
-                  {/* <li><a href="/security"><i className="ti-lock"></i><span>Security Settings</span></a></li> */}
                 </ul>
               </div>
             </div>
@@ -194,55 +168,58 @@ function Referals({ match }) {
                           <p style={{ color: "#FFFFFF" }}>Account Name:</p>
                         </td>
                         <td>
+                          <p style={{ color: "#FFFFFF" }}>test user</p>
+                        </td>
+                      </tr>
+                      <br />
+                      <tr>
+                        <td>
+                          <p style={{ color: "#FFFFFF" }}>Username:</p>
+                        </td>
+                        <td>
                           <p style={{ color: "#FFFFFF" }}>testuser3</p>
                         </td>
                       </tr>
                       <br />
                       <tr>
                         <td>
-                          <p style={{ color: "#FFFFFF" }}>Your Full Name:</p>
+                          <p style={{ color: "#FFFFFF" }}>Phone:</p>
                         </td>
                         <td>
-                          <input
-                            type="text"
-                            name="fullname"
-                            value="preccious prec"
-                            class="inpts"
-                            size="30"
-                          />
+                          <p style={{ color: "#FFFFFF" }}>08012345678</p>
                         </td>
                       </tr>
                       <br />
                       <tr>
                         <td>
-                          <p style={{ color: "#FFFFFF" }}>New Password:</p>
+                          <p style={{ color: "#FFFFFF" }}>Bank Account Name:</p>
                         </td>
                         <td>
-                          <input
-                            type="password"
-                            name="password"
-                            value=""
-                            class="inpts"
-                            size="10"
-                          />
+                          <p style={{ color: "#FFFFFF" }}>Test User</p>
                         </td>
                       </tr>
                       <br />
                       <tr>
                         <td>
-                          <p style={{ color: "#FFFFFF" }}>Retype Password:</p>
+                          <p style={{ color: "#FFFFFF" }}>
+                            Bank Account Number:
+                          </p>
                         </td>
                         <td>
-                          <input
-                            type="password"
-                            name="password2"
-                            value=""
-                            class="inpts"
-                            size="20"
-                          />
+                          <p style={{ color: "#FFFFFF" }}>123456789</p>
                         </td>
                       </tr>
                       <br />
+                      <tr>
+                        <td>
+                          <p style={{ color: "#FFFFFF" }}>Bank Name:</p>
+                        </td>
+                        <td>
+                          <p style={{ color: "#FFFFFF" }}>Best bank</p>
+                        </td>
+                      </tr>
+                      <br />
+
                       <tr>
                         <td>
                           <p style={{ color: "#FFFFFF" }}>E-mail address:</p>
@@ -256,7 +233,7 @@ function Referals({ match }) {
                           <input
                             type="submit"
                             value="Change Account data"
-                            class="sbmt"
+                            className="sbmt"
                           />
                         </td>
                       </tr>
@@ -404,16 +381,7 @@ function Referals({ match }) {
           <div className="footer_top">
             <div className="container">
               <div className="row">
-                <div className="col-sm-2">
-                  <div className="payment">
-                    <img
-                      src="images/bitcoin_logo.png"
-                      alt="bitcoin_logo"
-                      className="img-responsive"
-                    />
-                    <span>Accepted Here</span>
-                  </div>
-                </div>
+                <div className="col-sm-2"></div>
                 <div className="col-sm-8">
                   <div className="footer_menu">
                     <ul>
@@ -435,15 +403,7 @@ function Referals({ match }) {
                     </ul>
                   </div>
                 </div>
-                <div className="col-sm-2">
-                  <div className="footer_logo">
-                    <img
-                      src="images/logo.png"
-                      alt="footer_logo"
-                      className="img-responsive"
-                    />
-                  </div>
-                </div>
+                <div className="col-sm-2"></div>
               </div>
             </div>
           </div>
@@ -451,7 +411,7 @@ function Referals({ match }) {
             <div className="container">
               <div className="row">
                 <div className="col-sm-12">
-                  <h6>© 2020 Tesla Mining Limited.ltd. All Rights Reserved.</h6>
+                  <h6>© 2020 Splashcash247. All Rights Reserved.</h6>
                 </div>
               </div>
             </div>

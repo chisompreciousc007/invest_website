@@ -44,7 +44,7 @@ function Dashboard({ match }) {
         <div className="header_top">
           <div className="container">
             <div className="row">
-              <div className="col-md-4 col-sm-6 col-xs-6">
+              <div className="col-md-4 col-sm-6 col-xs-5">
                 <div className="logo">
                   <a href="/dashboard">
                     <img
@@ -56,23 +56,10 @@ function Dashboard({ match }) {
                   <ul></ul>
                 </div>
               </div>
-              <div className="col-md-5 col-sm-8 col-xs-8">
-                <div className="header_top_middle">
-                  <a
-                    href="https://t.me/teslamininglimited"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <img
-                      src="images/tel.png"
-                      alt="telegram icon"
-                      className="face"
-                    />
-                    &nbsp; Telegram{" "}
-                  </a>
-                </div>
+              <div className="col-md-5 col-sm-8 col-xs-3">
+                <div className="header_top_middle"></div>
               </div>
-              <div className="col-md-3 col-sm-4 col-xs-8">
+              <div className="col-md-3 col-sm-4 col-xs-3">
                 <div className="header_top_right">
                   <ul>
                     <li>
@@ -128,49 +115,36 @@ function Dashboard({ match }) {
         </div>
 
         <section className="admin_body">
-          <div className="container admin_menu">
+          <div className="container admin_menu" style={{ padding: "0px 0" }}>
             <div className="row">
               <div className="col-sm-12">
                 <ul>
                   <li>
-                    <a href="/dashboard">
+                    <a href="/dashboard" style={{ width: "80px" }}>
                       <i className="ti-dashboard"></i>
                       <span>Dashboard</span>
                     </a>
                   </li>
                   <li>
-                    <a href="/deposit">
+                    <a href="/deposit" style={{ width: "80px" }}>
                       <i className="ti-cloud"></i>
-                      <span>Make Deposit</span>
+                      <span>Deposit</span>
                     </a>
                   </li>
-                  {/* <li><a href="/deposit_list"><i className="ti-server"></i><span>Deposit List</span></a>
-                                        </li> */}
+
                   <li>
-                    <a href="/earnings">
+                    <a href="/transactions" style={{ width: "80px" }}>
                       <i className="ti-briefcase"></i>
                       <span>Transactions</span>
                     </a>
                   </li>
+
                   <li>
-                    <a href="/withdraw">
-                      <i className="ti-download"></i>
-                      <span>Withdraw</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/referals">
-                      <i className="ti-user"></i>
-                      <span>Your Refferals</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/edit_account">
+                    <a href="/edit_account" style={{ width: "80px" }}>
                       <i className="ti-lock"></i>
-                      <span>Edit Account</span>
+                      <span>Account</span>
                     </a>
                   </li>
-                  {/* <li><a href="/security"><i className="ti-lock"></i><span>Security Settings</span></a></li> */}
                 </ul>
               </div>
             </div>
@@ -183,31 +157,16 @@ function Dashboard({ match }) {
             <div className="row">
               <div className="col-md-5 col-sm-12">
                 <div className="admin_head_left">
-                  <img
-                    src="images/user_img.png"
-                    alt="user_img"
-                    className="img-responsive"
-                  />
                   <h4>
                     Hello, testuser3
                     <span>
-                      Your referral link:https://teslamining.ltd/?ref=testuser3
+                      Your referral
+                      link:https://splashcash247.com/signup=testuser3
                     </span>
                   </h4>
                 </div>
               </div>
-              <div className="col-md-7 col-sm-12">
-                {/* <div className="referral_link">
-                                        <div className="btn-group">
-                                            <a href="/me" className="btn btn-reflink btn-email" style={{ "border": "none" }}>
-
-
-
-                                            </a></div><a href="/me" className="btn btn-reflink btn-email" style={{ "border": "none" }}>
-                                            <span></span></a><a href="/referallinks" className="btn btn-default">Get Banners</a>
-
-                                    </div> */}
-              </div>
+              <div className="col-md-7 col-sm-12"></div>
             </div>
 
             <div className="currency_hashrate">
@@ -453,16 +412,7 @@ function Dashboard({ match }) {
           <div className="footer_top">
             <div className="container">
               <div className="row">
-                <div className="col-sm-2">
-                  <div className="payment">
-                    <img
-                      src="images/bitcoin_logo.png"
-                      alt="bitcoin_logo"
-                      className="img-responsive"
-                    />
-                    <span>Accepted Here</span>
-                  </div>
-                </div>
+                <div className="col-sm-2"></div>
                 <div className="col-sm-8">
                   <div className="footer_menu">
                     <ul>
@@ -484,15 +434,7 @@ function Dashboard({ match }) {
                     </ul>
                   </div>
                 </div>
-                <div className="col-sm-2">
-                  <div className="footer_logo">
-                    <img
-                      src="images/logo.png"
-                      alt="footer_logo"
-                      className="img-responsive"
-                    />
-                  </div>
-                </div>
+                <div className="col-sm-2"></div>
               </div>
             </div>
           </div>
@@ -500,7 +442,7 @@ function Dashboard({ match }) {
             <div className="container">
               <div className="row">
                 <div className="col-sm-12">
-                  <h6>© 2020 Tesla Mining Limited.ltd. All Rights Reserved.</h6>
+                  <h6>© 2020 Splashcash247. All Rights Reserved.</h6>
                 </div>
               </div>
             </div>

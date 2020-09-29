@@ -1,7 +1,16 @@
 import React from "react";
 function Spinner() {
   return (
-    <div class="lds-roller" style={{ marginLeft: "50%" }}>
+    <div
+      class="lds-roller"
+      style={{
+        zIndex: "999",
+        left: "30%",
+        position: "absolute",
+        top: "10%",
+        width: "30%",
+      }}
+    >
       <div></div>
       <div></div>
     </div>

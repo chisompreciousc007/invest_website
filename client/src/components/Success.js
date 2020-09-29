@@ -3,7 +3,7 @@ import React from "react";
 function Success({ savedUser, history }) {
   return (
     <div
-      class="alert alert-dismissible alert-success position-fixed mt-4 w-50 p-3"
+      className="alert alert-dismissible alert-success position-fixed mt-4 w-50 p-3"
       style={{
         zIndex: "999",
         left: "10%",
@@ -15,14 +15,14 @@ function Success({ savedUser, history }) {
     >
       <button
         type="button"
-        class="close"
+        className="close"
         data-dismiss="alert"
         onClick={() => history.push("/login")}
       >
         &times;
       </button>
-      <h4 class="alert-heading">Registration Successful!</h4>
-      <p class="mb-0">hello {savedUser}, Please Sign In to Continue</p>
+      <h4 className="alert-heading">Registration Successful!</h4>
+      <p className="mb-0">hello {savedUser}, Please Sign In to Continue</p>
     </div>
   );
 }

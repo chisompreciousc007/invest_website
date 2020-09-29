@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import Spinner from "./Spinner";
 import axios from "axios";
+import Error from "./Error";
 
 function Login() {
   const history = useHistory();
@@ -14,6 +15,8 @@ function Login() {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowpassword] = useState(false);
+  const [response, setResponse] = useState(null);
+
   const onChangeCheckbox = (e) => {
     e.preventDefault();
     setIsChecked(e.target.checked);
@@ -49,6 +52,8 @@ function Login() {
       .catch((err) => {
         setLoading(false);
         console.log(err);
+        const errmsg = err.response.data;
+        setResponse(errmsg);
         setError(true);
       });
   };
@@ -62,10 +67,18 @@ function Login() {
     }
   }, []);
 
-  return loading ? (
-    <Spinner />
-  ) : (
+  return (
     <div>
+      {loading ? <Spinner /> : null}
+      {error ? (
+        <Error
+          response={response}
+          setError={() => {
+            setError(false);
+            window.location.reload();
+          }}
+        />
+      ) : null}
       <header className="inner_page_header">
         <div className="header_top">
           <div className="container">
@@ -163,16 +176,16 @@ function Login() {
         </div>
       </section>
       <div className="bottom_body inner_page_body">
-        <section class="common_page">
-          <div class="container">
-            <div class="container">
-              <div class="row">
-                <div class="col-sm-12">
+        <section className="common_page">
+          <div className="container">
+            <div className="container">
+              <div className="row">
+                <div className="col-sm-12">
                   <form onSubmit={submitHandler} name="mainform">
-                    <h2 class="common_heading">Login</h2>
+                    <h2 className="common_heading">Login</h2>
 
-                    <div class="col-sm-12 col-xs-12">
-                      <div class="form_box form_box_login">
+                    <div className="col-sm-12 col-xs-12">
+                      <div className="form_box form_box_login">
                         <p
                           style={{
                             color: "white",
@@ -182,12 +195,12 @@ function Login() {
                           Invalid Username or Password
                         </p>
                         <span>
-                          <i class="fa fa-user"></i>
+                          <i className="fa fa-user"></i>
                           <input
                             placeholder="Username"
                             type="text"
                             name="username"
-                            class="inpts"
+                            className="inpts"
                             size="30"
                             required
                           />
@@ -195,17 +208,17 @@ function Login() {
                       </div>
                     </div>
 
-                    <div class="col-sm-12 col-xs-12">
+                    <div className="col-sm-12 col-xs-12">
                       {" "}
-                      <div class="form_box form_box_login">
+                      <div className="form_box form_box_login">
                         <span>
-                          <i class="fa fa-key"> </i>
+                          <i className="fa fa-key"> </i>
                           <input
                             type={showPassword ? "text" : "password"}
                             placeholder="Password"
                             onChange={inputHandler}
                             name="password"
-                            class="inpts"
+                            className="inpts"
                             size="30"
                             required
                           />
@@ -232,11 +245,11 @@ function Login() {
                       </div>
                     </div>
 
-                    <div class="col-sm-12 col-xs-12">
-                      <div class="form_box">
+                    <div className="col-sm-12 col-xs-12">
+                      <div className="form_box">
                         <b>
                           <input
-                            class="btn btn-primary"
+                            className="btn btn-primary"
                             type="submit"
                             value="Login"
                           />
@@ -245,8 +258,8 @@ function Login() {
                     </div>
                   </form>
 
-                  <div class="col-sm-12 col-xs-12 text-center">
-                    <div class="fp">
+                  <div className="col-sm-12 col-xs-12 text-center">
+                    <div className="fp">
                       <a href="/support">remember your login information</a>
                     </div>
                   </div>

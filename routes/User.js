@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const router = express.Router();
 const User = require("../models/user");
 const verify = require("../verifytoken");
-const { loginValidation } = require("../validation");
+// const { loginValidation } = require("../validation");
 
 router.get("/one", verify, async (req, res) => {
   try {
@@ -16,7 +16,7 @@ router.get("/one", verify, async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  //validate data before sending
+  // validate data before sending
   // const { error } = newUserValidation(req.body);
 
   // if (error) return res.status(400).send(error.details[0].message);
@@ -39,7 +39,6 @@ router.post("/", async (req, res) => {
     email: req.body.email,
     password: hashedPassword,
     phone: req.body.phone,
-    gender: req.body.gender,
     upline: req.body.upline,
     accountName: req.body.accountName,
     accountNo: req.body.accountNo,
@@ -76,11 +75,27 @@ router.post("/login", async (req, res) => {
   res.status(200).send(token);
 });
 
-router.get("/username", async (req, res) => {
+router.post("/username", async (req, res) => {
   // check if username is taken
+  console.log(req.body.username);
   const user = await User.findOne({ username: req.body.username });
 
-  if (user) return res.status(400).send("username already taken");
+  if (user) return res.send(true);
+  if (!user) return res.send(false);
+});
+router.post("/phone", async (req, res) => {
+  // check if username is taken
+  const user = await User.findOne({ phone: req.body.phone });
+
+  if (user) return res.send(true);
+  return res.send(false);
+});
+router.post("/email", async (req, res) => {
+  // check if email is taken
+  const user = await User.findOne({ email: req.body.email });
+
+  if (user) return res.send(true);
+  if (!user) return res.send(false);
 });
 
 router.get("/", async (req, res) => {

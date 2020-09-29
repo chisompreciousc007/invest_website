@@ -14,8 +14,9 @@ function SignUp({ match }) {
   const [usernameStatus, setUsernameStatus] = useState(null);
   const [emailStatus, setEmailStatus] = useState(null);
   const [phoneStatus, setPhoneStatus] = useState(null);
-  const [success, setSuccess] = useState(true);
+  const [success, setSuccess] = useState(false);
   const [savedUser, setSavedUser] = useState("");
+  const [loading, setLoading] = useState(false);
   const [user, setUser] = useState({
     name: "",
     username: "",
@@ -24,7 +25,7 @@ function SignUp({ match }) {
     phone: "",
     age: "",
     gender: "",
-    upline: "none",
+    upline: `${ref}`,
     accountName: "",
     accountNo: "",
     bank: "",
@@ -39,51 +40,85 @@ function SignUp({ match }) {
 
   const submitHandler = (e) => {
     e.preventDefault();
+    setLoading(true);
     console.log(user);
-    // axios
-    //     .post("http://localhost:4000/user/add", user)
-    //     .then((res) => {
-    //         console.log(res.data);
-    //         const resUser = res.data.name;
-    //         setSavedUser(resUser);
-    //         setSuccess(true)
-    //     })
-    //     .catch((err) => {
-    //         setError(true);
-    //         const errmsg = err.response.data;
-    //         console.log(typeof errmsg);
-    //         setResponse(errmsg)
-    //     });
+    axios.post("http://localhost:4000/users", user).then((res) => {
+      setLoading(false);
+      console.log(res.data);
+      const resUser = res.data.name;
+      setSavedUser(resUser);
+      setSuccess(true);
+      window.scrollTo(0, 0);
+    });
+    setLoading(false).catch((err) => {
+      const errmsg = err.response.data;
+      setResponse(errmsg);
+      setError(true);
+    });
   };
 
   const checkIfExist = (key) => {
     switch (key) {
       case "username":
+        console.log(user);
         axios
-          .post("http://localhost:4000/user/username", user)
+          .post("http://localhost:4000/users/username", user)
           .then((res) => {
-            console.log(res.data);
-            // const resUser = res.data.name;
-            // setSavedUser(resUser);
-            // setSuccess(true)
+            console.log("res from check username", res);
+            if (res.data === true)
+              setUsernameStatus("Already Exists, try another!");
+            if (res.data === false) setUsernameStatus("Available");
           })
           .catch((err) => {
-            setError(true);
             const errmsg = err.response.data;
-            console.log(typeof errmsg);
             setResponse(errmsg);
+            setError(true);
+            window.scrollTo(0, 0);
+          });
+
+        break;
+      case "email":
+        axios
+          .post("http://localhost:4000/users/email", user)
+          .then((res) => {
+            if (res.data === true)
+              setEmailStatus("Already Exists, try another!");
+            if (res.data === false) setEmailStatus("Available");
+          })
+          .catch((err) => {
+            const errmsg = err.response.data;
+            setResponse(errmsg);
+            setError(true);
+            window.scrollTo(0, 0);
+          });
+
+        break;
+      case "phone":
+        axios
+          .post("http://localhost:4000/users/phone", user)
+          .then((res) => {
+            if (res.data === true)
+              setPhoneStatus("Already Exists, try another!");
+            if (res.data === false) setPhoneStatus("Available");
+          })
+          .catch((err) => {
+            const errmsg = err.response.data;
+            setResponse(errmsg);
+            setError(true);
+            window.scrollTo(0, 0);
           });
 
         break;
 
       default:
+        console.log(user);
         break;
     }
-    console.log(user);
   };
 
   return (
     <div>
+      {loading ? <Spinner /> : null}
       {error ? (
         <Error
           response={response}
@@ -212,7 +247,7 @@ function SignUp({ match }) {
                           <span>
                             <i className="fa fa-user" aria-hidden="true"></i>
                             <input
-                              pattern="[a-zA-Z]"
+                              pattern="[a-zA-Z0-9 ]+"
                               minLength="8"
                               maxLength="50"
                               required
@@ -246,7 +281,9 @@ function SignUp({ match }) {
                               className="inpts"
                               size="30"
                               onChange={inputHandler}
-                              onBlur={() => {}}
+                              onBlur={() => {
+                                checkIfExist("username");
+                              }}
                             />
                           </span>
                         </div>
@@ -261,7 +298,6 @@ function SignUp({ match }) {
                           <span>
                             <i className="fa fa-envelope"></i>
                             <input
-                              onBlur={() => console.log("left username input")}
                               required
                               placeholder="Your E-mail Address"
                               type="email"
@@ -269,7 +305,10 @@ function SignUp({ match }) {
                               className="inpts"
                               size="30"
                               onChange={inputHandler}
-                              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                              // pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                              onBlur={() => {
+                                checkIfExist("email");
+                              }}
                             />
                           </span>
                         </div>
@@ -310,7 +349,7 @@ function SignUp({ match }) {
                               name="password2"
                               className="inpts"
                               size="30"
-                              onChange={(e) =>
+                              onBlur={(e) =>
                                 e.target.value === user.password
                                   ? setConfirmPass("Password Match!!")
                                   : setConfirmPass(
@@ -341,6 +380,9 @@ function SignUp({ match }) {
                               className="inpts"
                               size="30"
                               onChange={inputHandler}
+                              onBlur={() => {
+                                checkIfExist("phone");
+                              }}
                             />
                           </span>
                         </div>
@@ -351,7 +393,7 @@ function SignUp({ match }) {
                           <span>
                             <i className="fa fa-usd" aria-hidden="true"></i>
                             <input
-                              pattern="[a-zA-Z]+"
+                              pattern="[a-zA-Z ]+"
                               minLength="8"
                               maxLength="50"
                               required
@@ -390,7 +432,7 @@ function SignUp({ match }) {
                           <span>
                             <i className="fa fa-usd" aria-hidden="true"></i>
                             <input
-                              pattern="[a-zA-Z]+"
+                              pattern="[a-zA-Z ]+"
                               minLength="3"
                               maxLength="15"
                               required
@@ -409,17 +451,16 @@ function SignUp({ match }) {
                           <span>
                             <i className="fa fa-user" aria-hidden="true"></i>
                             <input
-                              pattern="[a-zA-Z0-9]"
-                              minLength="4"
-                              maxLength="15"
+                              pattern="[a-zA-Z0-9]+"
+                              minLength="3"
+                              maxLength="20"
                               required
-                              placeholder={
-                                ref === "new" ? "Enter Referal Username" : ref
-                              }
+                              placeholder={ref === "new" ? "" : ref}
                               type="text"
                               name="upline"
                               className="inpts"
                               size="30"
+                              disabled
                             />
                           </span>
                         </div>
@@ -437,7 +478,7 @@ function SignUp({ match }) {
                               defaultChecked
                             />{" "}
                             I agree with{" "}
-                            <a href="/terms">Terms and conditions</a>
+                            <a href="/rules">Terms and conditions</a>
                           </aside>{" "}
                         </div>{" "}
                       </div>

@@ -2,7 +2,7 @@ import React from "react";
 function Spinner() {
   return (
     <div
-      class="lds-roller"
+      className="lds-roller"
       style={{
         zIndex: "999",
         left: "30%",

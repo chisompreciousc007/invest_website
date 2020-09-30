@@ -4,11 +4,39 @@ const jwt = require("jsonwebtoken");
 const router = express.Router();
 const User = require("../models/user");
 const verify = require("../verifytoken");
-// const { loginValidation } = require("../validation");
+const { loginValidation } = require("../validation");
 
-router.get("/one", verify, async (req, res) => {
+const addHour = (date, value) => {
+  const dt = date;
+  dt.setHours(dt.getHours() + value);
+  return dt;
+};
+
+const blockUser = async (id) => {
+  await User.findByIdAndUpdate(
+    id,
+    {
+      isBlocked: true,
+    },
+    { new: true, runValidators: true, context: "query" },
+    function (err, result) {
+      if (err) {
+        return err;
+      } else {
+        return result;
+      }
+    }
+  );
+};
+router.get("/user", verify, async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.user });
+    if (!user.isActivated || user.wantToInvest) {
+      const dateNow = new Date();
+      const blockTime = addHour(user.updatedAt, 12);
+      console.log(dateNow, blockTime);
+      if (dateNow > blockTime) res.json(blockUser(req.user));
+    }
     res.json(user);
   } catch (err) {
     res.json({ message: err });
@@ -140,6 +168,22 @@ router.patch("/isActivated/:id", async (req, res) => {
     req.params.id,
     {
       isActivated: req.body.isActivated,
+    },
+    { new: true, runValidators: true, context: "query" },
+    function (err, result) {
+      if (err) {
+        res.json(err);
+      } else {
+        res.json(result);
+      }
+    }
+  );
+});
+router.patch("/unblock/:id", async (req, res) => {
+  await User.findByIdAndUpdate(
+    req.params.id,
+    {
+      isBlocked: false,
     },
     { new: true, runValidators: true, context: "query" },
     function (err, result) {

@@ -40,13 +40,12 @@ function Login() {
       localStorage.password = user.password;
       localStorage.checkbox = isChecked;
     }
-
     axios
       .post("http://localhost:4000/users/login", user)
       .then((res) => {
-        setLoading(false);
         document.cookie = `token=${res.data}`;
         console.log("token from server", res);
+        setLoading(false);
         history.push("/dashboard");
       })
       .catch((err) => {
@@ -60,6 +59,7 @@ function Login() {
   useEffect(() => {
     if (localStorage.checkbox && localStorage.username !== "") {
       setIsChecked(true);
+      console.log(localStorage.username);
       setUser({
         username: localStorage.username,
         password: localStorage.password,
@@ -203,6 +203,7 @@ function Login() {
                             className="inpts"
                             size="30"
                             required
+                            onChange={inputHandler}
                           />
                         </span>
                       </div>

@@ -23,16 +23,30 @@ function PhComponent({
         color: "black",
         margin: "5px",
         borderRadius: "5px",
-        fontWeight: "bold",
+        fontWeight: "bolder",
       }}
     >
       <h4>{title}</h4>
-      <h5 style={{ marginLeft: "0.5rem" }}>Account Name:{accountName}</h5>
-      <h5 style={{ marginLeft: "0.5rem" }}>Account Number:{accountNumber}</h5>
-      <h5 style={{ marginLeft: "0.5rem" }}>bank:{bank}</h5>
-      <h5 style={{ marginLeft: "0.5rem" }}>Phone:{phone}</h5>
-      <h5 style={{ marginLeft: "0.5rem" }}>Amount:{amount}</h5>
-      <h5 style={{ marginLeft: "0.5rem" }}>Due time: {duetime}</h5>
+      <h5 style={{ marginLeft: "0.5rem", marginBottom: "0.3rem" }}>
+        Account Name:{accountName}
+      </h5>
+      <h5 style={{ marginLeft: "0.5rem", marginBottom: "0.3rem" }}>
+        Account Number:{accountNumber}
+      </h5>
+      <h5 style={{ marginLeft: "0.5rem", marginBottom: "0.3rem" }}>
+        bank:{bank}
+      </h5>
+      <h5 style={{ marginLeft: "0.5rem", marginBottom: "0.3rem" }}>
+        Phone:{phone}
+      </h5>
+      <h5 style={{ marginLeft: "0.5rem", marginBottom: "0.3rem" }}>
+        Amount:{amount}
+      </h5>
+      <h5 style={{ marginLeft: "0.5rem", marginBottom: "0.3rem" }}>
+        You have 8 hours from
+        {duetime}
+        to make this Payment.
+      </h5>
       <div
         class="row"
         style={{

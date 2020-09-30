@@ -1,59 +1,68 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import SelectAmount from "./SelectAmount";
 import Ph from "./Ph";
+import Spinner from "./Spinner";
+import Error from "./Error";
 
 function Dashboard({ match }) {
   const history = useHistory();
-  const { ref } = match.params;
-  const [confirmPass, setConfirmPass] = useState("Re-Confirm password");
-  const [response, setResponse] = useState("");
   const [error, setError] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [savedUser, setSavedUser] = useState("");
-  const [user, setUser] = useState({
-    name: "",
-    username: "",
-    email: "",
-    password: "",
-    phone: "",
-    age: "",
-    gender: "",
-    upline: "ref",
-    accountName: "",
-    accountNo: "",
-    bank: "",
-  });
+  const [defaultFileLabel, setdefaultFileLabel] = useState("Choose File");
+  const [u, setUserData] = useState({});
   const [loading, setLoading] = useState(true);
   const [time, setTime] = useState(null);
   const [currentReceipt, setCurrentReceipt] = useState(null);
-  const [errormsg, setErrormsg] = useState(false);
   const [file, setFile] = useState(null);
-  const [day, setDay] = useState(null);
   const [uploadedFile, setUploadedFile] = useState({});
-  const [selectAmount, setSelectAmount] = useState(0);
-  // const { _id, name, isActivated, wantToCashout, wantToInvest, InvestAmt,
-  //     updatedAt, pendingInvestAmt, pendingCashoutAmt } = u;
-
-  // const inputHandler = (e) => {
-  //     e.preventDefault();
-  //     let key = e.target.name;
-  //     let value = e.target.value;
-  //     setUser((prev) => ({ ...prev, [key]: value }));
+  const [selectAmount, setSelectAmount] = useState(5000);
+  const [errormsg, setErrormsg] = useState(false);
+  const {
+    _id,
+    name,
+    isActivated,
+    wantToCashout,
+    wantToInvest,
+    InvestAmt,
+    updatedAt,
+    pendingInvestAmt,
+    pendingCashoutAmt,
+    isBlocked,
+  } = u;
+  // const addHour = (date, value) => {
+  //   console.log("date input in dashboard", date);
+  //   if (date !== undefined) {
+  //     const dt = date;
+  //     dt.setHours(dt.getHours() + value);
+  //     return setTime(dt);
+  //   }
+  //   return console.log("date not loaded");
   // };
-
-  // const submitHandler = (e) => {
-  //     e.preventDefault();
-  //     console.log(user)
-
-  // };
-
+  const getUser = () => {
+    axios
+      .get("http://localhost:4000/users/user", { withCredentials: true })
+      .then((res) => {
+        console.log(res.data);
+        setUserData((prevState) => ({
+          ...prevState,
+          ...res.data,
+        }));
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log("error from deposit: ", err.response);
+        return history.push("/");
+      });
+    //
+  };
+  useEffect(() => {
+    getUser();
+  }, []);
   const fileSelecthandler = (e) => {
     const filename = e.target.files[0].name;
     const file = e.target.files[0];
-    // setdefaultFileLabel(filename);
-    console.log(filename);
+    setdefaultFileLabel(filename);
     setFile(file);
     console.log(file);
   };
@@ -71,13 +80,13 @@ function Dashboard({ match }) {
 
       const { fileName, filePath } = res.data;
       setUploadedFile({ fileName, filePath });
-      axios
-        .patch(`http://localhost:4000/receipts/popPath/${currentReceipt._id}`, {
-          popPath: filePath,
-        })
-        .then((res) => {
-          console.log("edit popPath successful!!", res.data);
-        });
+      // axios
+      //   .patch(`http://localhost:4000/receipts/popPath/${currentReceipt._id}`, {
+      //     popPath: filePath,
+      //   })
+      //   .then((res) => {
+      //     console.log("edit popPath successful!!", res.data);
+      //   });
     } catch (error) {
       console.log(error);
       if (error.response.status === 500) {
@@ -87,8 +96,33 @@ function Dashboard({ match }) {
       }
     }
   };
+  const submitAmountHandler = (e) => {
+    e.preventDefault();
+    axios
+      .patch(`http://localhost:4000/users/wantToInvest/${_id}`, {
+        InvestAmt: +selectAmount,
+      })
+      .then((res) => {
+        console.log("edit wantToInvest successful!!", res.data);
+        history.push("/temp");
+        history.goBack();
+      })
+      .catch((err) => {
+        console.log("error from edit wwantToInvest: ", err.response);
+        setErrormsg(true);
+      });
+  };
+  const selectAmountHandler = (e) => {
+    e.preventDefault();
+    const v = e.target.value;
+    const val = +v;
+    setSelectAmount(val);
+    console.log(val);
+  };
 
-  return (
+  return loading ? (
+    <Spinner />
+  ) : !isBlocked ? (
     <div>
       <header className="inner_page_header">
         <div className="header_top">
@@ -200,29 +234,37 @@ function Dashboard({ match }) {
             </div>
           </div>
 
-          {/* <div
-            className="container"
-            style={{ marginTop: " 20px", marginBottom: "20px" }}
-          >
-            <div className="row">
-              <div className="col-md-5 col-sm-12">
-                <div className="admin_head_left"></div>
-              </div>
-              <div className="col-md-7 col-sm-12"></div>
-            </div>
-          </div> */}
-          <SelectAmount />
-          <Ph
-            title="Please pay an activation fee to be activated"
-            fileUpload={fileUploadHandler}
-            fileSelect={fileSelecthandler}
-            accountName={"gfjghfjh"}
-            accountNumber={"mainguider.accountNumber"}
-            bank={"mainguider.bank"}
-            phone={"mainguider.phone"}
-            amount={1000}
-            duetime={time}
-          />
+          {!isActivated ? (
+            <Ph
+              title="Please pay an activation fee to be activated"
+              fileUpload={fileUploadHandler}
+              fileSelect={fileSelecthandler}
+              accountName={"gfjghfjh"}
+              accountNumber={"mainguider.accountNumber"}
+              bank={"mainguider.bank"}
+              phone={"mainguider.phone"}
+              amount={1000}
+              duetime={time}
+            />
+          ) : !wantToInvest ? (
+            <SelectAmount
+              submitAmount={submitAmountHandler}
+              SelectAmount={selectAmountHandler}
+            />
+          ) : (
+            //ITERATE ALL THAT WILL BE PAID HERE
+            <Ph
+              title="Please pay an activation fee to be activated"
+              fileUpload={fileUploadHandler}
+              fileSelect={fileSelecthandler}
+              accountName={"gfjghfjh"}
+              accountNumber={"mainguider.accountNumber"}
+              bank={"mainguider.bank"}
+              phone={"mainguider.phone"}
+              amount={1000}
+              duetime={time}
+            />
+          )}
         </section>
 
         <section className="secure">
@@ -399,6 +441,13 @@ function Dashboard({ match }) {
         </footer>
       </header>
     </div>
+  ) : (
+    <Error
+      response="Your Account have been Blocked, Please write to support for verification and reactivation"
+      setError={() => {
+        history.push("/");
+      }}
+    />
   );
 }
 

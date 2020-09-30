@@ -1,13 +1,13 @@
 import React from "react";
 
-function SelectAmount({ duetime, submitAmount, SelectAmount }) {
+function SelectAmount({ submitAmount, SelectAmount }) {
   return (
     <div className="form-group">
-      <label htmlFor="exampleSelect1">
-        <h5>
-          Please Select an amount to invest, Your Deadline is <b>{duetime}</b>{" "}
-        </h5>
-      </label>
+      {/* <label htmlFor="exampleSelect1">
+          <h5>
+            Please Select an amount to invest, Your Deadline is <b>{duetime}</b>{" "}
+          </h5>
+        </label> */}
       <select
         onChange={SelectAmount}
         className="form-control"
@@ -25,18 +25,18 @@ function SelectAmount({ duetime, submitAmount, SelectAmount }) {
         <option value="20000">20,000</option>
         <option value="25000">25,000</option>
         <option value="30000">30,000</option>
-        <option value="30000">40,000</option>
-        <option value="30000">50,000</option>
-        <option value="30000">60,000</option>
-        <option value="30000">80,000</option>
-        <option value="30000">100,000</option>
-        <option value="30000">120,000</option>
-        <option value="30000">150,000</option>
-        <option value="30000">200,000</option>
-        <option value="30000">250,000</option>
-        <option value="30000">300,000</option>
-        <option value="30000">400,000</option>
-        <option value="30000">500,000</option>
+        <option value="40000">40,000</option>
+        <option value="50000">50,000</option>
+        <option value="60000">60,000</option>
+        <option value="80000">80,000</option>
+        <option value="100000">100,000</option>
+        <option value="120000">120,000</option>
+        <option value="150000">150,000</option>
+        <option value="200000">200,000</option>
+        <option value="250000">250,000</option>
+        <option value="300000">300,000</option>
+        <option value="400000">400,000</option>
+        <option value="500000">500,000</option>
       </select>
       <button
         type="button"

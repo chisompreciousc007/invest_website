@@ -1,44 +1,102 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
+import Spinner from "./Spinner";
+import Ph from "./Ph";
+import Error from "./Error";
 
 function Dashboard({ match }) {
-  // const history = useHistory();
-  // const { ref } = match.params;
-  // const [confirmPass, setConfirmPass] = useState('Re-Confirm password');
-  // const [response, setResponse] = useState("");
-  // const [error, setError] = useState(false);
-  // const [success, setSuccess] = useState(false);
-  // const [savedUser, setSavedUser] = useState("");
-  // const [user, setUser] = useState({
-  //     name: "",
-  //     username: "",
-  //     email: "",
-  //     password: "",
-  //     phone: "",
-  //     age: "",
-  //     gender: "",
-  //     upline: "ref",
-  //     accountName: "",
-  //     accountNo: "",
-  //     bank: ""
-
-  // });
-
-  // const inputHandler = (e) => {
-  //     e.preventDefault();
-  //     let key = e.target.name;
-  //     let value = e.target.value;
-  //     setUser((prev) => ({ ...prev, [key]: value }));
+  const history = useHistory();
+  const [u, setUserData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [defaultFileLabel, setdefaultFileLabel] = useState("Choose File");
+  const [file, setFile] = useState(null);
+  const [time, setTime] = useState(null);
+  const [uploadedFile, setUploadedFile] = useState({});
+  const {
+    _id,
+    name,
+    username,
+    isActivated,
+    wantToCashout,
+    wantToInvest,
+    InvestAmt,
+    updatedAt,
+    pendingInvestAmt,
+    pendingCashoutAmt,
+    isBlocked,
+  } = u;
+  // const addHour = (date, value) => {
+  //   console.log("date input in dashboard", date);
+  //   if (date !== undefined) {
+  //     const dt = date;
+  //     dt.setHours(dt.getHours() + value);
+  //     return setTime(dt);
+  //   }
+  //   return console.log("date not loaded");
   // };
 
-  // const submitHandler = (e) => {
-  //     e.preventDefault();
-  //     console.log(user)
+  const getUser = () => {
+    axios
+      .get("http://localhost:4000/users/user", { withCredentials: true })
+      .then((res) => {
+        console.log(res.data);
+        setUserData((prevState) => ({
+          ...prevState,
+          ...res.data,
+        }));
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log("error from dashboard: ", err.response);
+        return history.push("/");
+      });
+    //
+  };
+  useEffect(() => {
+    getUser();
+  }, []);
+  // const fileSelecthandler = (e) => {
+  //   const filename = e.target.files[0].name;
+  //   const file = e.target.files[0];
+  //   setdefaultFileLabel(filename);
+  //   setFile(file);
+  //   console.log(file);
+  // };
+  // const fileUploadHandler = async (e) => {
+  //   e.preventDefault();
+  //   const formData = new FormData();
+  //   formData.append("file", file);
+  //   console.log("formdata: ", formData);
+  //   try {
+  //     const res = await axios.post("http://localhost:4000/uploads", formData, {
+  //       headers: {
+  //         "Content-type": "multipart/form-data",
+  //       },
+  //     });
 
+  //     const { fileName, filePath } = res.data;
+  //     setUploadedFile({ fileName, filePath });
+  //     // axios
+  //     //   .patch(`http://localhost:4000/receipts/popPath/${currentReceipt._id}`, {
+  //     //     popPath: filePath,
+  //     //   })
+  //     //   .then((res) => {
+  //     //     console.log("edit popPath successful!!", res.data);
+  //     //   });
+  //   } catch (error) {
+  //     console.log(error);
+  //     if (error.response.status === 500) {
+  //       console.log("there was a problem with the server");
+  //     } else {
+  //       console.log(error.response.data.msg);
+  //     }
+  //   }
   // };
 
-  return (
+  return loading ? (
+    <Spinner />
+  ) : !isBlocked ? (
     <div>
       <header className="inner_page_header">
         <div className="header_top">
@@ -158,10 +216,10 @@ function Dashboard({ match }) {
               <div className="col-md-5 col-sm-12">
                 <div className="admin_head_left">
                   <h4>
-                    Hello, testuser3
+                    Hello, {name}
                     <span>
-                      Your referral
-                      link:https://splashcash247.com/signup=testuser3
+                      Your referral link:{" "}
+                      {`https://splashcash247.com/signup=${username}`}
                     </span>
                   </h4>
                 </div>
@@ -180,100 +238,96 @@ function Dashboard({ match }) {
                     marginRight: "auto",
                   }}
                 >
-                  <div className="col-sm-6">
+                  <div className="col-sm-6 col-xs-6">
                     <div className="summary_box">
-                      <h3>Investment</h3>
-                      <h4>
-                        Ƀ<b id="total_balance">0.00000000</b>
-                      </h4>
-
-                      <small></small>
-
-                      <span>
-                        Account Balance: Ƀ<b>0.00000000</b> &nbsp;
-                      </span>
-                      <h4>
-                        <span>
-                          Earned Total: Ƀ<b id="total_profit">0.00000000</b>
-                        </span>
-                      </h4>
+                      <h3>PH</h3>
+                      <h6>
+                        NGN<b id="total_balance">{InvestAmt}</b>
+                      </h6>
                     </div>
                   </div>
 
-                  <div className="col-sm-6">
+                  <div className="col-sm-6 col-xs-6">
                     <div className="summary_box">
-                      <h3>Profit</h3>
-                      <h4>
-                        Ƀ<b>0.00000000</b>
-                        <span>
-                          Total Contracts: Ƀ<b>0.00000000</b>
-                        </span>
-                        <span>
-                          Last Contarcts: <b>n/a</b> &nbsp;
-                        </span>
-                      </h4>
+                      <h3>GH</h3>
+                      <h6>
+                        NGN<b>{pendingCashoutAmt}</b>
+                      </h6>
                     </div>
                   </div>
-                  <div className="col-sm-6">
+                </div>
+                <div
+                  className="row"
+                  style={{
+                    width: "80%",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                  }}
+                >
+                  <div className="col-sm-6 col-xs-6">
                     <div className="summary_box">
-                      <h3>Investment</h3>
-                      <h4>
-                        Ƀ<b id="total_balance">0.00000000</b>
-                      </h4>
-
-                      <small></small>
-
-                      <span>
-                        Account Balance: Ƀ<b>0.00000000</b> &nbsp;
-                      </span>
-                      <h4>
-                        <span>
-                          Earned Total: Ƀ<b id="total_profit">0.00000000</b>
-                        </span>
-                      </h4>
+                      <h3>Total GH</h3>
+                      <h6>
+                        NGN<b id="total_balance">100,000</b>
+                      </h6>
                     </div>
                   </div>
-
-                  <div className="col-sm-6">
+                  <div className="col-sm-6 col-xs-6">
                     <div className="summary_box">
-                      <h3>Profit</h3>
-                      <h4>
-                        Ƀ<b>0.00000000</b>
-                        <span>
-                          Total Contracts: Ƀ<b>0.00000000</b>
-                        </span>
-                        <span>
-                          Last Contarcts: <b>n/a</b> &nbsp;
-                        </span>
-                      </h4>
+                      <h3>Total GH</h3>
+                      <h6>
+                        NGN<b>100,000</b>
+                      </h6>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="hash_power_content">
-            <div className="container">
-              <div className="row">
-                <div className="col-sm-6">
-                  <div className="hashpower_left">
-                    <h2>Deposit</h2>
-                    <a className="btn btn-white" href="?a=deposit">
-                      Click Here
-                    </a>
+          {isActivated ? (
+            <div className="hash_power_content">
+              <div className="container">
+                <div className="row">
+                  <div className="col-sm-6">
+                    <div className="hashpower_left">
+                      <h2>Deposit</h2>
+                      <a className="btn btn-white" href="?a=deposit">
+                        Click Here
+                      </a>
+                    </div>
                   </div>
-                </div>
-                <div className="col-sm-6">
-                  <div className="hashpower_right">
-                    <h2>Withdraw</h2>
-                    <a className="btn btn-primary" href="?a=withdraw">
-                      Click Here
-                    </a>
+                  <div className="col-sm-6">
+                    <div className="hashpower_right">
+                      <h2>Withdraw</h2>
+                      <a className="btn btn-primary" href="?a=withdraw">
+                        Click Here
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="hash_power_content">
+              <div className="container">
+                <div className="row">
+                  <div className="col-xs-12">
+                    <div className="hashpower_left">
+                      <h2>
+                        Pay a fee of NGN1000 to a guider to be activated. You
+                        have 8 hours from
+                        {time}
+                        to make this Payment.
+                      </h2>
+                      <a className="btn btn-white" href="/deposit">
+                        Click Here
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </section>
 
         <section className="secure">
@@ -450,6 +504,13 @@ function Dashboard({ match }) {
         </footer>
       </header>
     </div>
+  ) : (
+    <Error
+      response="Your Account have been Blocked, Please write to support for verification and reactivation"
+      setError={() => {
+        history.push("/");
+      }}
+    />
   );
 }
 

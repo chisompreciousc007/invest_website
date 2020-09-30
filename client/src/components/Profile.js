@@ -1,47 +1,33 @@
-import React, { useState } from "react";
-import axios from "axios";
-// import { useHistory } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import Header from "./Header";
+import Footer from "./Footer";
+import { useHistory } from "react-router-dom";
+import NavBar from "./NavBar";
+import { UserContext } from "./UserContext";
 
-function Referals({ match }) {
-  // const history = useHistory();
-  // const { ref } = match.params;
-  // const [confirmPass, setConfirmPass] = useState('Re-Confirm password');
-  // const [response, setResponse] = useState("");
+function Referals({}) {
+  const history = useHistory();
+
   // const [error, setError] = useState(false);
   // const [success, setSuccess] = useState(false);
   // const [savedUser, setSavedUser] = useState("");
-  // const [user, setUser] = useState({
-  //     name: "",
-  //     username: "",
-  //     email: "",
-  //     password: "",
-  //     phone: "",
-  //     age: "",
-  //     gender: "",
-  //     upline: "ref",
-  //     accountName: "",
-  //     accountNo: "",
-  //     bank: ""
-
-  // });
-
-  // const inputHandler = (e) => {
-  //     e.preventDefault();
-  //     let key = e.target.name;
-  //     let value = e.target.value;
-  //     setUser((prev) => ({ ...prev, [key]: value }));
-  // };
-
-  // const submitHandler = (e) => {
-  //     e.preventDefault();
-  //     console.log(user)
-
-  // };
+  const { user, setUser } = useContext(UserContext);
+  const {
+    _id,
+    name,
+    username,
+    accountName,
+    accountNo,
+    bank,
+    email,
+    phone,
+  } = user;
 
   return (
     <div>
       <header className="inner_page_header">
-        <div className="header_top">
+        <Header />
+        {/* <div className="header_top">
           <div className="container">
             <div className="row">
               <div className="col-md-4 col-sm-6 col-xs-5">
@@ -112,43 +98,10 @@ function Referals({ match }) {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <section className="admin_body">
-          <div className="container admin_menu" style={{ padding: "0px 0" }}>
-            <div className="row">
-              <div className="col-sm-12">
-                <ul>
-                  <li>
-                    <a href="/dashboard" style={{ width: "80px" }}>
-                      <i className="ti-dashboard"></i>
-                      <span>Dashboard</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/deposit" style={{ width: "80px" }}>
-                      <i className="ti-cloud"></i>
-                      <span>Deposit</span>
-                    </a>
-                  </li>
-
-                  <li>
-                    <a href="/transactions" style={{ width: "80px" }}>
-                      <i className="ti-briefcase"></i>
-                      <span>Transactions</span>
-                    </a>
-                  </li>
-
-                  <li>
-                    <a href="/edit_account" style={{ width: "80px" }}>
-                      <i className="ti-lock"></i>
-                      <span>Account</span>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
+          <NavBar />
 
           <div
             className="container"
@@ -156,7 +109,7 @@ function Referals({ match }) {
           >
             <div className="row">
               <div className="col-md-10 col-sm-12">
-                <form style={{ textAlign: "center", color: "#fff" }}>
+                <form style={{ textAlign: "left", color: "#fff" }}>
                   <h3>
                     <p style={{ color: "#FFFFFF" }}>Your account:</p>
                   </h3>
@@ -168,7 +121,7 @@ function Referals({ match }) {
                           <p style={{ color: "#FFFFFF" }}>Account Name:</p>
                         </td>
                         <td>
-                          <p style={{ color: "#FFFFFF" }}>test user</p>
+                          <p style={{ color: "#FFFFFF" }}>{name}</p>
                         </td>
                       </tr>
                       <br />
@@ -177,7 +130,7 @@ function Referals({ match }) {
                           <p style={{ color: "#FFFFFF" }}>Username:</p>
                         </td>
                         <td>
-                          <p style={{ color: "#FFFFFF" }}>testuser3</p>
+                          <p style={{ color: "#FFFFFF" }}>{username}</p>
                         </td>
                       </tr>
                       <br />
@@ -186,7 +139,7 @@ function Referals({ match }) {
                           <p style={{ color: "#FFFFFF" }}>Phone:</p>
                         </td>
                         <td>
-                          <p style={{ color: "#FFFFFF" }}>08012345678</p>
+                          <p style={{ color: "#FFFFFF" }}>{phone}</p>
                         </td>
                       </tr>
                       <br />
@@ -195,7 +148,7 @@ function Referals({ match }) {
                           <p style={{ color: "#FFFFFF" }}>Bank Account Name:</p>
                         </td>
                         <td>
-                          <p style={{ color: "#FFFFFF" }}>Test User</p>
+                          <p style={{ color: "#FFFFFF" }}>{accountName}</p>
                         </td>
                       </tr>
                       <br />
@@ -206,7 +159,7 @@ function Referals({ match }) {
                           </p>
                         </td>
                         <td>
-                          <p style={{ color: "#FFFFFF" }}>123456789</p>
+                          <p style={{ color: "#FFFFFF" }}>{accountNo}</p>
                         </td>
                       </tr>
                       <br />
@@ -215,7 +168,7 @@ function Referals({ match }) {
                           <p style={{ color: "#FFFFFF" }}>Bank Name:</p>
                         </td>
                         <td>
-                          <p style={{ color: "#FFFFFF" }}>Best bank</p>
+                          <p style={{ color: "#FFFFFF" }}>{bank}</p>
                         </td>
                       </tr>
                       <br />
@@ -224,7 +177,7 @@ function Referals({ match }) {
                         <td>
                           <p style={{ color: "#FFFFFF" }}>E-mail address:</p>
                         </td>
-                        <td>preciouscigwe@gmail.com</td>
+                        <td>{email}</td>
                       </tr>
                       <br />
                       <tr>
@@ -244,8 +197,9 @@ function Referals({ match }) {
             </div>
           </div>
         </section>
+        <Footer />
 
-        <section className="secure">
+        {/* <section className="secure">
           <div className="container">
             <div className="row">
               <div className="col-sm-12">
@@ -416,7 +370,7 @@ function Referals({ match }) {
               </div>
             </div>
           </div>
-        </footer>
+        </footer> */}
       </header>
     </div>
   );

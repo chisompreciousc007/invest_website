@@ -1,23 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import SelectAmount from "./SelectAmount";
 import Ph from "./Ph";
 import Spinner from "./Spinner";
 import Error from "./Error";
+import Footer from "./Footer";
+import Header from "./Header";
+import { UserContext } from "./UserContext";
+import NavBar from "./NavBar";
 
 function Dashboard({ match }) {
   const history = useHistory();
   const [error, setError] = useState(false);
   const [defaultFileLabel, setdefaultFileLabel] = useState("Choose File");
-  const [u, setUserData] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [time, setTime] = useState(null);
   const [currentReceipt, setCurrentReceipt] = useState(null);
   const [file, setFile] = useState(null);
   const [uploadedFile, setUploadedFile] = useState({});
   const [selectAmount, setSelectAmount] = useState(5000);
   const [errormsg, setErrormsg] = useState(false);
+  const { user, setUser } = useContext(UserContext);
   const {
     _id,
     name,
@@ -29,7 +33,7 @@ function Dashboard({ match }) {
     pendingInvestAmt,
     pendingCashoutAmt,
     isBlocked,
-  } = u;
+  } = user;
   // const addHour = (date, value) => {
   //   console.log("date input in dashboard", date);
   //   if (date !== undefined) {
@@ -39,26 +43,26 @@ function Dashboard({ match }) {
   //   }
   //   return console.log("date not loaded");
   // };
-  const getUser = () => {
-    axios
-      .get("http://localhost:4000/users/user", { withCredentials: true })
-      .then((res) => {
-        console.log(res.data);
-        setUserData((prevState) => ({
-          ...prevState,
-          ...res.data,
-        }));
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.log("error from deposit: ", err.response);
-        return history.push("/");
-      });
-    //
-  };
-  useEffect(() => {
-    getUser();
-  }, []);
+  // const getUser = () => {
+  //   axios
+  //     .get("http://localhost:4000/users/user", { withCredentials: true })
+  //     .then((res) => {
+  //       console.log(res.data);
+  //       setUserData((prevState) => ({
+  //         ...prevState,
+  //         ...res.data,
+  //       }));
+  //       setLoading(false);
+  //     })
+  //     .catch((err) => {
+  //       console.log("error from deposit: ", err.response);
+  //       return history.push("/");
+  //     });
+  //   //
+  // };
+  // useEffect(() => {
+  //   getUser();
+  // }, []);
   const fileSelecthandler = (e) => {
     const filename = e.target.files[0].name;
     const file = e.target.files[0];
@@ -125,7 +129,8 @@ function Dashboard({ match }) {
   ) : !isBlocked ? (
     <div>
       <header className="inner_page_header">
-        <div className="header_top">
+        <Header />
+        {/* <div className="header_top">
           <div className="container">
             <div className="row">
               <div className="col-md-4 col-sm-6 col-xs-5">
@@ -196,43 +201,10 @@ function Dashboard({ match }) {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <section className="admin_body">
-          <div className="container admin_menu" style={{ padding: "0px 0" }}>
-            <div className="row">
-              <div className="col-sm-12">
-                <ul>
-                  <li>
-                    <a href="/dashboard" style={{ width: "80px" }}>
-                      <i className="ti-dashboard"></i>
-                      <span>Dashboard</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/deposit" style={{ width: "80px" }}>
-                      <i className="ti-cloud"></i>
-                      <span>Deposit</span>
-                    </a>
-                  </li>
-
-                  <li>
-                    <a href="/transactions" style={{ width: "80px" }}>
-                      <i className="ti-briefcase"></i>
-                      <span>Transactions</span>
-                    </a>
-                  </li>
-
-                  <li>
-                    <a href="/edit_account" style={{ width: "80px" }}>
-                      <i className="ti-lock"></i>
-                      <span>Account</span>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
+          <NavBar />
 
           {!isActivated ? (
             <Ph
@@ -266,8 +238,9 @@ function Dashboard({ match }) {
             />
           )}
         </section>
+        <Footer />
 
-        <section className="secure">
+        {/* <section className="secure">
           <div className="container">
             <div className="row">
               <div className="col-sm-12">
@@ -438,7 +411,7 @@ function Dashboard({ match }) {
               </div>
             </div>
           </div>
-        </footer>
+        </footer> */}
       </header>
     </div>
   ) : (

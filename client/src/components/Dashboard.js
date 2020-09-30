@@ -1,31 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import Spinner from "./Spinner";
-import Ph from "./Ph";
 import Error from "./Error";
+import Footer from "./Footer";
+import Header from "./Header";
+import { UserContext } from "./UserContext";
+import NavBar from "./NavBar";
 
 function Dashboard({ match }) {
   const history = useHistory();
-  const [u, setUserData] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [defaultFileLabel, setdefaultFileLabel] = useState("Choose File");
-  const [file, setFile] = useState(null);
-  const [time, setTime] = useState(null);
-  const [uploadedFile, setUploadedFile] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const { user, setUser } = useContext(UserContext);
   const {
     _id,
     name,
     username,
     isActivated,
-    wantToCashout,
-    wantToInvest,
     InvestAmt,
     updatedAt,
     pendingInvestAmt,
     pendingCashoutAmt,
     isBlocked,
-  } = u;
+  } = user;
   // const addHour = (date, value) => {
   //   console.log("date input in dashboard", date);
   //   if (date !== undefined) {
@@ -36,26 +34,33 @@ function Dashboard({ match }) {
   //   return console.log("date not loaded");
   // };
 
-  const getUser = () => {
-    axios
-      .get("http://localhost:4000/users/user", { withCredentials: true })
-      .then((res) => {
-        console.log(res.data);
-        setUserData((prevState) => ({
-          ...prevState,
-          ...res.data,
-        }));
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.log("error from dashboard: ", err.response);
-        return history.push("/");
-      });
-    //
-  };
-  useEffect(() => {
-    getUser();
-  }, []);
+  // const getUser = () => {
+  //   axios
+  //     .get("http://localhost:4000/users/user", { withCredentials: true })
+  //     .then((res) => {
+  //       console.log(res.data);
+  //       setUser((prevState) => ({
+  //         ...prevState,
+  //         ...res.data,
+  //       }));
+  //       setLoading(false);
+  //     })
+  //     .catch((err) => {
+  //       console.log("error from dashboard: ", err.response);
+  //       return history.push("/");
+  //     });
+  // };
+  // const checkUser = () => {
+  //   console.log("checking user Data availability", user);
+  //   if (!user) {
+  //     return history.push("/");
+  //   }
+  //   setLoading(false);
+  // };
+  // useEffect(() => {
+  //   setLoading(true);
+  //   checkUser();
+  // }, []);
   // const fileSelecthandler = (e) => {
   //   const filename = e.target.files[0].name;
   //   const file = e.target.files[0];
@@ -99,7 +104,8 @@ function Dashboard({ match }) {
   ) : !isBlocked ? (
     <div>
       <header className="inner_page_header">
-        <div className="header_top">
+        <Header />
+        {/* <div className="header_top">
           <div className="container">
             <div className="row">
               <div className="col-md-4 col-sm-6 col-xs-5">
@@ -170,43 +176,10 @@ function Dashboard({ match }) {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <section className="admin_body">
-          <div className="container admin_menu" style={{ padding: "0px 0" }}>
-            <div className="row">
-              <div className="col-sm-12">
-                <ul>
-                  <li>
-                    <a href="/dashboard" style={{ width: "80px" }}>
-                      <i className="ti-dashboard"></i>
-                      <span>Dashboard</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/deposit" style={{ width: "80px" }}>
-                      <i className="ti-cloud"></i>
-                      <span>Deposit</span>
-                    </a>
-                  </li>
-
-                  <li>
-                    <a href="/transactions" style={{ width: "80px" }}>
-                      <i className="ti-briefcase"></i>
-                      <span>Transactions</span>
-                    </a>
-                  </li>
-
-                  <li>
-                    <a href="/edit_account" style={{ width: "80px" }}>
-                      <i className="ti-lock"></i>
-                      <span>Account</span>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
+          <NavBar />
 
           <div
             className="container"
@@ -216,7 +189,7 @@ function Dashboard({ match }) {
               <div className="col-md-5 col-sm-12">
                 <div className="admin_head_left">
                   <h4>
-                    Hello, {name}
+                    Hello, {name},
                     <span>
                       Your referral link:{" "}
                       {`https://splashcash247.com/signup=${username}`}
@@ -315,9 +288,9 @@ function Dashboard({ match }) {
                     <div className="hashpower_left">
                       <h2>
                         Pay a fee of NGN1000 to a guider to be activated. You
-                        have 8 hours from
-                        {time}
-                        to make this Payment.
+                        have 8 hours from{" "}
+                        {updatedAt ? updatedAt.slice(0, 16) : null} to make this
+                        Payment.
                       </h2>
                       <a className="btn btn-white" href="/deposit">
                         Click Here
@@ -329,8 +302,9 @@ function Dashboard({ match }) {
             </div>
           )}
         </section>
+        <Footer />
 
-        <section className="secure">
+        {/* <section className="secure">
           <div className="container">
             <div className="row">
               <div className="col-sm-12">
@@ -501,7 +475,7 @@ function Dashboard({ match }) {
               </div>
             </div>
           </div>
-        </footer>
+        </footer> */}
       </header>
     </div>
   ) : (

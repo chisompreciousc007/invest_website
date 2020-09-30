@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 
 import { useHistory } from "react-router-dom";
 import Spinner from "./Spinner";
 import axios from "axios";
 import Error from "./Error";
+import { UserContext } from "./UserContext";
 
 function Login() {
   const history = useHistory();
-  const [user, setUser] = useState({
+  const [loginData, setLoginData] = useState({
     username: "",
     password: "",
   });
@@ -16,6 +17,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowpassword] = useState(false);
   const [response, setResponse] = useState(null);
+  const { setUser } = useContext(UserContext);
 
   const onChangeCheckbox = (e) => {
     e.preventDefault();
@@ -29,24 +31,33 @@ function Login() {
     e.preventDefault();
     let key = e.target.name;
     let value = e.target.value;
-    setUser((prev) => ({ ...prev, [key]: value }));
+    setLoginData((prev) => ({ ...prev, [key]: value }));
   };
 
   const submitHandler = (e) => {
     e.preventDefault();
     setLoading(true);
-    if (isChecked && user.username !== "") {
-      localStorage.username = user.username;
-      localStorage.password = user.password;
+    if (isChecked && loginData.username !== "") {
+      localStorage.username = loginData.username;
+      localStorage.password = loginData.password;
       localStorage.checkbox = isChecked;
     }
     axios
-      .post("http://localhost:4000/users/login", user)
+      .post("http://localhost:4000/users/login", loginData)
       .then((res) => {
         document.cookie = `token=${res.data}`;
         console.log("token from server", res);
-        setLoading(false);
-        history.push("/dashboard");
+        axios
+          .get("http://localhost:4000/users/user", { withCredentials: true })
+          .then((res) => {
+            console.log("res.data", res.data);
+            setUser((prevState) => ({
+              ...prevState,
+              ...res.data,
+            }));
+
+            history.push("/dashboard");
+          });
       })
       .catch((err) => {
         setLoading(false);
@@ -59,8 +70,7 @@ function Login() {
   useEffect(() => {
     if (localStorage.checkbox && localStorage.username !== "") {
       setIsChecked(true);
-      console.log(localStorage.username);
-      setUser({
+      setLoginData({
         username: localStorage.username,
         password: localStorage.password,
       });
@@ -198,6 +208,7 @@ function Login() {
                           <i className="fa fa-user"></i>
                           <input
                             placeholder="Username"
+                            value={loginData ? loginData.username : null}
                             type="text"
                             name="username"
                             className="inpts"
@@ -215,8 +226,9 @@ function Login() {
                         <span>
                           <i className="fa fa-key"> </i>
                           <input
-                            type={showPassword ? "text" : "password"}
                             placeholder="Password"
+                            type={showPassword ? "text" : "password"}
+                            value={loginData ? loginData.password : null}
                             onChange={inputHandler}
                             name="password"
                             className="inpts"

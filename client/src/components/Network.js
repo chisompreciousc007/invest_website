@@ -1,47 +1,25 @@
-import React, { useState } from "react";
-import axios from "axios";
-// import { useHistory } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import Header from "./Header";
+import Footer from "./Footer";
+import { UserContext } from "./UserContext";
+import NavBar from "./NavBar";
+import { useHistory } from "react-router-dom";
 
-function Referals({ match }) {
-  // const history = useHistory();
+function Referals({}) {
+  const history = useHistory();
   // const { ref } = match.params;
   // const [confirmPass, setConfirmPass] = useState('Re-Confirm password');
   // const [response, setResponse] = useState("");
   // const [error, setError] = useState(false);
   // const [success, setSuccess] = useState(false);
   // const [savedUser, setSavedUser] = useState("");
-  // const [user, setUser] = useState({
-  //     name: "",
-  //     username: "",
-  //     email: "",
-  //     password: "",
-  //     phone: "",
-  //     age: "",
-  //     gender: "",
-  //     upline: "ref",
-  //     accountName: "",
-  //     accountNo: "",
-  //     bank: ""
-
-  // });
-
-  // const inputHandler = (e) => {
-  //     e.preventDefault();
-  //     let key = e.target.name;
-  //     let value = e.target.value;
-  //     setUser((prev) => ({ ...prev, [key]: value }));
-  // };
-
-  // const submitHandler = (e) => {
-  //     e.preventDefault();
-  //     console.log(user)
-
-  // };
+  const { user, setUser } = useContext(UserContext);
 
   return (
     <div>
       <header className="inner_page_header">
-        <div className="header_top">
+        <Header />
+        {/* <div className="header_top">
           <div className="container">
             <div className="row">
               <div className="col-md-4 col-sm-6 col-xs-6">
@@ -125,56 +103,10 @@ function Referals({ match }) {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <section className="admin_body">
-          <div className="container admin_menu">
-            <div className="row">
-              <div className="col-sm-12">
-                <ul>
-                  <li>
-                    <a href="/dashboard">
-                      <i className="ti-dashboard"></i>
-                      <span>Dashboard</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/deposit">
-                      <i className="ti-cloud"></i>
-                      <span>Make Deposit</span>
-                    </a>
-                  </li>
-                  {/* <li><a href="/deposit_list"><i className="ti-server"></i><span>Deposit List</span></a>
-                                        </li> */}
-                  <li>
-                    <a href="/transactions">
-                      <i className="ti-briefcase"></i>
-                      <span>Transactions</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/withdraw">
-                      <i className="ti-download"></i>
-                      <span>Withdraw</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/referals">
-                      <i className="ti-user"></i>
-                      <span>Your Refferals</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/edit_account">
-                      <i className="ti-lock"></i>
-                      <span>Edit Account</span>
-                    </a>
-                  </li>
-                  {/* <li><a href="/security"><i className="ti-lock"></i><span>Security Settings</span></a></li> */}
-                </ul>
-              </div>
-            </div>
-          </div>
+          <NavBar />
 
           <div
             className="container"
@@ -351,8 +283,9 @@ function Referals({ match }) {
             </div>
           </div>
         </section>
+        <Footer />
 
-        <footer>
+        {/* <footer>
           <div className="footer_top">
             <div className="container">
               <div className="row">
@@ -408,7 +341,7 @@ function Referals({ match }) {
               </div>
             </div>
           </div>
-        </footer>
+        </footer> */}
       </header>
     </div>
   );

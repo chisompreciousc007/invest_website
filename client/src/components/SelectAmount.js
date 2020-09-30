@@ -3,11 +3,6 @@ import React from "react";
 function SelectAmount({ submitAmount, SelectAmount }) {
   return (
     <div className="form-group">
-      {/* <label htmlFor="exampleSelect1">
-          <h5>
-            Please Select an amount to invest, Your Deadline is <b>{duetime}</b>{" "}
-          </h5>
-        </label> */}
       <select
         onChange={SelectAmount}
         className="form-control"

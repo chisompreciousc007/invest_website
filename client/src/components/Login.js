@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 
-import { useHistory } from "react-router-dom";
+import { useHistory, Redirect } from "react-router-dom";
 import Spinner from "./Spinner";
 import axios from "axios";
 import Error from "./Error";
@@ -15,9 +15,10 @@ function Login() {
   const [isChecked, setIsChecked] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [redirect, setRedirect] = useState(false);
   const [showPassword, setShowpassword] = useState(false);
   const [response, setResponse] = useState(null);
-  const { setUser } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
 
   const onChangeCheckbox = (e) => {
     e.preventDefault();
@@ -54,9 +55,11 @@ function Login() {
             setUser((prevState) => ({
               ...prevState,
               ...res.data,
+              authenticated: true,
             }));
 
-            history.push("/dashboard");
+            setRedirect(true);
+            console.log(user);
           });
       })
       .catch((err) => {
@@ -76,9 +79,14 @@ function Login() {
       });
     }
   }, []);
+  let redirecting = null;
+  if (redirect) {
+    redirecting = <Redirect to="/dashboard" />;
+  }
 
   return (
     <div>
+      {redirecting}
       {loading ? <Spinner /> : null}
       {error ? (
         <Error

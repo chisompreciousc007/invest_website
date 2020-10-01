@@ -1,16 +1,10 @@
 import React, { useState, useContext } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
-import { useHistory } from "react-router-dom";
 import NavBar from "./NavBar";
 import { UserContext } from "./UserContext";
 
 function Referals({}) {
-  const history = useHistory();
-
-  // const [error, setError] = useState(false);
-  // const [success, setSuccess] = useState(false);
-  // const [savedUser, setSavedUser] = useState("");
   const { user, setUser } = useContext(UserContext);
   const {
     _id,

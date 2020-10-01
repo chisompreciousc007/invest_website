@@ -6,13 +6,6 @@ import NavBar from "./NavBar";
 import { useHistory } from "react-router-dom";
 
 function Referals({}) {
-  const history = useHistory();
-  // const { ref } = match.params;
-  // const [confirmPass, setConfirmPass] = useState('Re-Confirm password');
-  // const [response, setResponse] = useState("");
-  // const [error, setError] = useState(false);
-  // const [success, setSuccess] = useState(false);
-  // const [savedUser, setSavedUser] = useState("");
   const { user, setUser } = useContext(UserContext);
 
   return (

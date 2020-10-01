@@ -10,7 +10,7 @@ import Header from "./Header";
 import { UserContext } from "./UserContext";
 import NavBar from "./NavBar";
 
-function Dashboard({ match }) {
+function Dashboard({}) {
   const history = useHistory();
   const [error, setError] = useState(false);
   const [defaultFileLabel, setdefaultFileLabel] = useState("Choose File");

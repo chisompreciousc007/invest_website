@@ -3,14 +3,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
 const User = require("../models/user");
+const Guider = require("../models/guider");
 const verify = require("../verifytoken");
 const { loginValidation } = require("../validation");
-
-const addHour = (date, value) => {
-  const dt = date;
-  dt.setHours(dt.getHours() + value);
-  return dt;
-};
 
 const blockUser = async (id) => {
   await User.findByIdAndUpdate(
@@ -28,6 +23,7 @@ const blockUser = async (id) => {
     }
   );
 };
+
 router.get("/user", verify, async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.user });
@@ -58,25 +54,45 @@ router.post("/", async (req, res) => {
   // if (phoneexist) return res.status(400).send("phone number Already Exist");
   // if (usernameexist) return res.status(400).send("username Already Exist");
   // hash password
-  const salt = await bcrypt.genSaltSync(10);
-  const hashedPassword = await bcrypt.hash(req.body.password, salt);
-
-  const newUser = new User({
-    name: req.body.name,
-    username: req.body.username,
-    email: req.body.email,
-    password: hashedPassword,
-    phone: req.body.phone,
-    upline: req.body.upline,
-    accountName: req.body.accountName,
-    accountNo: req.body.accountNo,
-    bank: req.body.bank,
-  });
 
   try {
+    const salt = await bcrypt.genSaltSync(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    const foundGuiders = await Guider.find();
+    const randomNumber = Math.floor(
+      Math.random() * Math.floor(foundGuiders.length)
+    );
+    const selectedGuider = foundGuiders[randomNumber];
+    console.log("selected guider");
+
+    const newUser = new User({
+      name: req.body.name,
+      username: req.body.username,
+      email: req.body.email,
+      password: hashedPassword,
+      phone: req.body.phone,
+      upline: req.body.upline,
+      accountName: req.body.accountName,
+      accountNo: req.body.accountNo,
+      bank: req.body.bank,
+      guider: selectedGuider,
+    });
     const savedUser = await newUser.save();
+    console.log("new User saved");
+    const editGuider = await User.findOneAndUpdate(
+      { email: selectedGuider.email },
+      {
+        $push: {
+          guiderMatchedForCashoutList: {
+            name: savedUser.name,
+            phone: savedUser.phone,
+          },
+        },
+      },
+      { new: true, runValidators: true, context: "query" }
+    );
+    console.log("guider edited");
     res.json(savedUser);
-    // console.log("User saved");
   } catch (err) {
     res.json({ message: err });
   }
@@ -179,6 +195,25 @@ router.patch("/isActivated/:id", async (req, res) => {
     }
   );
 });
+
+router.patch("/pop-guider/:id", async (req, res) => {
+  console.log("pop saved name", req.body.popPath);
+  await User.findByIdAndUpdate(
+    req.params.id,
+    {
+      $set: { "guider.popPath": req.body.popPath },
+    },
+    { new: true, runValidators: true, context: "query" },
+    function (err, result) {
+      if (err) {
+        res.json(err);
+      } else {
+        res.json(result);
+      }
+    }
+  );
+});
+
 router.patch("/unblock/:id", async (req, res) => {
   await User.findByIdAndUpdate(
     req.params.id,

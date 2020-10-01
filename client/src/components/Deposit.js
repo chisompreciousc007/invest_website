@@ -33,6 +33,7 @@ function Dashboard({}) {
     pendingInvestAmt,
     pendingCashoutAmt,
     isBlocked,
+    guider,
   } = user;
   // const addHour = (date, value) => {
   //   console.log("date input in dashboard", date);
@@ -84,13 +85,13 @@ function Dashboard({}) {
 
       const { fileName, filePath } = res.data;
       setUploadedFile({ fileName, filePath });
-      // axios
-      //   .patch(`http://localhost:4000/receipts/popPath/${currentReceipt._id}`, {
-      //     popPath: filePath,
-      //   })
-      //   .then((res) => {
-      //     console.log("edit popPath successful!!", res.data);
-      //   });
+      axios
+        .patch(`http://localhost:4000/users/pop-guider/:${_id}`, {
+          popPath: filePath,
+        })
+        .then((res) => {
+          console.log("edit popPath successful!!", res.data);
+        });
     } catch (error) {
       console.log(error);
       if (error.response.status === 500) {
@@ -211,12 +212,12 @@ function Dashboard({}) {
               title="Please pay an activation fee to be activated"
               fileUpload={fileUploadHandler}
               fileSelect={fileSelecthandler}
-              accountName={"gfjghfjh"}
-              accountNumber={"mainguider.accountNumber"}
-              bank={"mainguider.bank"}
-              phone={"mainguider.phone"}
+              accountName={guider.accountName}
+              accountNumber={guider.accountNumber}
+              bank={guider.bank}
+              phone={guider.phone}
               amount={1000}
-              duetime={time}
+              duetime={createdAt}
             />
           ) : !wantToInvest ? (
             <SelectAmount

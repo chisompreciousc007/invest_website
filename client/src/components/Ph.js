@@ -1,5 +1,5 @@
 import React from "react";
-// import "bootswatch/dist/solar/bootstrap.min.css";
+import { addHours, format } from "date-fns";
 
 function PhComponent({
   title,
@@ -8,11 +8,14 @@ function PhComponent({
   bank,
   phone,
   amount,
-  duetime,
+  time,
   fileSelect,
   fileUpload,
   pop,
+  IdSet,
 }) {
+  const working = () => IdSet();
+
   return (
     <div
       style={{
@@ -43,12 +46,11 @@ function PhComponent({
         Amount:{amount}
       </h5>
       <h5 style={{ marginLeft: "0.5rem", marginBottom: "0.3rem" }}>
-        You have 8 hours from
-        {duetime}
+        You have until {` ${format(addHours(time, 8), "MMM-dd' 'hh:mm aaaa")} `}
         to make this Payment.
       </h5>
       <div
-        class="row"
+        className="row"
         style={{
           display: "flex",
           flexWrap: "wrap",
@@ -59,23 +61,24 @@ function PhComponent({
         {pop === undefined ? (
           <div className="col-md-4 col-sm-6 col-12">
             <div
-              class="form-group"
+              className="form-group"
               //   style={{
               //     background:
               //       "linear-gradient(45deg, rgba(248,186,18,1) 0%,rgba(167,80,37,1) 100%",
               //   }}
             >
-              <div class="input-group mb-3">
-                <div class="custom-file">
+              <div className="input-group mb-3">
+                <div className="custom-file">
                   <input
+                    onClick={() => IdSet()}
                     type="file"
-                    class="custom-file-input"
+                    className="custom-file-input"
                     id="inputGroupFile02"
                     onChange={fileSelect}
                   />
-                  {/* <label class="custom-file-label" htmlFor="inputGroupFile02" >{fileLabel}</label> */}
+                  {/* <label className="custom-file-label" htmlFor="inputGroupFile02" >{fileLabel}</label> */}
                 </div>
-                <div class="input-group-append">
+                <div className="input-group-append">
                   <button
                     style={{ color: "black" }}
                     type="button"
@@ -92,7 +95,7 @@ function PhComponent({
         ) : (
           <div className="col-md-4 col-sm-6 col-12">
             <div style={{ marginLeft: "0.5rem" }}>
-              <span class="badge badge-success">POP Uploaded!!</span>
+              <span className="badge badge-success">POP Uploaded!!</span>
             </div>
             <img
               style={{ marginLeft: "0.5rem" }}

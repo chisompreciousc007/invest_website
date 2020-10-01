@@ -11,6 +11,9 @@ require("dotenv/config");
 const userRouter = require("./routes/User");
 const uploadRouter = require("./routes/Upload");
 const receiptRouter = require("./routes/Receipt");
+const guiderRouter = require("./routes/Guider");
+const pherRouter = require("./routes/Pher");
+const gherRouter = require("./routes/Gher");
 
 const port = process.env.PORT || 4000;
 
@@ -48,6 +51,9 @@ app.use(
 app.use("/users", userRouter);
 app.use("/uploads", uploadRouter);
 app.use("/receipts", receiptRouter);
+app.use("/phers", pherRouter);
+app.use("/ghers", gherRouter);
+app.use("/guiders", guiderRouter);
 // app.use('/public', express.static('public'));
 
 // app.use('/pop', popRouter)

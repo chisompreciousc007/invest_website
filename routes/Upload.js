@@ -19,7 +19,7 @@ router.post("/", (req, res) => {
 
     res.json({
       filename: uuidfilename,
-      filePath: `../../public/uploads/${uuidfilename}${ext}`,
+      filePath: `${uuidfilename}${ext}`,
     });
   });
 });

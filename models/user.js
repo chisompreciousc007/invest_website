@@ -144,6 +144,10 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isGuider: {
+      type: Boolean,
+      default: false,
+    },
     isBlocked: {
       type: Boolean,
       default: false,
@@ -161,14 +165,6 @@ const UserSchema = new mongoose.Schema(
         amount: { type: Number, default: 0 },
       },
     ],
-    // totalInvestedAmt: {
-    //   type: Number,
-    //   default: 0,
-    // },
-    // totalRecievedAmt: {
-    //   type: Number,
-    //   default: 0,
-    // },
     pendingInvestAmt: {
       type: Number,
       default: 0,
@@ -209,7 +205,17 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    investList: [
+    guider: {
+      name: { type: String },
+      accountName: { type: String },
+      accountNo: { type: String },
+      bank: { type: String },
+      phone: { type: String },
+      popPath: { type: String, default: "" },
+      isConfirmed: { type: Boolean, default: false },
+    },
+
+    matchedForInvestList: [
       {
         accountName: { type: String },
         accountNumber: { type: String },
@@ -226,19 +232,24 @@ const UserSchema = new mongoose.Schema(
         bank: { type: String },
         phone: { type: String },
         amount: { type: Number },
+        popPath: { type: String },
       },
     ],
-    guiderList: [
+    guiderMatchedForCashoutList: [
       {
-        accountName: String,
-        accountNumber: String,
-        bank: String,
-        phone: String,
-        amount: Number,
-        popPath: { type: String, default: "" },
+        name: { type: String },
+        phone: { type: String },
+        popPath: { type: String, default: null },
       },
     ],
-    cashoutList: [
+    guiderMatchedForCashoutHistory: [
+      {
+        name: { type: String },
+        phone: { type: String },
+        popPath: { type: String, default: null },
+      },
+    ],
+    matchedForcashoutList: [
       {
         name: { type: String },
         phone: { type: String },

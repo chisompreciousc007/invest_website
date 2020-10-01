@@ -18,7 +18,7 @@ const Home = asyncComponent(() => import("./components/Home"));
 const Login = asyncComponent(() => import("./components/Login"));
 const SignUp = asyncComponent(() => import("./components/SignUp"));
 const Support = asyncComponent(() => import("./components/Support"));
-const Dashboard = asyncComponent(() => import("./components/Terms"));
+const Dashboard = asyncComponent(() => import("./components/Dashboard"));
 const Profile = asyncComponent(() => import("./components/Profile"));
 const Transactions = asyncComponent(() => import("./components/Transactions"));
 const Deposit = asyncComponent(() => import("./components/Deposit"));

@@ -42,19 +42,21 @@ function SignUp({ match }) {
     e.preventDefault();
     setLoading(true);
     console.log(user);
-    axios.post("http://localhost:4000/users", user).then((res) => {
-      setLoading(false);
-      console.log(res.data);
-      const resUser = res.data.name;
-      setSavedUser(resUser);
-      setSuccess(true);
-      window.scrollTo(0, 0);
-    });
-    setLoading(false).catch((err) => {
-      const errmsg = err.response.data;
-      setResponse(errmsg);
-      setError(true);
-    });
+    axios
+      .post("http://localhost:4000/users", user)
+      .then((res) => {
+        const resUser = res.data.name;
+        setSavedUser(resUser);
+        setLoading(false);
+        setSuccess(true);
+        window.scrollTo(0, 0);
+      })
+      .catch((err) => {
+        const errmsg = err.response.data;
+        setResponse(errmsg);
+        setLoading(false);
+        setError(true);
+      });
   };
 
   const checkIfExist = (key) => {
@@ -241,7 +243,11 @@ function SignUp({ match }) {
               <div className="row">
                 <div className="col-md-10 col-md-offset-1">
                   <div className="row">
-                    <form name="regform" onSubmit={submitHandler}>
+                    <form
+                      name="regform"
+                      onSubmit={submitHandler}
+                      style={{ color: "black" }}
+                    >
                       <div className="col-sm-12 col-xs-12">
                         <div className="form_box" style={{ width: "340px" }}>
                           <span>
@@ -455,7 +461,7 @@ function SignUp({ match }) {
                               minLength="3"
                               maxLength="20"
                               required
-                              placeholder={ref === "new" ? "" : ref}
+                              placeholder={ref === "new" ? "no referer" : ref}
                               type="text"
                               name="upline"
                               className="inpts"

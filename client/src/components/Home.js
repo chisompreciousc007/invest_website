@@ -110,7 +110,7 @@ function Home() {
                   <span>
                     <br />
 
-                    <a className="btn btn-primary" href="/signupnew">
+                    <a className="btn btn-primary" href="/signup=new">
                       Start Now !
                     </a>
                     <a className="btn btn-primary" href="#index_about_div">

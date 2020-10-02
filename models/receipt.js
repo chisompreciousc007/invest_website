@@ -1,23 +1,19 @@
 const mongoose = require("mongoose");
 // const { types } = require("@hapi/joi");
-var Schema = mongoose.Schema;
-const ReceiptSchema = new Schema(
+const ReceiptSchema = new mongoose.Schema(
   {
-    gher: {
-      name: { type: String },
-      _id: { type: String },
-      accountName: { type: String },
-      accountNumber: { type: String },
-      bank: { type: String },
-      phone: { type: String },
-    },
-    pher: {
-      name: { type: String },
-      _id: { type: String },
-      phone: { type: String },
-    },
+    gher_name: { type: String },
+    gher_email: { type: String },
+    gher_accountName: { type: String },
+    gher_accountNo: { type: String },
+    gher_bank: { type: String },
+    gher_phone: { type: String },
+    pher_name: { type: String },
+    pher_email: { type: String },
+    pher_phone: { type: String },
     amount: { type: Number },
     isConfirmed: { type: Boolean, default: false },
+    isActivationFee: { type: Boolean, default: false },
     isPurged: { type: Boolean, default: false },
     popPath: { type: String, default: null },
   },

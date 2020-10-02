@@ -13,12 +13,8 @@ router.post("/:id", async (req, res) => {
       { new: true, runValidators: true, context: "query" }
     );
     const newGuider = new Guider({
-      name: regGuider.name,
+      username: regGuider.username,
       email: regGuider.email,
-      phone: regGuider.phone,
-      accountName: regGuider.accountName,
-      accountNo: regGuider.accountNo,
-      bank: regGuider.bank,
     });
     const savedGuider = await newGuider.save();
     res.json(savedGuider);

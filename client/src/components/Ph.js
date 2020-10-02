@@ -46,7 +46,8 @@ function PhComponent({
         Amount:{amount}
       </h5>
       <h5 style={{ marginLeft: "0.5rem", marginBottom: "0.3rem" }}>
-        You have until {` ${format(addHours(time, 8), "MMM-dd' 'hh:mm aaaa")} `}
+        You have until{" "}
+        {` ${format(addHours(new Date(time), 8), "MMM-dd' 'hh:mm aaaa")} `}
         to make this Payment.
       </h5>
       <div
@@ -60,37 +61,39 @@ function PhComponent({
       >
         {pop === undefined ? (
           <div className="col-md-4 col-sm-6 col-12">
-            <div
-              className="form-group"
-              //   style={{
-              //     background:
-              //       "linear-gradient(45deg, rgba(248,186,18,1) 0%,rgba(167,80,37,1) 100%",
-              //   }}
-            >
-              <div className="input-group mb-3">
-                <div className="custom-file">
-                  <input
-                    onClick={() => IdSet()}
-                    type="file"
-                    className="custom-file-input"
-                    id="inputGroupFile02"
-                    onChange={fileSelect}
-                  />
-                  {/* <label className="custom-file-label" htmlFor="inputGroupFile02" >{fileLabel}</label> */}
-                </div>
-                <div className="input-group-append">
-                  <button
-                    style={{ color: "black" }}
-                    type="button"
-                    className="btn btn-default"
-                    id=""
-                    onClick={fileUpload}
-                  >
-                    Upload
-                  </button>
+            <form onsubmit="return false">
+              <div
+                className="form-group"
+                //   style={{
+                //     background:
+                //       "linear-gradient(45deg, rgba(248,186,18,1) 0%,rgba(167,80,37,1) 100%",
+                //   }}
+              >
+                <div className="input-group mb-3">
+                  <div className="custom-file">
+                    <input
+                      onClick={() => IdSet()}
+                      type="file"
+                      className="custom-file-input"
+                      id="inputGroupFile02"
+                      onChange={fileSelect}
+                    />
+                    {/* <label className="custom-file-label" htmlFor="inputGroupFile02" >{fileLabel}</label> */}
+                  </div>
+                  <div className="input-group-append">
+                    <button
+                      style={{ color: "black" }}
+                      type="button"
+                      className="btn btn-default"
+                      id=""
+                      onClick={fileUpload}
+                    >
+                      Upload
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            </form>
           </div>
         ) : (
           <div className="col-md-4 col-sm-6 col-12">

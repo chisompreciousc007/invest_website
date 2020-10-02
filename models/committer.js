@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-const GherSchema = new mongoose.Schema(
+
+const CommitterSchema = new mongoose.Schema(
   {
     username: {
       type: String,
@@ -14,6 +15,6 @@ const GherSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-// GherSchema.plugin(uniqueValidator, { message: "is already taken." });
+// CommitterSchema.plugin(uniqueValidator, { message: "is already taken." });
 
-module.exports = mongoose.model("Gher", GherSchema);
+module.exports = mongoose.model("Committer", CommitterSchema);

@@ -158,7 +158,7 @@ function Dashboard({}) {
           {!isActivated ? (
             <Ph
               IdSet={() => setCurrentReceipt({ name: "bla labbss" })}
-              title="Please pay an activation fee to be activated"
+              title="Please pay an activation fee of to be activated"
               fileUpload={fileUploadHandler}
               fileSelect={fileSelecthandler}
               accountName={"gfjghfjh"}

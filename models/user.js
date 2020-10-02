@@ -87,6 +87,29 @@ const bankValidator = [
   }),
 ];
 
+const payeeSchema = new mongoose.Schema(
+  {
+    accountName: String,
+    accountNo: String,
+    bank: String,
+    phone: String,
+    amount: { type: Number, default: 0 },
+    popPath: { type: String, default: "" },
+    // isConfirmed: { type: Boolean, default: false },
+  },
+  { timestamps: true }
+);
+
+const payerSchema = new mongoose.Schema(
+  {
+    name: String,
+    phone: String,
+    amount: { type: Number, default: 0 },
+    popPath: { type: String, default: "" },
+  },
+  { timestamps: true }
+);
+
 const UserSchema = new mongoose.Schema(
   {
     name: {
@@ -144,18 +167,12 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    isGuider: {
-      type: Boolean,
-      default: false,
-    },
+
     isBlocked: {
       type: Boolean,
       default: false,
     },
-    investmentConfirmed: {
-      type: Boolean,
-      default: false,
-    },
+
     upline: {
       type: String,
     },
@@ -165,26 +182,7 @@ const UserSchema = new mongoose.Schema(
         amount: { type: Number, default: 0 },
       },
     ],
-    pendingInvestAmt: {
-      type: Number,
-      default: 0,
-    },
-    purgedAmt: {
-      type: Number,
-      default: 0,
-    },
-    InvestAmt: {
-      type: Number,
-      default: 0,
-    },
-    pendingCashoutAmt: {
-      type: Number,
-      default: 0,
-    },
-    CashoutAmt: {
-      type: Number,
-      default: 0,
-    },
+    investAmountHistory: [Number],
     wantToInvest: {
       type: Boolean,
       default: false,
@@ -193,78 +191,9 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    readyForCashout: {
-      type: Boolean,
-      default: false,
-    },
-    matchToInvest: {
-      type: Boolean,
-      default: false,
-    },
-    matchToCashout: {
-      type: Boolean,
-      default: false,
-    },
-    guider: {
-      name: { type: String },
-      accountName: { type: String },
-      accountNo: { type: String },
-      bank: { type: String },
-      phone: { type: String },
-      popPath: { type: String, default: "" },
-      isConfirmed: { type: Boolean, default: false },
-    },
-
-    matchedForInvestList: [
-      {
-        accountName: { type: String },
-        accountNumber: { type: String },
-        bank: { type: String },
-        phone: { type: String },
-        amount: { type: Number },
-        popPath: { type: String },
-      },
-    ],
-    investHistory: [
-      {
-        accountName: { type: String },
-        accountNumber: { type: String },
-        bank: { type: String },
-        phone: { type: String },
-        amount: { type: Number },
-        popPath: { type: String },
-      },
-    ],
-    guiderMatchedForCashoutList: [
-      {
-        name: { type: String },
-        phone: { type: String },
-        popPath: { type: String, default: null },
-      },
-    ],
-    guiderMatchedForCashoutHistory: [
-      {
-        name: { type: String },
-        phone: { type: String },
-        popPath: { type: String, default: null },
-      },
-    ],
-    matchedForcashoutList: [
-      {
-        name: { type: String },
-        phone: { type: String },
-        amount: { type: Number, default: 0 },
-        popPath: { type: String },
-      },
-    ],
-    cashoutHistory: [
-      {
-        name: { type: String },
-        phone: { type: String },
-        amount: { type: Number, default: 0 },
-        popPath: { type: String },
-      },
-    ],
+    investHistory: [payeeSchema],
+    guiderHistory: [payerSchema],
+    cashoutHistory: [payerSchema],
   },
   { timestamps: true }
 );

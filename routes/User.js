@@ -6,6 +6,30 @@ const User = require("../models/user");
 const Guider = require("../models/guider");
 const verify = require("../verifytoken");
 const { loginValidation } = require("../validation");
+const { findOne } = require("../models/user");
+const Receipt = require("../models/receipt");
+const Committer = require("../models/committer");
+
+const pairPhGhWithEmail = async (a, b, amount) => {
+  const ph = await User.findOne({ email: a });
+  const gh = await User.findOne({ email: b });
+  const newReceipt = new Receipt({
+    gher_name: gh.name,
+    gher_email: gh.email,
+    gher_accountName: gh.accountName,
+    gher_accountNo: gh.accountNo,
+    gher_bank: gh.bank,
+    gher_phone: gh.phone,
+    pher_name: ph.name,
+    pher_email: ph.email,
+    pher_phone: ph.phone,
+    amount: amount,
+    isActivationFee: true,
+  });
+  const savedReceipt = await newReceipt.save();
+  // res.json(savedReceipt);
+  console.log("receipt saved");
+};
 
 const blockUser = async (id) => {
   await User.findByIdAndUpdate(
@@ -26,19 +50,20 @@ const blockUser = async (id) => {
 
 router.get("/user", verify, async (req, res) => {
   try {
-    const user = await User.findOne({ _id: req.user });
-    if (!user.isActivated || user.wantToInvest) {
-      const dateNow = new Date();
-      const blockTime = addHour(user.updatedAt, 12);
-      console.log(dateNow, blockTime);
-      if (dateNow > blockTime) res.json(blockUser(req.user));
-    }
+    console.log(req.user._id);
+    const user = await User.findOne({ _id: req.user._id });
+    // if (!user.isActivated || user.wantToInvest) {
+    //   const dateNow = new Date();
+    //   const blockTime = addHour(user.updatedAt, 12);
+    //   console.log(dateNow, blockTime);
+    //   if (dateNow > blockTime) res.json(blockUser(req.user));
+    // }
     res.json(user);
   } catch (err) {
     res.json({ message: err });
   }
 });
-
+// CREATE USER
 router.post("/", async (req, res) => {
   // validate data before sending
   // const { error } = newUserValidation(req.body);
@@ -56,14 +81,20 @@ router.post("/", async (req, res) => {
   // hash password
 
   try {
+    // HASH PASSWORD
     const salt = await bcrypt.genSaltSync(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    // SELECT A RANDOM GUIDER
     const foundGuiders = await Guider.find();
     const randomNumber = Math.floor(
       Math.random() * Math.floor(foundGuiders.length)
     );
-    const selectedGuider = foundGuiders[randomNumber];
-    console.log("selected guider");
+    const selectGuider = foundGuiders[randomNumber];
+    // const selectedGuider = await User.findOne({ email: selectGuider.email });
+    console.log(
+      `selected random guider ${selectGuider.email} out of ${foundGuiders.length} `
+    );
+    // SAVE USER
 
     const newUser = new User({
       name: req.body.name,
@@ -75,29 +106,56 @@ router.post("/", async (req, res) => {
       accountName: req.body.accountName,
       accountNo: req.body.accountNo,
       bank: req.body.bank,
-      guider: selectedGuider,
+      // guider: selectedGuider,
     });
     const savedUser = await newUser.save();
     console.log("new User saved");
-    const editGuider = await User.findOneAndUpdate(
-      { email: selectedGuider.email },
-      {
-        $push: {
-          guiderMatchedForCashoutList: {
-            name: savedUser.name,
-            phone: savedUser.phone,
+    // CREATE RECEIPT
+    pairPhGhWithEmail(savedUser.email, selectedGuider.email, 1000);
+    // UPDATE GUIDER WITH NEW USER MATCHED
+    // const editGuider = await User.findOneAndUpdate(
+    //   { email: selectedGuider.email },
+    //   {
+    //     $push: {
+    //       guiderMatchedForCashoutList: {
+    //         name: savedUser.name,
+    //         phone: savedUser.phone,
+    //         amount: 1000,
+    //       },
+    //     },
+    //   },
+    //   { new: true, runValidators: true, context: "query" }
+    // );
+    // console.log("guider edited");
+    // UPDATE REFERRALS
+    const checkReferee = await User.findOne({ username: req.body.upline });
+    if (req.body.upline !== "new" && checkReferee !== null) {
+      const editReferee = await User.findOneAndUpdate(
+        { username: req.body.upline },
+        {
+          $push: {
+            downline: {
+              name: savedUser.name,
+            },
           },
         },
-      },
-      { new: true, runValidators: true, context: "query" }
-    );
-    console.log("guider edited");
+        { new: true, runValidators: true, context: "query" }
+      );
+      console.log("Referal Updated");
+    }
+
     res.json(savedUser);
   } catch (err) {
     res.json({ message: err });
   }
 });
-
+// TESTING OUT ROUTES
+// router.post("/test", async (req, res) => {
+//   const checkReferee = await User.find({
+//     $or: [{ username: "jbond" }, { username: "user1" }],
+//   });
+//   console.log(checkReferee.length);
+// });
 //LOGIN
 router.post("/login", async (req, res) => {
   //validate data before sending
@@ -195,14 +253,13 @@ router.patch("/isActivated/:id", async (req, res) => {
     }
   );
 });
-
-router.patch("/pop-guider/:id", async (req, res) => {
+// POP UPLOAD FOR ACTIVATION FEE
+router.patch("/pop/:id", async (req, res) => {
   console.log("pop saved name", req.body.popPath);
-  await User.findByIdAndUpdate(
+  await Receipt.findByIdAndUpdate(
     req.params.id,
-    {
-      $set: { "guider.popPath": req.body.popPath },
-    },
+
+    { pop: req.body.popPath },
     { new: true, runValidators: true, context: "query" },
     function (err, result) {
       if (err) {
@@ -237,10 +294,13 @@ router.patch("/wantToInvest/:id", async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
       {
-        InvestAmt: req.body.InvestAmt,
+        $push: {
+          investAmountHistory: req.body.investAmt,
+        },
       },
       { new: true, runValidators: true, context: "query" }
     );
+    console.log("Invest Amount History Array Updated");
     const result = await User.findByIdAndUpdate(
       req.params.id,
       {
@@ -248,6 +308,7 @@ router.patch("/wantToInvest/:id", async (req, res) => {
       },
       { new: true, runValidators: true, context: "query" }
     );
+    console.log("wantToInvest status Updated");
     res.json(result);
   } catch (error) {
     res.json(error);

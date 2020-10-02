@@ -1,67 +1,20 @@
 const mongoose = require("mongoose");
-const uniqueValidator = require("mongoose-unique-validator");
-const validate = require("mongoose-validator");
-
-const nameValidator = [
-  validate({
-    validator: "isLength",
-    arguments: [5, 50],
-    message: "Name should be between {ARGS[0]} and {ARGS[1]} characters",
-  }),
-  validate({
-    validator: "isAscii",
-    message: "accountName should contain ASCII characters only",
-  }),
-];
-const emailValidator = [
-  validate({
-    validator: "isLength",
-    arguments: [5, 50],
-    message: "email should be between {ARGS[0]} and {ARGS[1]} characters",
-  }),
-  validate({
-    validator: "isEmail",
-    message: "email must be valid",
-  }),
-];
-const phoneValidator = [
-  validate({
-    validator: "isLength",
-    arguments: [11, 15],
-    message: "phone should be between {ARGS[0]} and {ARGS[1]} characters",
-  }),
-  validate({
-    validator: "isNumeric",
-    message: "phone should contain numeric characters only",
-  }),
-];
 
 const PherSchema = new mongoose.Schema(
   {
-    name: {
+    username: {
       type: String,
-      required: true,
-      lowercase: true,
-      trim: true,
-      validate: nameValidator,
-    },
-    phone: {
-      type: String,
-      required: true,
-      unique: true,
-      validate: phoneValidator,
     },
     email: {
       type: String,
-      required: true,
-      lowercase: true,
-      unique: true,
-      uniqueCaseInsensitive: true,
-      validate: emailValidator,
+    },
+    amount: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }
 );
-PherSchema.plugin(uniqueValidator, { message: "is already taken." });
+// PherSchema.plugin(uniqueValidator, { message: "is already taken." });
 
 module.exports = mongoose.model("Pher", PherSchema);

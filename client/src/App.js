@@ -26,7 +26,7 @@ const Terms = asyncComponent(() => import("./components/Terms"));
 const TestPage = asyncComponent(() => import("./components/TestPage"));
 
 function App() {
-  const [user, setUser] = useState({ authenticated: false });
+  const [user, setUser] = useState({});
   return (
     <div className="App">
       <BrowserRouter>
@@ -39,18 +39,14 @@ function App() {
           <Route path="/rules" exact component={Terms} />
           <Route path="/test" exact component={TestPage} />
           <UserContext.Provider value={{ user, setUser }}>
-            {user.authenticated ? (
-              <Route path="/edit_account" exact component={Profile} />
-            ) : null}
-            {user.authenticated ? (
-              <Route path="/dashboard" exact component={Dashboard} />
-            ) : null}
-            {user.authenticated ? (
-              <Route path="/deposit" exact component={Deposit} />
-            ) : null}
-            {user.authenticated ? (
-              <Route path="/transactions" exact component={Transactions} />
-            ) : null}
+            <Route path="/edit_account" exact component={Profile} />
+
+            <Route path="/dashboard" exact component={Dashboard} />
+
+            <Route path="/deposit" exact component={Deposit} />
+
+            <Route path="/transactions" exact component={Transactions} />
+
             <Route path="/login" exact component={Login} />
           </UserContext.Provider>
           <Route render={() => <h1>Page Not Found</h1>} />

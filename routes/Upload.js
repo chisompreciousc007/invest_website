@@ -16,6 +16,7 @@ router.post("/", (req, res) => {
       console.error(err);
       return res.status(500).send(err);
     }
+    console.log("image saved");
 
     res.json({
       filename: uuidfilename,

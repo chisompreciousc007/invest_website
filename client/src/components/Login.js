@@ -51,15 +51,27 @@ function Login() {
         axios
           .get("http://localhost:4000/users/user", { withCredentials: true })
           .then((res) => {
-            console.log("res.data", res.data);
+            console.log("user data", res.data);
             setUser((prevState) => ({
               ...prevState,
-              ...res.data,
-              authenticated: true,
+              user: { ...res.data },
+              // authenticated: true,
             }));
 
-            setRedirect(true);
-            console.log(user);
+            axios
+              .get(`http://localhost:4000/receipts/foruser/${res.data.email}`, {
+                withCredentials: true,
+              })
+              .then((res) => {
+                console.log("receipt data", res.data);
+                setUser((prevState) => ({
+                  ...prevState,
+                  receipt: [...res.data],
+                }));
+                sessionStorage.setItem("authenticated", "true");
+                setRedirect(true);
+                console.log("finalState", user);
+              });
           });
       })
       .catch((err) => {

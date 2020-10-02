@@ -14,6 +14,7 @@ const receiptRouter = require("./routes/Receipt");
 const guiderRouter = require("./routes/Guider");
 const pherRouter = require("./routes/Pher");
 const gherRouter = require("./routes/Gher");
+const committerRouter = require("./routes/Committer");
 
 const port = process.env.PORT || 4000;
 
@@ -54,6 +55,7 @@ app.use("/receipts", receiptRouter);
 app.use("/phers", pherRouter);
 app.use("/ghers", gherRouter);
 app.use("/guiders", guiderRouter);
+app.use("/committers", committerRouter);
 // app.use('/public', express.static('public'));
 
 // app.use('/pop', popRouter)

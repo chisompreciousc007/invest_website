@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import axios from "axios";
 import { useHistory, Redirect, Link } from "react-router-dom";
 import Spinner from "./Spinner";
 import Error from "./Error";
@@ -6,13 +7,15 @@ import Footer from "./Footer";
 import Header from "./Header";
 import { UserContext } from "./UserContext";
 import NavBar from "./NavBar";
+import { addHours, format } from "date-fns";
 
 function Dashboard({}) {
   const [loading, setLoading] = useState(false);
   const [redirect, setRedirect] = useState(false);
   const { user, setUser } = useContext(UserContext);
+  const [error, setError] = useState(false);
+  const [response, setResponse] = useState(null);
   const {
-    _id,
     name,
     username,
     isActivated,
@@ -21,10 +24,11 @@ function Dashboard({}) {
     pendingInvestAmt,
     pendingCashoutAmt,
     isBlocked,
-  } = user;
+    createdAt,
+  } = user.user;
   let redirecting = null;
   if (redirect) {
-    redirecting = <Redirect to="/" />;
+    redirecting = <Redirect to="/login" />;
   }
 
   return (
@@ -146,9 +150,13 @@ function Dashboard({}) {
                         <div className="hashpower_left">
                           <h2>
                             Pay a fee of NGN1000 to a guider to be activated.
-                            You have 8 hours from{" "}
-                            {updatedAt ? updatedAt.slice(0, 16) : null} to make
-                            this Payment.
+                            You have until{" "}
+                            {` ${format(
+                              addHours(new Date(createdAt), 8),
+                              "MMM-dd' 'hh:mm aaaa"
+                            )} `}
+                            to make this Payment or your account will be
+                            blocked.
                           </h2>
                           <Link className="btn btn-white" to="/deposit">
                             Click Here

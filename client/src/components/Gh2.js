@@ -37,7 +37,11 @@ function PhComponent({
         Amount:{amount}
       </h5>
       <h5 style={{ marginLeft: "0.5rem", marginBottom: "0.3rem" }}>
-        You have until {` ${format(addHours(time, 8), "MMM-dd' 'hh:mm aaaa")} `}
+        You have until{" "}
+        {
+          time
+          // ` ${format(addHours(time, 8), "MMM-dd' 'hh:mm aaaa")} `
+        }
         to recieve this Payment or Purge User.
       </h5>
       <div className="row">

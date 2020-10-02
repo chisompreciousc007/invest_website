@@ -13,12 +13,9 @@ router.post("/:id", async (req, res) => {
       { new: true, runValidators: true, context: "query" }
     );
     const newPher = new Pher({
-      name: regPher.name,
+      username: regPher.username,
       email: regPher.email,
-      phone: regPher.phone,
-      accountName: regPher.accountName,
-      accountNo: regPher.accountNo,
-      bank: regPher.bank,
+      amount: req.body.amount,
     });
     const savedPher = await newPher.save();
     res.json(savedPher);

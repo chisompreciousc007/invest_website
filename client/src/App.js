@@ -12,6 +12,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 // import Support from "./components/Support";
 import asyncComponent from "./components/asyncComponent";
 import { UserContext } from "./components/UserContext";
+import ErrorHandler from "./components/ErrorHandler";
 const FAQ = asyncComponent(() => import("./components/FAQ"));
 const About = asyncComponent(() => import("./components/About"));
 const Home = asyncComponent(() => import("./components/Home"));
@@ -26,7 +27,20 @@ const Terms = asyncComponent(() => import("./components/Terms"));
 const TestPage = asyncComponent(() => import("./components/TestPage"));
 
 function App() {
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState({
+    user: {
+      name: "Loading",
+      username: "Loading",
+      isActivated: false,
+      InvestAmt: "Loading",
+      updatedAt: "Loading",
+      pendingInvestAmt: "Loading",
+      pendingCashoutAmt: "Loading",
+      isBlocked: false,
+      createdAt: "Loading",
+    },
+    receipt: [],
+  });
   return (
     <div className="App">
       <BrowserRouter>
@@ -38,18 +52,20 @@ function App() {
           <Route path="/signup=:ref" exact component={SignUp} />
           <Route path="/rules" exact component={Terms} />
           <Route path="/test" exact component={TestPage} />
+
           <UserContext.Provider value={{ user, setUser }}>
-            <Route path="/edit_account" exact component={Profile} />
-
-            <Route path="/dashboard" exact component={Dashboard} />
-
-            <Route path="/deposit" exact component={Deposit} />
-
-            <Route path="/transactions" exact component={Transactions} />
-
             <Route path="/login" exact component={Login} />
+            <ErrorHandler>
+              <Route path="/edit_account" exact component={Profile} />
+
+              <Route path="/dashboard" exact component={Dashboard} />
+
+              <Route path="/deposit" exact component={Deposit} />
+
+              <Route path="/transactions" exact component={Transactions} />
+            </ErrorHandler>
           </UserContext.Provider>
-          <Route render={() => <h1>Page Not Found</h1>} />
+          <Route component={Login} />
         </Switch>
       </BrowserRouter>
     </div>

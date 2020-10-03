@@ -94,7 +94,7 @@ const payeeSchema = new mongoose.Schema(
     bank: String,
     phone: String,
     amount: { type: Number, default: 0 },
-    popPath: { type: String, default: "" },
+    popPath: { type: String, default: null },
     // isConfirmed: { type: Boolean, default: false },
   },
   { timestamps: true }
@@ -105,7 +105,7 @@ const payerSchema = new mongoose.Schema(
     name: String,
     phone: String,
     amount: { type: Number, default: 0 },
-    popPath: { type: String, default: "" },
+    popPath: { type: String, default: null },
   },
   { timestamps: true }
 );
@@ -180,6 +180,13 @@ const UserSchema = new mongoose.Schema(
       {
         name: { type: String },
         amount: { type: Number, default: 0 },
+      },
+    ],
+    pledge: [
+      {
+        isFulfilled: { type: Boolean, default: false },
+        amount: { type: Number },
+        id: Number,
       },
     ],
     investAmountHistory: [Number],

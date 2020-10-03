@@ -1,125 +1,198 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import { Redirect } from "react-router-dom";
+import axios from "axios";
+import Error from "./Error";
 import Header from "./Header";
 import Footer from "./Footer";
 import { UserContext } from "./UserContext";
 import NavBar from "./NavBar";
+import Spinner from "./Spinner";
 
 function Transactions({}) {
   const { user, setUser } = useContext(UserContext);
-  const {
-    _id,
-    name,
-    isActivated,
-    wantToCashout,
-    wantToInvest,
-    InvestAmt,
-    updatedAt,
-    pendingInvestAmt,
-    pendingCashoutAmt,
-    isBlocked,
-  } = user;
+  const { downline, investHistory, cashoutHistory } = user.user;
+  const [redirect, setRedirect] = useState(false);
+  const [error, setError] = useState(false);
+  const [response, setResponse] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const getUserData = () => {
+    console.log("get userData running");
+    if (user.user._id) {
+      setLoading(false);
+      return console.log("already gotten user data");
+    }
+    axios
+      .get("http://localhost:4000/users/user", { withCredentials: true })
+      .then((res) => {
+        console.log("user data", res.data);
+        setUser((prevState) => ({
+          ...prevState,
+          user: { ...res.data },
+        }));
+
+        axios
+          .get(`http://localhost:4000/receipts/foruser/${res.data.email}`, {
+            withCredentials: true,
+          })
+          .then((res) => {
+            console.log("receipt data", res.data);
+            setUser((prevState) => ({
+              ...prevState,
+              receipt: [...res.data],
+            }));
+          });
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        const errmsg = err.response.data;
+        setResponse(errmsg);
+        setError(true);
+      });
+  };
+  useEffect(() => {
+    getUserData();
+  }, []);
 
   return (
     <div>
-      <header className="inner_page_header">
-        <Header />
-        <section className="admin_body">
-          <NavBar />
+      {redirect ? <Redirect to="/login" /> : null}
+      {error ? (
+        <Error
+          response={response}
+          setError={() => {
+            setError(false);
+            setRedirect(true);
+          }}
+        />
+      ) : null}
+      {loading ? (
+        <Spinner />
+      ) : (
+        <header className="inner_page_header">
+          <Header />
+          <section className="admin_body">
+            <NavBar />
 
-          <div
-            className="container"
-            style={{ marginTop: " 20px", marginBottom: "20px" }}
-          >
-            <div className="row">
-              <div className="col-md-10 col-sm-12">
-                <table
-                  cellSpacing="1"
-                  cellPadding="2"
-                  border="0"
-                  width="100%"
-                  className="tab"
-                >
-                  <tbody>
-                    <tr>
-                      <td className="inheader">
-                        <b>Transactions</b>
-                      </td>
-                      <td className="inheader" width="200">
-                        <b>Amount</b>
-                      </td>
-                      <td className="inheader" width="170">
-                        <b>Date</b>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="inheader">
-                        <b>Paid</b>
-                      </td>
-                      <td className="inheader" width="200">
-                        <b>5000</b>
-                      </td>
-                      <td className="inheader" width="170">
-                        <b>12-02-2020</b>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">Total Investment:</td>
-                      <td align="right">
-                        <b>123456</b>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">Total Recieved:</td>
-                      <td align="right">
-                        <b>123456</b>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+            <div
+              className="container"
+              style={{ marginTop: " 20px", marginBottom: "20px" }}
+            >
+              <div className="row">
+                <div className="col-md-10 col-sm-12">
+                  <table
+                    cellSpacing="1"
+                    cellPadding="2"
+                    border="0"
+                    width="100%"
+                    className="tab"
+                  >
+                    <tbody>
+                      <tr>
+                        <td className="inheader">
+                          <b>PH</b>
+                        </td>
+                        <td className="inheader" width="200">
+                          <b>Amount</b>
+                        </td>
+                        <td className="inheader" width="170">
+                          <b>Date</b>
+                        </td>
+                      </tr>
+                      {investHistory.map((el) => (
+                        <tr>
+                          <td className="inheader">
+                            <b>{el.gher_accountName}</b>
+                          </td>
+                          <td className="inheader" width="200">
+                            <b>{el.amount}</b>
+                          </td>
+                          <td className="inheader" width="170">
+                            <b>{el.updatedAt}</b>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <br />
+                <div className="col-md-10 col-sm-12">
+                  <table
+                    cellSpacing="1"
+                    cellPadding="2"
+                    border="0"
+                    width="100%"
+                    className="tab"
+                  >
+                    <tbody>
+                      <tr>
+                        <td className="inheader">
+                          <b>GH</b>
+                        </td>
+                        <td className="inheader" width="200">
+                          <b>Amount</b>
+                        </td>
+                        <td className="inheader" width="170">
+                          <b>Date</b>
+                        </td>
+                      </tr>
+                      {cashoutHistory.map((el) => (
+                        <tr>
+                          <td className="inheader">
+                            <b>{el.pher_name}</b>
+                          </td>
+                          <td className="inheader" width="200">
+                            <b>{el.amount}</b>
+                          </td>
+                          <td className="inheader" width="170">
+                            <b>{el.updatedAt}</b>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <br />
+              <br />
+              <div className="row">
+                <div className="col-md-10 col-sm-12">
+                  <table
+                    cellSpacing="1"
+                    cellPadding="2"
+                    border="0"
+                    width="100%"
+                    className="tab"
+                  >
+                    <tbody>
+                      <tr>
+                        <td className="inheader">
+                          <b>Referals</b>
+                        </td>
+                        <td className="inheader" width="200">
+                          <b>Bonus</b>
+                        </td>
+                      </tr>
+                      {downline.map((el) => (
+                        <tr>
+                          <td className="inheader">
+                            <b>{el.name}</b>
+                          </td>
+                          <td className="inheader" width="200">
+                            <b>{el.amount * 0.1}</b>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
-            <br />
-            <br />
-            <div className="row">
-              <div className="col-md-10 col-sm-12">
-                <table
-                  cellSpacing="1"
-                  cellPadding="2"
-                  border="0"
-                  width="100%"
-                  className="tab"
-                >
-                  <tbody>
-                    <tr>
-                      <td className="inheader">
-                        <b>Referals</b>
-                      </td>
-                      <td className="inheader" width="200">
-                        <b>Bonus</b>
-                      </td>
-                      <td className="inheader" width="170">
-                        <b>Date</b>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="inheader">
-                        <b>User</b>
-                      </td>
-                      <td className="inheader" width="200">
-                        <b>5000</b>
-                      </td>
-                      <td className="inheader" width="170">
-                        <b>12-02-2020</b>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </section>
-        <Footer />{" "}
-      </header>
+          </section>
+          <Footer />{" "}
+        </header>
+      )}
     </div>
   );
 }

@@ -38,10 +38,7 @@ function PhComponent({
       </h5>
       <h5 style={{ marginLeft: "0.5rem", marginBottom: "0.3rem" }}>
         You have until{" "}
-        {
-          time
-          // ` ${format(addHours(time, 8), "MMM-dd' 'hh:mm aaaa")} `
-        }
+        {` ${format(addHours(new Date(time), 8), "MMM-dd' 'hh:mm aaaa")} `}
         to recieve this Payment or Purge User.
       </h5>
       <div className="row">
@@ -91,7 +88,9 @@ function PhComponent({
         </div>
       ) : null}
 
-      {pop !== undefined ? (
+      {pop == null ? (
+        <p>No POP available</p>
+      ) : (
         <div className="row">
           <div className="col-md-4 col-sm-6 col-xs-12  ml-2">
             {" "}
@@ -102,7 +101,7 @@ function PhComponent({
             />
           </div>{" "}
         </div>
-      ) : null}
+      )}
     </div>
   );
 }

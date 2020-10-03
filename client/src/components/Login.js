@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from "react";
-
 import { useHistory, Redirect } from "react-router-dom";
 import Spinner from "./Spinner";
 import axios from "axios";
@@ -44,35 +43,38 @@ function Login() {
       localStorage.checkbox = isChecked;
     }
     axios
-      .post("http://localhost:4000/users/login", loginData)
+      .post("http://localhost:4000/users/login", loginData, {
+        withCredentials: true,
+      })
       .then((res) => {
         document.cookie = `token=${res.data}`;
         console.log("token from server", res);
-        axios
-          .get("http://localhost:4000/users/user", { withCredentials: true })
-          .then((res) => {
-            console.log("user data", res.data);
-            setUser((prevState) => ({
-              ...prevState,
-              user: { ...res.data },
-              // authenticated: true,
-            }));
+        setRedirect(true);
+        // axios
+        //   .get("http://localhost:4000/users/user", { withCredentials: true })
+        //   .then((res) => {
+        //     console.log("user data", res.data);
+        //     setUser((prevState) => ({
+        //       ...prevState,
+        //       user: { ...res.data },
+        //       // authenticated: true,
+        //     }));
 
-            axios
-              .get(`http://localhost:4000/receipts/foruser/${res.data.email}`, {
-                withCredentials: true,
-              })
-              .then((res) => {
-                console.log("receipt data", res.data);
-                setUser((prevState) => ({
-                  ...prevState,
-                  receipt: [...res.data],
-                }));
-                sessionStorage.setItem("authenticated", "true");
-                setRedirect(true);
-                console.log("finalState", user);
-              });
-          });
+        //     axios
+        //       .get(`http://localhost:4000/receipts/foruser/${res.data.email}`, {
+        //         withCredentials: true,
+        //       })
+        //       .then((res) => {
+        //         console.log("receipt data", res.data);
+        //         setUser((prevState) => ({
+        //           ...prevState,
+        //           receipt: [...res.data],
+        //         }));
+        //         sessionStorage.setItem("authenticated", "true");
+        //         setRedirect(true);
+        //         console.log("finalState", user);
+        //       });
+        //   });
       })
       .catch((err) => {
         setLoading(false);

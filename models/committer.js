@@ -2,15 +2,15 @@ const mongoose = require("mongoose");
 
 const CommitterSchema = new mongoose.Schema(
   {
-    username: {
-      type: String,
-    },
     email: {
       type: String,
     },
     amount: {
       type: Number,
       default: 0,
+    },
+    pledgeIndex: {
+      type: Number,
     },
   },
   { timestamps: true }

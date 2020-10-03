@@ -2,9 +2,6 @@ const mongoose = require("mongoose");
 
 const PherSchema = new mongoose.Schema(
   {
-    username: {
-      type: String,
-    },
     email: {
       type: String,
     },

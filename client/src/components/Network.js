@@ -7,6 +7,7 @@ import { useHistory } from "react-router-dom";
 
 function Referals({}) {
   const { user, setUser } = useContext(UserContext);
+  const { downline, investHistory, cashoutHistory } = user.user;
 
   return (
     <div>

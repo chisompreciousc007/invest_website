@@ -10,7 +10,7 @@ import NavBar from "./NavBar";
 import { addHours, format } from "date-fns";
 
 function Dashboard({}) {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [redirect, setRedirect] = useState(false);
   const { user, setUser } = useContext(UserContext);
   const [error, setError] = useState(false);
@@ -26,14 +26,58 @@ function Dashboard({}) {
     isBlocked,
     createdAt,
   } = user.user;
-  let redirecting = null;
-  if (redirect) {
-    redirecting = <Redirect to="/login" />;
-  }
+
+  const getUserData = () => {
+    console.log("get userData running");
+    if (user.user._id) {
+      setLoading(false);
+      return console.log("already gotten user data");
+    }
+    axios
+      .get("http://localhost:4000/users/user", { withCredentials: true })
+      .then((res) => {
+        console.log("user data", res.data);
+        setUser((prevState) => ({
+          ...prevState,
+          user: { ...res.data },
+        }));
+
+        axios
+          .get(`http://localhost:4000/receipts/foruser/${res.data.email}`, {
+            withCredentials: true,
+          })
+          .then((res) => {
+            console.log("receipt data", res.data);
+            setUser((prevState) => ({
+              ...prevState,
+              receipt: [...res.data],
+            }));
+          });
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        const errmsg = err.response.data;
+        setResponse(errmsg);
+        setError(true);
+      });
+  };
+  useEffect(() => {
+    getUserData();
+  }, []);
 
   return (
     <div>
-      {redirecting}
+      {redirect ? <Redirect to="/login" /> : null}
+      {error ? (
+        <Error
+          response={response}
+          setError={() => {
+            setError(false);
+            setRedirect(true);
+          }}
+        />
+      ) : null}
       {loading ? (
         <Spinner />
       ) : !isBlocked ? (

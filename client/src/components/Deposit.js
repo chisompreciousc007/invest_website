@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
-import { useHistory } from "react-router-dom";
+import { useHistory, Redirect } from "react-router-dom";
 import SelectAmount from "./SelectAmount";
 import Ph from "./Ph";
 import Gh from "./Gh2";
@@ -10,7 +10,7 @@ import Footer from "./Footer";
 import Header from "./Header";
 import { UserContext } from "./UserContext";
 import NavBar from "./NavBar";
-import { addHours, format } from "date-fns";
+// import { addHours, format } from "date-fns";
 
 function Dashboard({}) {
   const history = useHistory();
@@ -24,6 +24,8 @@ function Dashboard({}) {
   const [selectAmount, setSelectAmount] = useState(5000);
   const [errormsg, setErrormsg] = useState(false);
   const { user, setUser } = useContext(UserContext);
+  const [response, setResponse] = useState(null);
+  const [redirect, setRedirect] = useState(false);
   const {
     _id,
     name,
@@ -48,7 +50,7 @@ function Dashboard({}) {
     const file = e.target.files[0];
     // setdefaultFileLabel(filename);
     setFile(file);
-    console.log(file);
+    console.log("File Selected");
   };
   const fileUploadHandler = async (e) => {
     e.preventDefault();
@@ -138,8 +140,8 @@ function Dashboard({}) {
   const purgeHandler = () => {
     axios
       .patch(
-        `http://localhost:4000/receipts/purge/${currentReceiptID}`,
-        currentReceiptID
+        `http://localhost:4000/receipts/purge/${currentReceipt._id}`,
+        currentReceipt
       )
       .then((res) => {
         console.log("purge successful!!", res.data);
@@ -155,11 +157,62 @@ function Dashboard({}) {
   const FeeArr = receipt.filter(
     (el) => el.gher_email === email && el.isActivationFee === true
   );
+  const getUserData = () => {
+    console.log("get userData running");
+    if (user.user._id) {
+      setLoading(false);
+      return console.log("already gotten user data");
+    }
+    axios
+      .get("http://localhost:4000/users/user", { withCredentials: true })
+      .then((res) => {
+        console.log("user data", res.data);
+        setUser((prevState) => ({
+          ...prevState,
+          user: { ...res.data },
+        }));
+
+        axios
+          .get(`http://localhost:4000/receipts/foruser/${res.data.email}`, {
+            withCredentials: true,
+          })
+          .then((res) => {
+            console.log("receipt data", res.data);
+            setUser((prevState) => ({
+              ...prevState,
+              receipt: [...res.data],
+            }));
+          });
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        const errmsg = err.response.data;
+        setResponse(errmsg);
+        setError(true);
+      });
+  };
+  useEffect(() => {
+    getUserData();
+  }, []);
 
   return loading ? (
-    <Spinner />
+    redirect ? (
+      <Redirect to="/login" />
+    ) : (
+      <Spinner />
+    )
   ) : !isBlocked ? (
     <div>
+      {error ? (
+        <Error
+          response={response}
+          setError={() => {
+            setError(false);
+            setRedirect(true);
+          }}
+        />
+      ) : null}
       <header className="inner_page_header">
         <Header />
 
@@ -210,19 +263,16 @@ function Dashboard({}) {
             //    ITERATE THROUGH LIST
             <h4>You will be Matched within the next few hours</h4>
           ) : null}
-          {isActivated && FeeArr.length
+          {!isActivated && FeeArr.length
             ? //ITERATE THROUGH LIST FOR GUIDER
-              phReceiptArr.map((el) => (
+              FeeArr.map((el) => (
                 <Gh
-                  name={el.pher_email}
+                  name={el.pher_name}
                   phone={el.pher_phone}
                   amount={el.amount}
-                  time={` ${format(
-                    addHours(new Date(el.createdAt), 8),
-                    "MMM-dd' 'hh:mm aaaa"
-                  )} `}
+                  time={el.createdAt}
                   confirm={confirmFeeHandler}
-                  purge={purgeHandler}
+                  purge={() => console.log("cant purge new user")}
                   pop={el.popPath}
                   IdSet={() => setCurrentReceipt(el)}
                 />
@@ -232,13 +282,10 @@ function Dashboard({}) {
             ? //ITERATE THROUGH LIST,CHECK IF ACTIVATED and PAIRED
               phReceiptArr.map((el) => (
                 <Gh
-                  name={el.pher_email}
+                  name={el.pher_name}
                   phone={el.pher_phone}
                   amount={el.amount}
-                  time={` ${format(
-                    addHours(new Date(el.createdAt), 8),
-                    "MMM-dd' 'hh:mm aaaa"
-                  )} `}
+                  time={el.createdAt}
                   confirm={confirmPaymentHandler}
                   purge={purgeHandler}
                   pop={el.popPath}
@@ -254,7 +301,7 @@ function Dashboard({}) {
     <Error
       response="Your Account have been Blocked, Please write to support for verification and reactivation"
       setError={() => {
-        history.push("/");
+        history.push("/login");
       }}
     />
   );

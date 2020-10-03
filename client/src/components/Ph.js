@@ -59,7 +59,7 @@ function PhComponent({
           marginLeft: "-15px",
         }}
       >
-        {pop === undefined ? (
+        {pop == null ? (
           <div className="col-md-4 col-sm-6 col-12">
             <form onsubmit="return false">
               <div
@@ -100,12 +100,12 @@ function PhComponent({
             <div style={{ marginLeft: "0.5rem" }}>
               <span className="badge badge-success">POP Uploaded!!</span>
             </div>
-            <img
+            {/* <img
               style={{ marginLeft: "0.5rem" }}
               src={require(`../boostrapdashboard${pop}`)}
               style={{ height: "400px", width: "100%" }}
               alt="popslip"
-            />
+            /> */}
           </div>
         )}
       </div>

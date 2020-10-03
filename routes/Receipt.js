@@ -7,6 +7,7 @@ const Pher = require("../models/pher");
 const Guider = require("../models/guider");
 const User = require("../models/user");
 const Committer = require("../models/committer");
+const { findOneAndRemove } = require("../models/user");
 // const verify = require("../verifytoken");
 
 const pairPhGh = async (ph, gh, amount) => {
@@ -79,9 +80,10 @@ router.patch("/confirm/:id", async (req, res) => {
     const confirmReceipt = await Receipt.findByIdAndUpdate(req.params.id, {
       isConfirmed: true,
     });
+    const { pher_email, gher_email, amount } = confirmReceipt;
     console.log("Receipt status changed to Confirmed");
     const addToPherHistory = await User.findOneAndUpdate(
-      { email: req.body.pher_email },
+      { email: pher_email },
       {
         $push: {
           investHistory: {
@@ -95,9 +97,11 @@ router.patch("/confirm/:id", async (req, res) => {
         },
       }
     );
+    const index = addToPherHistory.pledge.length;
+    const { pledge } = addToPherHistory;
     console.log("Pher's investHistory Updated");
     const addToGherHistory = await User.findOneAndUpdate(
-      { email: req.body.gher_email },
+      { email: gher_email },
       {
         $push: {
           cashoutHistory: {
@@ -110,41 +114,145 @@ router.patch("/confirm/:id", async (req, res) => {
     );
     console.log("Gher's cashoutHistory Updated");
 
+    // BALANCE OUT GHER DATA
+    const checkGherAmount = await Gher.findOne({ email: gher_email });
+    const GherAmount = +checkGherAmount.amount;
+    const receiptAmount = +amount;
+    if (GherAmount == receiptAmount) {
+      const deleteGher = await Gher.findOneAndRemove({
+        email: gher_email,
+      });
+    }
+    if (GherAmount > receiptAmount) {
+      const balance = GherAmount - receiptAmount;
+      const deleteGher = await Gher.findOneAndUpdate(
+        { email: gher_email },
+        { amount: balance }
+      );
+    }
+
     const deleteReceipt = await Receipt.findByIdAndDelete(req.params.id);
     console.log("Receipt Deleted");
-
-    const committerExist = await find({ email: req.body.pher_email });
-    if (committerExist.length) {
-      const tempArray = committerExist.map((el) => el.amount);
-      const sumOfCommit = tempArray.reduce((a, b) => a + b, 0);
-      const tempUser = await User.findOne({ email: req.body.pher_email });
-      const lastPledgeIndex = tempUser.investAmountHistory.length - 1;
-      const lastPledge = +tempUser.investAmountHistory[lastPledgeIndex];
-      if (sumOfCommit == lastPledge) {
-        const newGher = new Gher({
-          username: committerExist[0].username,
-          email: committerExist[0].email,
-          amount: sumOfCommit,
-        });
-        const savedGher = await newGher.save();
-        console.log("Pushed Old Commit to Ghers Array");
-      }
-      // CONTINUE HERE
-      if (sumOfCommit <= lastPledge) {
-        const newGher = new Gher({
-          username: committerExist[0].username,
-          email: committerExist[0].email,
-          amount: sumOfCommit,
-        });
-        const savedGher = await newGher.save();
-        console.log("Pushed Old Commit to Ghers Array");
+    // CHECK FOR OLD COMMITMENT
+    const committerExist = await Committer.findOne({
+      email: pher_email,
+    });
+    if (!CommitterExist) {
+      // create committer
+      const newCommitter = new Committer({
+        email: pher_email,
+        amount: amount,
+        pledgeIndex: index,
+      });
+      const saveCommiter = await newCommitter.save();
+      // CHECK IF RECEIPT PAYMENT IS EQUAL TO PLEDGE
+      if (amount == pledge) {
+        const updatePherProfile = await User.findOneAndUpdate(
+          { email: pher_email, "pledge.id": index },
+          {
+            $set: {
+              "pledge.$.isFulfilled": true,
+            },
+          }
+        );
       }
     }
-    if (!committerExist.length) {
+
+    // IF COMMITTER EXIST
+    if (committerExist) {
+      const amt = committerExist.amount;
+      if (pledge[index].isFulfilled) {
+        const newGher = await new Gher({
+          email: pher_email,
+          amount: amt * 1.5,
+        }).save();
+
+        const deletePherFromCommitterArr = await Committer.findOneAndRemove({
+          email: pher_email,
+        });
+
+        const newComitFromReceipt = await new Committer({
+          email: pher_email,
+          amount: amount,
+          pledgeIndex: index,
+        }).save();
+
+        if (newComitFromReceipt.amount == pledge[index].amount) {
+          const updatePherProfile = await User.findOneAndUpdate(
+            { email: pher_email, "pledge.id": index },
+            {
+              $set: {
+                "pledge.$.isFulfilled": true,
+              },
+            }
+          );
+        }
+      }
+      if (!pledge[index].isFulfilled) {
+        const oldCommit = await Committer.findOne({ email: pher_email });
+        const oldCommitAmt = oldCommit.amount;
+        const totalAmt = oldCommitAmt + amount;
+        const updateCommit = await Committer.findOneAndUpdate(
+          { email: pher_email },
+          { amount: totalAmt }
+        );
+
+        if (updateCommit.amount == pledge[index].amount) {
+          const updatePherProfil = await User.findOneAndUpdate(
+            { email: pher_email, "pledge.id": index },
+            {
+              $set: {
+                "pledge.$.isFulfilled": true,
+              },
+            }
+          );
+        }
+      }
+    }
+
+    // IF COMMITMENT EXIST, CHECK IF FULLY PAID
+    if (committerExist) {
+      const committArr = await Committer.find({ email: req.body.pher_email });
+      const tempArray = committArr.map((el) => el.amount);
+      const sumOfCommit = tempArray.reduce((a, b) => a + b, 0);
+      const tempUser = await User.findOne(
+        { email: req.body.pher_email },
+        { investAmountHistory: 1 }
+      );
+      const lastPledgeIndex = tempUser.investAmountHistory.length - 1;
+      const lastPledge = +tempUser.investAmountHistory[lastPledgeIndex];
+      // IF COMPLETED PAYMENT FOR FIRST PLEDGE
+      if (sumOfCommit == lastPledge) {
+        // delete old records of commit
+        const deleteOldCommits = await Committer.deleteMany({
+          email: req.body.email,
+        });
+        // ADD OLD COMMIT TO GHER ARRAY
+        const newGher = new Gher({
+          username: req.body.pher_username,
+          email: req.body.pher_email,
+          amount: lastPledge * 1.5,
+        });
+        const savedGher = await newGher.save();
+        console.log("Pushed Old Commits to Ghers Array");
+      }
+      // IF NOT COMPLETED LAST PLEDGE
+      if (sumOfCommit <= lastPledge) {
+        const newCommitter = new Committer({
+          username: req.body.pher_username,
+          email: req.body.email,
+          amount: req.body.amount,
+        });
+        const savedCommitter = await newCommitter.save();
+        console.log("Updated Payer to Incomplete Committers Array");
+      }
+    }
+    // IF NO RECORD IN COMMITTED, ADD TO COMMITTED ARRAY
+    if (!committerExist) {
       const newCommitter = new Committer({
-        username: committerExist.username,
-        email: committerExist.email,
-        amount: committerExist.amount * 1.5,
+        username: req.body.pher_username,
+        email: req.body.email,
+        amount: req.body.amount,
       });
       const savedCommitter = await newCommitter.save();
       console.log("saved Payer to Committers Array");

@@ -14,9 +14,8 @@ router.post("/:id", async (req, res) => {
       { new: true, runValidators: true, context: "query" }
     );
     const newCommitter = new Committer({
-      username: regCommitter.username,
       email: regCommitter.email,
-      amount: +req.body.amount * 1.5,
+      amount: +req.body.amount,
     });
     const savedCommitter = await newCommitter.save();
     res.json(savedCommitter);

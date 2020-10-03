@@ -9,6 +9,19 @@ const { loginValidation } = require("../validation");
 const { findOne } = require("../models/user");
 const Receipt = require("../models/receipt");
 const Committer = require("../models/committer");
+const Nexmo = require("nexmo");
+const { addHours, format } = require("date-fns");
+
+require("dotenv/config");
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const autheToken = process.env.TWILIO_AUTHE_TOKEN;
+const client = require("twilio")(accountSid, autheToken);
+const { TelegramClient } = require("messaging-api-telegram");
+
+// get accessToken from telegram [@BotFather](https://telegram.me/BotFather)
+const clientTelegram = new TelegramClient({
+  accessToken: "1305066920:AAEcJ5MEM2SNDnb-82ypWLcYCPFe7twyt4c",
+});
 
 const pairPhGhWithEmail = async (a, b, amount) => {
   const ph = await User.findOne({ email: a });
@@ -93,6 +106,7 @@ router.post("/", async (req, res) => {
     });
     const savedUser = await newUser.save();
     console.log("new User saved");
+
     // CREATE RECEIPT FOR ACTIVATION FEE
     const gh = await User.findOne({ email: selectGuider.email });
     const newReceipt = new Receipt({
@@ -109,6 +123,27 @@ router.post("/", async (req, res) => {
       isActivationFee: true,
     });
     const savedReceipt = await newReceipt.save();
+    client.messages
+      .create({
+        body: `You have been matched to pay 1000 activation fee to  ${
+          savedReceipt.gher_name
+        } before ${format(
+          addHours(new Date(savedReceipt.createdAt), 8),
+          "MMM-dd' 'hh:mm aaaa"
+        )}.`,
+        from: "+12059646173",
+        to: "+2348036734191",
+      })
+      .then((message) => console.log(message.body))
+      .catch((err) => console.log(err));
+    const res = await clientTelegram.sendMessage(
+      "@splash_cash247",
+      `${savedReceipt.pher_name} been matched to pay 1000 activation fee to ${savedReceipt.gher_name}.`,
+      {
+        disableWebPagePreview: true,
+        disableNotification: true,
+      }
+    );
     console.log("Fee Receipt Generated");
     // UPDATE GUIDER History
     const editGuider = await User.findOneAndUpdate(
@@ -151,7 +186,7 @@ router.post("/", async (req, res) => {
 // TESTING OUT ROUTES
 // router.post("/test", async (req, res) => {
 //   const checkReferee = await User.findOne({ username: "jbond" }, "name");
-//   res.send(checkReferee);
+//   res.send("wait for text");
 // });
 //LOGIN
 router.post("/login", async (req, res) => {

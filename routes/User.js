@@ -14,6 +14,7 @@ const Committer = require("../models/committer");
 const Nexmo = require("nexmo");
 const { addHours, format } = require("date-fns");
 require("dotenv/config");
+const rateLimit = require("express-rate-limit");
 const BOT_TOKEN = process.env.BOT_TOKEN;
 // const accountSid = process.env.TWILIO_ACCOUNT_SID;
 // const autheToken = process.env.TWILIO_AUTHE_TOKEN;
@@ -22,6 +23,14 @@ const { TelegramClient } = require("messaging-api-telegram");
 const clientTelegram = new TelegramClient({
   accessToken: BOT_TOKEN,
 });
+
+const createAccountLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour window
+  max: 5, // start blocking after 5 requests
+  message:
+    "Too many accounts created from this IP, please try again after an hour",
+});
+
 // VERIFY USER AND RETURN USER DATA
 router.get("/user", verify, async (req, res) => {
   try {
@@ -32,7 +41,7 @@ router.get("/user", verify, async (req, res) => {
   }
 });
 // CREATE USER
-router.post("/", async (req, res) => {
+router.post("/", createAccountLimiter, async (req, res) => {
   try {
     const {
       name,

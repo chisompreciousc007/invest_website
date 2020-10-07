@@ -8,6 +8,7 @@ bodyParser = require("body-parser");
 // const ejwt = require("express-jwt");
 require("dotenv/config");
 // const path = require("path");
+const rateLimit = require("express-rate-limit");
 const userRouter = require("./routes/User");
 const uploadRouter = require("./routes/Upload");
 const receiptRouter = require("./routes/Receipt");
@@ -32,11 +33,16 @@ try {
 } catch (error) {
   console.log("errrorrrr");
 }
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+});
 // const corsOptions = {
 //   origin: true,
 //   credentials: true,
 //   maxAge: 3600,
 // };
+
 app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 app.use(express.json());
 app.use(cookieParser());
@@ -48,7 +54,9 @@ app.use(
     extended: false,
   })
 );
-
+app.use("/receipts", apiLimiter);
+app.use("/users", apiLimiter);
+app.use("/uploads", apiLimiter);
 app.use("/users", userRouter);
 app.use("/uploads", uploadRouter);
 app.use("/receipts", receiptRouter);

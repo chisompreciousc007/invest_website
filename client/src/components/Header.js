@@ -1,6 +1,12 @@
-import React, { Link } from "react";
+import React from "react";
+import { useHistory } from "react-router-dom";
 
 export default function MainHeader() {
+  const history = useHistory();
+  const logout = () => {
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    history.push("/login");
+  };
   return (
     <>
       <div className="header_top">
@@ -25,7 +31,11 @@ export default function MainHeader() {
               <div className="header_top_right">
                 <ul>
                   <li>
-                    <a className="btn btn-default" href="/">
+                    <a
+                      className="btn btn-default"
+                      href="/login"
+                      onClick={logout}
+                    >
                       Logout
                     </a>
                   </li>

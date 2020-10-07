@@ -97,7 +97,7 @@ function PhComponent({
             <img
               src={require(`../../public/uploads/${pop}`)}
               style={{ height: "400px", width: "100%" }}
-              alt="image"
+              alt="pop"
             />
           </div>{" "}
         </div>

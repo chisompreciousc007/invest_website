@@ -2,14 +2,24 @@ const express = require("express");
 const router = express.Router();
 const { v4: uuidv4 } = require("uuid");
 const path = require("path");
+const fileUpload = require("express-fileupload");
+const fs = require("fs");
 
 router.post("/", (req, res) => {
-  if (req.files == null) {
-    return res.status(400).json({ msg: "No file Uploaded" });
+  try {
+  } catch (error) {}
+  console.log("running");
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.status(400).send("No files were uploaded.");
   }
   const file = req.files.file;
   const uuidfilename = uuidv4();
   const ext = path.extname(file.name);
+  const filesize = file.size;
+  const filetype = file.mimetype;
+  console.log("filesize", filesize, "filetype", filetype);
+  if (filesize >= 1000000) throw new Error("File exceeds 1mb");
+
   file.mv(`client/public/uploads/${uuidfilename}${ext}`, (err) => {
     // file.mv(`client/src/components/boostrapdashboard/uploads/${uuidfilename}${ext}`, err => {
     if (err) {
@@ -24,5 +34,16 @@ router.post("/", (req, res) => {
     });
   });
 });
+// router.delete("/", (req, res) => {
+//   try {
+//     console.log("running");
+//     fs.unlink(`client/public/uploads/oie_2iE5KQclNSiP.jpg`, (err) => {
+//       if (err) throw err;
+//       console.log("path/file.txt was deleted");
+//     });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// });
 
 module.exports = router;

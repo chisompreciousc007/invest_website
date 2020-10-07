@@ -8,7 +8,7 @@ import { UserContext } from "./UserContext";
 import NavBar from "./NavBar";
 import Spinner from "./Spinner";
 
-function Transactions({}) {
+function Transactions() {
   const { user, setUser } = useContext(UserContext);
   const { downline, investHistory, cashoutHistory } = user.user;
   const [redirect, setRedirect] = useState(false);

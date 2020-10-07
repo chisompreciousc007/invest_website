@@ -24,7 +24,6 @@ const Profile = asyncComponent(() => import("./components/Profile"));
 const Transactions = asyncComponent(() => import("./components/Transactions"));
 const Deposit = asyncComponent(() => import("./components/Deposit"));
 const Terms = asyncComponent(() => import("./components/Terms"));
-const TestPage = asyncComponent(() => import("./components/TestPage"));
 
 function App() {
   const [user, setUser] = useState({
@@ -51,7 +50,6 @@ function App() {
           <Route path="/support" exact component={Support} />
           <Route path="/signup=:ref" exact component={SignUp} />
           <Route path="/rules" exact component={Terms} />
-          <Route path="/test" exact component={TestPage} />
 
           <UserContext.Provider value={{ user, setUser }}>
             <Route path="/login" exact component={Login} />

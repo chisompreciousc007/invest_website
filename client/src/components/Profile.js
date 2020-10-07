@@ -8,7 +8,7 @@ import Error from "./Error";
 import axios from "axios";
 import Spinner from "./Spinner";
 
-function Referals({}) {
+function Referals() {
   const { user, setUser } = useContext(UserContext);
   const [error, setError] = useState(false);
   const [response, setResponse] = useState(null);

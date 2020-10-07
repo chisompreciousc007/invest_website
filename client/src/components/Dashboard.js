@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { useHistory, Redirect, Link } from "react-router-dom";
+import { Redirect, Link } from "react-router-dom";
 import Spinner from "./Spinner";
 import Error from "./Error";
 import Footer from "./Footer";
@@ -9,7 +9,7 @@ import { UserContext } from "./UserContext";
 import NavBar from "./NavBar";
 import { addHours, format } from "date-fns";
 
-function Dashboard({}) {
+function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [redirect, setRedirect] = useState(false);
   const { user, setUser } = useContext(UserContext);
@@ -20,12 +20,17 @@ function Dashboard({}) {
     username,
     isActivated,
     InvestAmt,
-    updatedAt,
-    pendingInvestAmt,
     pendingCashoutAmt,
-    isBlocked,
     createdAt,
+    cashoutHistory,
+    investHistory,
+    pledge,
+    email,
   } = user.user;
+  const { receipt } = user;
+  const ghReceiptArr = receipt.filter(
+    (el) => el.gher_email === email && el.isActivationFee === false
+  );
 
   const getUserData = () => {
     console.log("get userData running");
@@ -80,7 +85,7 @@ function Dashboard({}) {
       ) : null}
       {loading ? (
         <Spinner />
-      ) : !isBlocked ? (
+      ) : (
         <div>
           <header className="inner_page_header">
             <Header />
@@ -119,18 +124,26 @@ function Dashboard({}) {
                     >
                       <div className="col-sm-6 col-xs-6">
                         <div className="summary_box">
-                          <h3>PH</h3>
+                          <h3>Pending PH</h3>
                           <h6>
-                            NGN<b id="total_balance">{InvestAmt}</b>
+                            NGN
+                            <b id="total_balance">{pledge}</b>
                           </h6>
                         </div>
                       </div>
 
                       <div className="col-sm-6 col-xs-6">
                         <div className="summary_box">
-                          <h3>GH</h3>
+                          <h3>Pending GH</h3>
                           <h6>
-                            NGN<b>{pendingCashoutAmt}</b>
+                            NGN
+                            <b>
+                              {ghReceiptArr !== []
+                                ? ghReceiptArr
+                                    .map((el) => el.amount)
+                                    .reduce((a, b) => a + b, 0)
+                                : 0}
+                            </b>
                           </h6>
                         </div>
                       </div>
@@ -147,15 +160,25 @@ function Dashboard({}) {
                         <div className="summary_box">
                           <h3>Total GH</h3>
                           <h6>
-                            NGN<b id="total_balance">100,000</b>
+                            NGN
+                            <b id="total_balance">
+                              {cashoutHistory
+                                .map((el) => el.amount)
+                                .reduce((a, b) => a + b, 0)}
+                            </b>
                           </h6>
                         </div>
                       </div>
                       <div className="col-sm-6 col-xs-6">
                         <div className="summary_box">
-                          <h3>Total GH</h3>
+                          <h3>Total PH</h3>
                           <h6>
-                            NGN<b>100,000</b>
+                            NGN
+                            <b>
+                              {investHistory
+                                .map((el) => el.amount)
+                                .reduce((a, b) => a + b, 0)}
+                            </b>
                           </h6>
                         </div>
                       </div>
@@ -215,13 +238,6 @@ function Dashboard({}) {
             <Footer />
           </header>
         </div>
-      ) : (
-        <Error
-          response="Your Account have been Blocked, Please write to support for verification and reactivation"
-          setError={() => {
-            setRedirect(true);
-          }}
-        />
       )}
     </div>
   );

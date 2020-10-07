@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useContext } from "react";
-import { useHistory, Redirect } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Redirect } from "react-router-dom";
 import Spinner from "./Spinner";
 import axios from "axios";
 import Error from "./Error";
-import { UserContext } from "./UserContext";
+// import { UserContext } from "./UserContext";
 
 function Login() {
-  const history = useHistory();
+  // const history = useHistory();
   const [loginData, setLoginData] = useState({
     username: "",
     password: "",
@@ -17,7 +17,7 @@ function Login() {
   const [redirect, setRedirect] = useState(false);
   const [showPassword, setShowpassword] = useState(false);
   const [response, setResponse] = useState(null);
-  const { user, setUser } = useContext(UserContext);
+  // const { user, setUser } = useContext(UserContext);
 
   const onChangeCheckbox = (e) => {
     e.preventDefault();

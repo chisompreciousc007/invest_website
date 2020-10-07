@@ -172,24 +172,23 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    recommit: {
+      type: Boolean,
+      default: false,
+    },
 
     upline: {
       type: String,
+      default: "new",
     },
-    downline: [
+
+    guiderMatch: [
       {
         name: { type: String },
-        amount: { type: Number, default: 0 },
       },
     ],
-    pledge: [
-      {
-        isFulfilled: { type: Boolean, default: false },
-        amount: { type: Number },
-        id: Number,
-      },
-    ],
-    investAmountHistory: [Number],
+    pledge: { type: Number, default: 0 },
+
     wantToInvest: {
       type: Boolean,
       default: false,
@@ -198,9 +197,36 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    investHistory: [payeeSchema],
-    guiderHistory: [payerSchema],
-    cashoutHistory: [payerSchema],
+    downline: [
+      {
+        name: { type: String },
+        amount: { type: Number, default: 0 },
+      },
+    ],
+    purgeHistory: [
+      {
+        name: { type: String },
+        amount: { type: Number },
+      },
+    ],
+    investHistory: [
+      {
+        name: { type: String },
+        amount: { type: Number },
+      },
+    ],
+    guiderHistory: [
+      {
+        name: { type: String },
+        amount: { type: Number },
+      },
+    ],
+    cashoutHistory: [
+      {
+        name: { type: String },
+        amount: { type: Number },
+      },
+    ],
   },
   { timestamps: true }
 );

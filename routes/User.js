@@ -3,6 +3,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
 const User = require("../models/user");
+const Pher = require("../models/pher");
+const Gher = require("../models/gher");
 const Guider = require("../models/guider");
 const verify = require("../verifytoken");
 const { loginValidation } = require("../validation");
@@ -11,66 +13,19 @@ const Receipt = require("../models/receipt");
 const Committer = require("../models/committer");
 const Nexmo = require("nexmo");
 const { addHours, format } = require("date-fns");
-
 require("dotenv/config");
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const autheToken = process.env.TWILIO_AUTHE_TOKEN;
-const client = require("twilio")(accountSid, autheToken);
+const BOT_TOKEN = process.env.BOT_TOKEN;
+// const accountSid = process.env.TWILIO_ACCOUNT_SID;
+// const autheToken = process.env.TWILIO_AUTHE_TOKEN;
+// const client = require("twilio")(accountSid, autheToken);
 const { TelegramClient } = require("messaging-api-telegram");
-
-// get accessToken from telegram [@BotFather](https://telegram.me/BotFather)
 const clientTelegram = new TelegramClient({
-  accessToken: "1305066920:AAEcJ5MEM2SNDnb-82ypWLcYCPFe7twyt4c",
+  accessToken: BOT_TOKEN,
 });
-
-const pairPhGhWithEmail = async (a, b, amount) => {
-  const ph = await User.findOne({ email: a });
-  const gh = await User.findOne({ email: b });
-  const newReceipt = new Receipt({
-    gher_name: gh.name,
-    gher_email: gh.email,
-    gher_accountName: gh.accountName,
-    gher_accountNo: gh.accountNo,
-    gher_bank: gh.bank,
-    gher_phone: gh.phone,
-    pher_name: ph.name,
-    pher_email: ph.email,
-    pher_phone: ph.phone,
-    amount: amount,
-    isActivationFee: true,
-  });
-  const savedReceipt = await newReceipt.save();
-  console.log(
-    `Receipt generated btw ${pher_email} and ${gher_email} for ${amount} `
-  );
-};
-
-const blockUser = async (id) => {
-  await User.findByIdAndUpdate(
-    id,
-    {
-      isBlocked: true,
-    },
-    { new: true, runValidators: true, context: "query" },
-    function (err, result) {
-      if (err) {
-        return err;
-      } else {
-        return result;
-      }
-    }
-  );
-};
-
+// VERIFY USER AND RETURN USER DATA
 router.get("/user", verify, async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.user._id });
-    // if (!user.isActivated || user.wantToInvest) {
-    //   const dateNow = new Date();
-    //   const blockTime = addHour(user.updatedAt, 12);
-    //   console.log(dateNow, blockTime);
-    //   if (dateNow > blockTime) res.json(blockUser(req.user));
-    // }
     res.json(user);
   } catch (err) {
     res.json({ message: err });
@@ -79,97 +34,56 @@ router.get("/user", verify, async (req, res) => {
 // CREATE USER
 router.post("/", async (req, res) => {
   try {
-    // HASH PASSWORD
-    const salt = await bcrypt.genSaltSync(10);
-    const hashedPassword = await bcrypt.hash(req.body.password, salt);
-    // SELECT A RANDOM GUIDER
+    const {
+      name,
+      username,
+      email,
+      password,
+      phone,
+      upline,
+      accountName,
+      accountNo,
+      bank,
+    } = req.body;
     const foundGuiders = await Guider.find({});
     const randomNumber = Math.floor(
       Math.random() * Math.floor(foundGuiders.length)
     );
     const selectGuider = foundGuiders[randomNumber];
+    const guiderEmail = selectGuider.email;
     console.log(
-      `selected random guider ${selectGuider.email} out of ${foundGuiders.length} `
+      `selected random guider ${guiderEmail} out of ${foundGuiders.length} `
     );
-    // SAVE USER
+    // HASH PASSWORD
+    const salt = await bcrypt.genSaltSync(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // SAVE USER ON DB
 
     const newUser = new User({
-      name: req.body.name,
-      username: req.body.username,
-      email: req.body.email,
+      name: name,
+      username: username,
+      email: email,
       password: hashedPassword,
-      phone: req.body.phone,
-      upline: req.body.upline,
-      accountName: req.body.accountName,
-      accountNo: req.body.accountNo,
-      bank: req.body.bank,
+      phone: phone,
+      upline: upline,
+      accountName: accountName,
+      accountNo: accountNo,
+      bank: bank,
     });
     const savedUser = await newUser.save();
     console.log("new User saved");
 
-    // CREATE RECEIPT FOR ACTIVATION FEE
-    const gh = await User.findOne({ email: selectGuider.email });
-    const newReceipt = new Receipt({
-      gher_name: gh.name,
-      gher_email: gh.email,
-      gher_accountName: gh.accountName,
-      gher_accountNo: gh.accountNo,
-      gher_bank: gh.bank,
-      gher_phone: gh.phone,
-      pher_name: savedUser.name,
-      pher_email: savedUser.email,
-      pher_phone: savedUser.phone,
-      amount: 1000,
-      isActivationFee: true,
-    });
-    const savedReceipt = await newReceipt.save();
-    client.messages
-      .create({
-        body: `You have been matched to pay 1000 activation fee to  ${
-          savedReceipt.gher_name
-        } before ${format(
-          addHours(new Date(savedReceipt.createdAt), 8),
-          "MMM-dd' 'hh:mm aaaa"
-        )}.`,
-        from: "+12059646173",
-        to: "+2348036734191",
-      })
-      .then((message) => console.log(message.body))
-      .catch((err) => console.log(err));
-    const res = await clientTelegram.sendMessage(
-      "@splash_cash247",
-      `${savedReceipt.pher_name} been matched to pay 1000 activation fee to ${savedReceipt.gher_name}.`,
-      {
-        disableWebPagePreview: true,
-        disableNotification: true,
-      }
-    );
-    console.log("Fee Receipt Generated");
-    // UPDATE GUIDER History
-    const editGuider = await User.findOneAndUpdate(
-      { email: selectGuider.email },
-      {
-        $push: {
-          // change to guiderHistory afterv test
-          guiderList: {
-            name: savedUser.name,
-            phone: savedUser.phone,
-            amount: 1000,
-          },
-        },
-      },
-      { new: true, runValidators: true, context: "query" }
-    );
-    console.log("guiderHistory edited");
     // UPDATE REFERRALS
-    const checkReferee = await User.findOne({ username: req.body.upline });
-    if (req.body.upline !== "new" && checkReferee !== null) {
+
+    if (upline !== "new") {
+      const checkReferee = await User.findOne({ username: upline });
       const editReferee = await User.findOneAndUpdate(
-        { username: req.body.upline },
+        { username: upline },
         {
           $push: {
             downline: {
-              name: savedUser.name,
+              name: name,
             },
           },
         },
@@ -178,16 +92,54 @@ router.post("/", async (req, res) => {
       console.log("Referal Updated");
     }
 
+    // CREATE RECEIPT FOR ACTIVATION FEE
+    const gh = await User.findOne({ email: guiderEmail });
+    const newReceipt = new Receipt({
+      gher_name: gh.name,
+      gher_email: gh.email,
+      gher_accountName: gh.accountName,
+      gher_accountNo: gh.accountNo,
+      gher_bank: gh.bank,
+      gher_phone: gh.phone,
+      pher_name: name,
+      pher_email: email,
+      pher_phone: phone,
+      amount: 1000,
+      isActivationFee: true,
+    });
+    const savedReceipt = await newReceipt.save();
+    console.log("Fee Receipt Generated");
+
+    const postTelegram = clientTelegram.sendMessage(
+      "@splash_cash247",
+      `${savedReceipt.pher_name} have been Successfully registered, Please proceed to pay activation fee to your guider.`,
+      {
+        disableWebPagePreview: true,
+        disableNotification: true,
+      }
+    );
+
+    // UPDATE GUIDER MaTCH ARRAY
+    const editGuider = User.findOneAndUpdate(
+      { email: guiderEmail },
+      {
+        $push: {
+          guiderMatch: {
+            name: name,
+          },
+        },
+      },
+      { new: true, runValidators: true, context: "query" }
+    );
+    const postTelegramPromise = await postTelegram;
+    const editGuiderPromise = await editGuider;
+    console.log("Telegram Posted");
+    console.log("guiderMatch Updated");
     res.json(savedUser);
   } catch (err) {
     res.json({ message: err });
   }
 });
-// TESTING OUT ROUTES
-// router.post("/test", async (req, res) => {
-//   const checkReferee = await User.findOne({ username: "jbond" }, "name");
-//   res.send("wait for text");
-// });
 //LOGIN
 router.post("/login", async (req, res) => {
   //validate data before sending
@@ -231,23 +183,6 @@ router.post("/email", async (req, res) => {
   if (user) return res.send(true);
   if (!user) return res.send(false);
 });
-// POP UPLOAD FOR ACTIVATION FEE
-router.patch("/pop/:id", async (req, res) => {
-  console.log("pop saved name", req.body.popPath);
-  await Receipt.findByIdAndUpdate(
-    req.params.id,
-
-    { pop: req.body.popPath },
-    { new: true, runValidators: true, context: "query" },
-    function (err, result) {
-      if (err) {
-        res.json(err);
-      } else {
-        res.json(result);
-      }
-    }
-  );
-});
 router.get("/", async (req, res) => {
   try {
     const foundUser = await User.find();
@@ -256,37 +191,40 @@ router.get("/", async (req, res) => {
     res.json({ message: err });
   }
 });
-router.patch("/wantToInvest/:id", async (req, res) => {
+router.patch("/wantToInvest", async (req, res) => {
   try {
+    // INPUTS
+    const { _id: id, email, investAmt } = req.body;
+
     const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
+      id,
       {
-        $push: {
-          investAmountHistory: req.body.investAmt,
-        },
-      },
-      { new: true, runValidators: true, context: "query" }
-    );
-    console.log("Invest Amount History Array Updated");
-    const result = await User.findByIdAndUpdate(
-      req.params.id,
-      {
+        pledge: investAmt,
         wantToInvest: true,
       },
       { new: true, runValidators: true, context: "query" }
     );
-    console.log("wantToInvest status Updated");
-    res.json(result);
+    console.log("Pledge/ wantToInvest Updated");
+    const checkDB = await Pher.findOne({ email: email });
+    if (!checkDB) {
+      const createPher = await new Pher({
+        email: email,
+        amount: investAmt,
+      }).save();
+      console.log("Created Pher for User");
+      res.json(createPher);
+    } else {
+      const updatePher = await Pher.findOneAndUpdate(
+        {
+          email: email,
+        },
+        { amount: investAmt, isPaired: false }
+      );
+      console.log("Updated Pher Amt for User");
+      res.json(updatePher);
+    }
   } catch (error) {
-    res.json(error);
-  }
-});
-router.delete("/:id", async (req, res) => {
-  try {
-    await User.findByIdAndDelete(req.params.id);
-    res.json("user is deleted");
-  } catch (err) {
-    res.json({ message: err });
+    res.status(400).send(error);
   }
 });
 
@@ -298,75 +236,6 @@ router.patch("/password/:id", async (req, res) => {
     req.params.id,
     {
       password: hashedPassword,
-    },
-    { new: true, runValidators: true, context: "query" },
-    function (err, result) {
-      if (err) {
-        res.json(err);
-      } else {
-        res.json(result);
-      }
-    }
-  );
-});
-router.patch("/isActivated/:id", async (req, res) => {
-  await User.findByIdAndUpdate(
-    req.params.id,
-    {
-      isActivated: req.body.isActivated,
-    },
-    { new: true, runValidators: true, context: "query" },
-    function (err, result) {
-      if (err) {
-        res.json(err);
-      } else {
-        res.json(result);
-      }
-    }
-  );
-});
-
-router.patch("/unblock/:id", async (req, res) => {
-  await User.findByIdAndUpdate(
-    req.params.id,
-    {
-      isBlocked: false,
-    },
-    { new: true, runValidators: true, context: "query" },
-    function (err, result) {
-      if (err) {
-        res.json(err);
-      } else {
-        res.json(result);
-      }
-    }
-  );
-});
-
-//testing backend logic
-
-// testing block ends
-router.patch("/wantToCashout/:id", async (req, res) => {
-  await User.findByIdAndUpdate(
-    req.params.id,
-    {
-      wantToCashout: req.body.wantToCashout,
-    },
-    { new: true, runValidators: true, context: "query" },
-    function (err, result) {
-      if (err) {
-        res.json(err);
-      } else {
-        res.json(result);
-      }
-    }
-  );
-});
-router.patch("/readyForCashout/:id", async (req, res) => {
-  await User.findByIdAndUpdate(
-    req.params.id,
-    {
-      readyForCashout: req.body.readyForCashout,
     },
     { new: true, runValidators: true, context: "query" },
     function (err, result) {

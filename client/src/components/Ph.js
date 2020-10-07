@@ -14,8 +14,6 @@ function PhComponent({
   pop,
   IdSet,
 }) {
-  const working = () => IdSet();
-
   return (
     <div
       style={{

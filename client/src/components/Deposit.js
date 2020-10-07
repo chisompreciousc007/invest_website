@@ -12,31 +12,24 @@ import { UserContext } from "./UserContext";
 import NavBar from "./NavBar";
 // import { addHours, format } from "date-fns";
 
-function Dashboard({}) {
+function Dashboard() {
   const history = useHistory();
   const [error, setError] = useState(false);
   // const [defaultFileLabel, setdefaultFileLabel] = useState("Choose File");
   const [loading, setLoading] = useState(false);
-  const [time, setTime] = useState(null);
   const [currentReceipt, setCurrentReceipt] = useState(null);
   const [file, setFile] = useState(null);
-  const [uploadedFile, setUploadedFile] = useState({});
+  // const [uploadedFile, setUploadedFile] = useState({});
   const [selectAmount, setSelectAmount] = useState(5000);
-  const [errormsg, setErrormsg] = useState(false);
   const { user, setUser } = useContext(UserContext);
   const [response, setResponse] = useState(null);
   const [redirect, setRedirect] = useState(false);
   const {
     _id,
-    name,
     email,
     isActivated,
     wantToCashout,
     wantToInvest,
-    InvestAmt,
-    updatedAt,
-    pendingInvestAmt,
-    pendingCashoutAmt,
     isBlocked,
     guider,
     createdAt,
@@ -65,15 +58,13 @@ function Dashboard({}) {
         },
       });
 
-      const { fileName, filePath } = res.data;
-      setUploadedFile({ fileName, filePath });
+      const { filePath } = res.data;
+      // setUploadedFile({ fileName, filePath });got  fileName from res.data
       axios
-        .patch(
-          `http://localhost:4000/receipts/updatePopPath/${currentReceipt._id}`,
-          {
-            popPath: filePath,
-          }
-        )
+        .patch(`http://localhost:4000/receipts/updatePopPath`, {
+          popPath: filePath,
+          ...currentReceipt,
+        })
         .then((res) => {
           console.log("edit popPath successful!!", res.data);
           setLoading(false);
@@ -91,13 +82,14 @@ function Dashboard({}) {
   const submitAmountHandler = (e) => {
     e.preventDefault();
     axios
-      .patch(`http://localhost:4000/users/wantToInvest/${_id}`, {
+      .patch(`http://localhost:4000/users/wantToInvest`, {
         InvestAmt: +selectAmount,
+        _id: _id,
+        email: email,
       })
       .then((res) => {
         console.log("edit wantToInvest successful!!", res.data);
-        history.push("/temp");
-        history.goBack();
+        window.location.reload();
       })
       .catch((err) => {
         console.log("error from edit wwantToInvest: ", err.response);
@@ -113,12 +105,10 @@ function Dashboard({}) {
   };
   const confirmPaymentHandler = () => {
     axios
-      .patch(
-        `http://localhost:4000/receipts/confirm/${currentReceipt._id}`,
-        currentReceipt
-      )
+      .patch(`http://localhost:4000/receipts/confirmpayment`, currentReceipt)
       .then((res) => {
         console.log("confirm receipt successful!!", res.data);
+        window.location.reload();
       })
       .catch((err) => {
         console.log("error from confirm receipt: ", err.response);
@@ -126,10 +116,7 @@ function Dashboard({}) {
   };
   const confirmFeeHandler = () => {
     axios
-      .patch(
-        `http://localhost:4000/receipts/confirmfee/${currentReceipt._id}`,
-        currentReceipt
-      )
+      .patch("http://localhost:4000/receipts/confirmfee", currentReceipt)
       .then((res) => {
         console.log("confirm receipt successful!!", res.data);
       })
@@ -230,6 +217,7 @@ function Dashboard({}) {
                   accountNumber={el.gher_accountNo}
                   bank={el.gher_bank}
                   phone={el.gher_phone}
+                  pop={el.popPath}
                   amount={1000}
                   time={el.createdAt}
                 />
@@ -254,6 +242,7 @@ function Dashboard({}) {
                   bank={el.gher_bank}
                   phone={el.gher_phone}
                   amount={el.amount}
+                  pop={el.popPath}
                   time={el.createdAt}
                   IdSet={() => setCurrentReceipt(el)}
                 />

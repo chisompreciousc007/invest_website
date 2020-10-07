@@ -46,7 +46,7 @@ function Referals() {
             console.log("receipt data", res.data);
             setUser((prevState) => ({
               ...prevState,
-              receipt: [...res.data],
+              ...res.data,
             }));
           });
         setLoading(false);
@@ -60,7 +60,14 @@ function Referals() {
   };
   useEffect(() => {
     getUserData();
-  }, []);
+  }, [user]);
+  const isEmpty = (obj) => {
+    for (var i in obj) {
+      return false;
+    }
+    return true;
+  };
+  if (isEmpty(user.user)) return <Spinner />;
   return (
     <div>
       {redirect ? <Redirect to="/login" /> : null}

@@ -41,24 +41,42 @@ router.get("/foruser/:email", async (req, res) => {
     const receipt = await Receipt.find({
       $or: [{ gher_email: email }, { pher_email: email }],
     });
+    const phReceiptArr = receipt.filter(
+      (el) => el.pher_email === email && el.isActivationFee === false
+    );
+    const ghReceiptArr = receipt.filter(
+      (el) => el.gher_email === email && el.isActivationFee === false
+    );
+    const guiderReceiptArr = receipt.filter(
+      (el) => el.gher_email === email && el.isActivationFee === true
+    );
+    const feeArr = receipt.filter(
+      (el) => el.pher_email === email && el.isActivationFee === true
+    );
+    const resultObj = {
+      payArr: [...phReceiptArr],
+      getArr: [...ghReceiptArr],
+      guiderArr: [...guiderReceiptArr],
+      activationFee: { ...feeArr },
+    };
 
-    res.json(receipt);
+    res.json(resultObj);
   } catch (err) {
     res.json({ message: err });
   }
 });
-router.patch("/updatePopPath", async (req, res) => {
-  const { popPath, _id: receiptId } = req.body;
+router.patch("/updatePopPath/:id", async (req, res) => {
+  const { popPath } = req.body;
   // UPDATE RECEIPT WITH POP-PATH
   try {
     const result = await Receipt.findByIdAndUpdate(
-      receiptId,
+      req.params.id,
       {
         popPath: popPath,
       },
       { new: true, runValidators: true, context: "query" }
     );
-    console.log("Receipt POP updated");
+    console.log(result);
     res.json(result);
   } catch (err) {
     res.json({ message: err });
@@ -79,6 +97,7 @@ router.patch("/confirmpayment/", async (req, res) => {
     } = req.body;
     const oneuser = await User.findOne({ email: pher_email }, "pledge");
     const pledge = oneuser.pledge;
+    console.log("pledge", pledge);
     // UPDATE HISTORY OF GHER AND PHER
     const addToPherHistory = await User.findOneAndUpdate(
       { email: pher_email },
@@ -115,16 +134,18 @@ router.patch("/confirmpayment/", async (req, res) => {
         isFulfilled: false,
       });
       const savedCommit = await newCommitter.save();
+      console.log("new Commit Created");
       //CHECKS AND SETUP
-      if ((savedCommit.amount = pledge)) {
+      if (savedCommit.amount == pledge) {
         const setisFulfilledTrue = await Committer.findOneAndUpdate(
           { email: pher_email },
           { isFulfilled: true }
         );
         const setRecommitTrue = await User.findOneAndUpdate(
           { email: pher_email },
-          { Recommit: true }
+          { Recommit: true, wantToInvest: true }
         );
+        console.log("ready for recommit");
       }
       if (savedCommit.amount < pledge) {
         const setisFulfilledTrue = await Committer.findOneAndUpdate(
@@ -133,8 +154,9 @@ router.patch("/confirmpayment/", async (req, res) => {
         );
         const setRecommitTrue = await User.findOneAndUpdate(
           { email: pher_email },
-          { Recommit: false }
+          { Recommit: false, wantToInvest: false }
         );
+        console.log("not ready for recommit");
       }
       //ADD TO DOWNLINE
       const userF = await User.findOne({ email: pher_email }, "upline");
@@ -150,33 +172,38 @@ router.patch("/confirmpayment/", async (req, res) => {
           },
         }
       );
-      console.log("New Commit Created");
+      console.log("Added to Downline");
       res.send("Successful");
     } else {
+      console.log("old commit exists");
       const checkisFulfil = await exist.isFulfilled;
       if (checkisFulfil) {
+        console.log("old commit is fulfilled");
         // CREATE NEW GHER WITH OLD COMMIT AMOUNT
         const GherAmt = exist.amount * 1.5;
         const moveOldCommitToGherCollection = await new Gher({
           email: pher_email,
           amount: GherAmt,
         }).save();
+        console.log("old commit sent to Gher Collection");
         // RESET COMMIT
         const savedCommit = await Committer.findOneAndUpdate(
           { email: pher_email },
           { amount: amount },
           { new: true, runValidators: true, context: "query" }
         );
+        console.log("commit reset");
         //CHECKS AND SETUP
-        if ((savedCommit.amount = pledge)) {
+        if (savedCommit.amount == pledge) {
           const setisFulfilledTrue = await Committer.findOneAndUpdate(
             { email: pher_email },
             { isFulfilled: true }
           );
           const setRecommitTrue = await User.findOneAndUpdate(
             { email: pher_email },
-            { Recommit: true }
+            { wantToInvest: true }
           );
+          console.log("new commit set isfulfilled");
         }
         if (savedCommit.amount < pledge) {
           const setisFulfilledTrue = await Committer.findOneAndUpdate(
@@ -185,27 +212,31 @@ router.patch("/confirmpayment/", async (req, res) => {
           );
           const setRecommitTrue = await User.findOneAndUpdate(
             { email: pher_email },
-            { Recommit: false }
+            { wantToInvest: false }
           );
+          console.log("new commit is not fulfilled");
         }
       }
       if (!checkisFulfil) {
         //INCREMENT TO COMMIT
+        console.log("add to existing commit");
         const savedCommit = await Committer.findOneAndUpdate(
           { email: pher_email },
           { $inc: { amount: +amount } },
           { new: true, runValidators: true, context: "query" }
         );
+        console.log("total new inc. ommit", savedCommit.amount);
         //CHECKS AND SETUP
-        if ((savedCommit.amount = pledge)) {
+        if (savedCommit.amount == pledge) {
           const setisFulfilledTrue = await Committer.findOneAndUpdate(
             { email: pher_email },
             { isFulfilled: true }
           );
           const setRecommitTrue = await User.findOneAndUpdate(
             { email: pher_email },
-            { Recommit: true }
+            { Recommit: true, wantToInvest: true }
           );
+          console.log("new total commit set isfulfilled");
         }
         if (savedCommit.amount < pledge) {
           const setisFulfilledTrue = await Committer.findOneAndUpdate(
@@ -214,16 +245,19 @@ router.patch("/confirmpayment/", async (req, res) => {
           );
           const setRecommitTrue = await User.findOneAndUpdate(
             { email: pher_email },
-            { Recommit: false }
+            { Recommit: false, wantToInvest: false }
           );
+          console.log("new total commit is not fulfilled");
         }
       }
     }
     // DELETE POP IMAGE
-    fs.unlink(`client/public/uploads/${popPath}`, (err) => {
-      if (err) throw err;
-      console.log("POP was deleted");
-    });
+    if (popPath) {
+      fs.unlink(`client/public/uploads/${popPath}`, (err) => {
+        if (err) throw err;
+        console.log("POP was deleted");
+      });
+    }
     // DELETE RECEIPT
     const deleteReceipt = await Receipt.findByIdAndDelete(receiptId);
     console.log("Receipt Deleted");
@@ -286,7 +320,7 @@ router.patch("/confirmfee/", async (req, res) => {
 router.patch("/purge", async (req, res) => {
   try {
     const {
-      _id: receiptID,
+      _id: receiptId,
       gher_email,
       pher_email,
       pher_name,
@@ -300,6 +334,7 @@ router.patch("/purge", async (req, res) => {
         { email: pher_email },
         { isBlocked: true }
       );
+      console.log("user blocked");
       const addToGherPurgeHistory = await User.findOneAndUpdate(
         { email: gher_email },
         {
@@ -311,29 +346,26 @@ router.patch("/purge", async (req, res) => {
           },
         }
       );
+      console.log("guider purge updated");
       const deleteReceipt = await Receipt.findByIdAndDelete(receiptId);
-      console.log("Guider Fee Purge successful");
+      console.log("delete receipt and Guider Fee Purge successful");
+      res.send("success");
     } else {
       // PAYMENT PURGE
-      const blockPher2 = await User.findOneAndUpdate(
+      const blockPher = await User.findOneAndUpdate(
         { email: pher_email },
         { isBlocked: true }
       );
-      const gherCurrentAmt = await Gher.findById(gherCollectionID);
-      const currentAmt = gherCurrentAmt.amount;
-      const newAmount = currentAmt + amount;
+      console.log("blocked payment user");
       const reverseGherCollection = await Gher.findByIdAndUpdate(
         gherCollectionID,
-        { amount: newAmount }
+        { $inc: { amount: amount }, isPaired: false }
       );
+      console.log("gher reversed");
       const deleteReceipt = await Receipt.findByIdAndDelete(receiptId);
-      console.log("Guider Fee Purge successful");
+      console.log("delete receipt and Payment Purge successful");
+      res.send("success");
     }
-    const newGher = new Gher({
-      email: gher_email,
-      amount: amount,
-    }).save();
-    console.log("Purged, Gher Resaved again to collection");
   } catch (error) {
     res.json({ message: err });
   }
@@ -528,22 +560,70 @@ router.post("/automatch", async (req, res) => {
   console.log("MatchAuto Started");
 });
 
-router.post(
-  "/match-with-given-phemail-and-new-ghemail-and-amount",
-  async (req, res) => {
-    // INPUTS
-    try {
-      const {
-        pher_email: firstPherEmail,
-        gher_email: firstGherEmail,
-        amount,
-      } = req.body;
+router.post("/match-manual", async (req, res) => {
+  // INPUTS
+  try {
+    const {
+      pher_email: firstPherEmail,
+      gher_email: firstGherEmail,
+      amount,
+    } = req.body;
+    const gherExist = await Gher.findOne({ email: firstGherEmail });
+
+    if (!gherExist) {
       const createGher = await new Gher({
         email: firstGherEmail,
         amount: amount,
       }).save();
-      const gh = await User.findOne({ email: firstGherEmail });
-      const ph = await User.findOne({ email: firstPherEmail });
+    }
+    const gherExis = await Gher.findOne({ email: firstGherEmail });
+    const gh = await User.findOne({ email: firstGherEmail });
+    const ph = await User.findOne({ email: firstPherEmail });
+    const makeReceipt = new Receipt({
+      gher_name: gh.name,
+      gher_email: gh.email,
+      gher_accountName: gh.accountName,
+      gher_accountNo: gh.accountNo,
+      gher_bank: gh.bank,
+      gher_phone: gh.phone,
+      pher_name: ph.name,
+      pher_email: ph.email,
+      pher_phone: ph.phone,
+      amount: amount,
+      isActivationFee: false,
+    }).save();
+    const updateIsPairedGher = await Gher.findByIdAndUpdate(gherExis._id, {
+      isPaired: true,
+    });
+    const updateIsPairedPher = await Pher.findByIdAndUpdate(firstPherID, {
+      isPaired: true,
+    });
+    console.log(
+      `Receipt created for ${firstPherEmail}  to pay  ${firstGherEmail}   ${amount}`
+    );
+  } catch (err) {
+    res.json({ message: err });
+  }
+});
+
+router.post("/match-faster", async (req, res) => {
+  // INPUTS
+  try {
+    const { email: firstGherEmail, amount } = req.body;
+    const addamounttoGher = await Gher.findOneAndUpdate(
+      { email: firstGherEmail },
+      { $inc: { amount: amount }, isPaired: false }
+    );
+    const pherSorted = await Pher.find({ isPaired: false }).sort("createdAt 1");
+    let {
+      amount: firstPherAmt,
+      _id: firstPherID,
+      email: firstPherEmail,
+    } = pherSorted[0];
+
+    const gh = await User.findOne({ email: firstGherEmail });
+    const ph = await User.findOne({ email: firstPherEmail });
+    if ((firstGherAmt = firstPherAmt)) {
       const makeReceipt = new Receipt({
         gher_name: gh.name,
         gher_email: gh.email,
@@ -554,122 +634,20 @@ router.post(
         pher_name: ph.name,
         pher_email: ph.email,
         pher_phone: ph.phone,
-        amount: amount,
+        amount: firstPherAmt,
         isActivationFee: false,
       }).save();
-      const updateIsPairedGher = await Gher.findByIdAndUpdate(firstGherID, {
+
+      const gherExis = await Gher.findOne({ email: firstGherEmail });
+      const updateIsPairedGher = await Gher.findByIdAndUpdate(gherExis._id, {
         isPaired: true,
       });
       const updateIsPairedPher = await Pher.findByIdAndUpdate(firstPherID, {
         isPaired: true,
       });
-    } catch (err) {
-      res.json({ message: err });
-    }
-  }
-);
-
-router.post("/match-existing-gher-mail-now", async (req, res) => {
-  // INPUTS
-  try {
-    const { email: firstGherEmai } = req.body;
-    const gherSorted = await Gher.find({
-      email: firstGherEmai,
-      isPaired: false,
-    });
-    const pherSorted = await Pher.find({ isPaired: false }).sort("createdAt 1");
-    let {
-      amount: firstGherAmt,
-      _id: firstGherID,
-      email: firstGherEmail,
-    } = gherSorted;
-    let {
-      amount: firstPherAmt,
-      _id: firstPherID,
-      email: firstPherEmail,
-    } = pherSorted[0];
-    while (firstGherAmt > 0) {
-      if (pherSorted.length && gherSorted.length) {
-        const gh = await User.findOne({ email: firstGherEmail });
-        const ph = await User.findOne({ email: firstPherEmail });
-        if ((firstGherAmt = firstPherAmt)) {
-          const makeReceipt = new Receipt({
-            gher_name: gh.name,
-            gher_email: gh.email,
-            gher_accountName: gh.accountName,
-            gher_accountNo: gh.accountNo,
-            gher_bank: gh.bank,
-            gher_phone: gh.phone,
-            pher_name: ph.name,
-            pher_email: ph.email,
-            pher_phone: ph.phone,
-            amount: firstPherAmt,
-            isActivationFee: false,
-          }).save();
-          const updateIsPairedGher = await Gher.findByIdAndUpdate(firstGherID, {
-            isPaired: true,
-          });
-          const updateIsPairedPher = await Pher.findByIdAndUpdate(firstPherID, {
-            isPaired: true,
-          });
-          let firstGherAmt = 0;
-          console.log(
-            `Receipt created for ${firstPherEmail}  to pay ${firstPherAmt}, ${firstGherEmail} to get ${firstGherAmt}`
-          );
-        }
-        if (firstPherAmt < firstGherAmt) {
-          const makeReceipt2 = new Receipt({
-            gher_name: gh.name,
-            gher_email: gh.email,
-            gher_accountName: gh.accountName,
-            gher_accountNo: gh.accountNo,
-            gher_bank: gh.bank,
-            gher_phone: gh.phone,
-            pher_name: ph.name,
-            pher_email: ph.email,
-            pher_phone: ph.phone,
-            amount: firstPherAmt,
-            isActivationFee: false,
-          }).save();
-          const newAmt = firstGherAmt - firstPherAmt;
-          const upddateGherBalance = await Gher.findByIdAndUpdate(firstGherID, {
-            amount: newAmt,
-          });
-          const updateIsPairedPher = await Pher.findByIdAndUpdate(firstPherID, {
-            isPaired: true,
-          });
-          let firstGherAmt = newAmt;
-          console.log(
-            `Receipt created for ${firstPherEmail}  to pay ${firstPherAmt}, ${firstGherEmail} to get ${firstGherAmt}`
-          );
-        } else {
-          // PHERAMT > GHERAMT
-          const makeReceipt3 = new Receipt({
-            gher_name: gh.name,
-            gher_email: gh.email,
-            gher_accountName: gh.accountName,
-            gher_accountNo: gh.accountNo,
-            gher_bank: gh.bank,
-            gher_phone: gh.phone,
-            pher_name: ph.name,
-            pher_email: ph.email,
-            pher_phone: ph.phone,
-            amount: firstPherAmt,
-            isActivationFee: false,
-          }).save();
-          const newAmt = firstPherAmt - firstGherAmt;
-          const upddatePherBalance = await Pher.findByIdAndUpdate(firstPherID, {
-            amount: newAmt,
-          });
-          const updateIsPairedGher = await Gher.findByIdAndUpdate(firstGherID, {
-            isPaired: true,
-          });
-          let firstGherAmt = 0;
-          console.log(
-            `Receipt created for ${firstPherEmail}  to pay ${firstPherAmt}, ${firstGherEmail} to get ${firstGherAmt}`
-          );
-        }
-      }
+      console.log(
+        `Receipt created for ${firstPherEmail}  to pay  ${firstGherEmail}   ${amount}`
+      );
     }
   } catch (err) {
     res.json({ message: err });

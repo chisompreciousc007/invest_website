@@ -10,16 +10,15 @@ import Footer from "./Footer";
 import Header from "./Header";
 import { UserContext } from "./UserContext";
 import NavBar from "./NavBar";
-// import { addHours, format } from "date-fns";
+import { addHours, format } from "date-fns";
 
 function Dashboard() {
   const history = useHistory();
   const [error, setError] = useState(false);
-  // const [defaultFileLabel, setdefaultFileLabel] = useState("Choose File");
+  const [uploadedFile, setUploadedFile] = useState({});
   const [loading, setLoading] = useState(false);
   const [currentReceipt, setCurrentReceipt] = useState(null);
   const [file, setFile] = useState(null);
-  // const [uploadedFile, setUploadedFile] = useState({});
   const [selectAmount, setSelectAmount] = useState(5000);
   const { user, setUser } = useContext(UserContext);
   const [response, setResponse] = useState(null);
@@ -30,14 +29,11 @@ function Dashboard() {
     isActivated,
     wantToCashout,
     wantToInvest,
-    isBlocked,
-    guider,
     createdAt,
     investList,
-    isGuider,
+    recommit,
   } = user.user;
-  const { receipt } = user;
-
+  const { payArr, getArr, guiderArr, activationFee } = user;
   const fileSelecthandler = (e) => {
     // const filename = e.target.files[0].name;
     const file = e.target.files[0];
@@ -54,20 +50,23 @@ function Dashboard() {
     try {
       const res = await axios.post("http://localhost:4000/uploads", formData, {
         headers: {
-          "Content-type": "multipart/form-data",
+          "Content-Type": "multipart/form-data",
         },
       });
 
-      const { filePath } = res.data;
-      // setUploadedFile({ fileName, filePath });got  fileName from res.data
+      const { filePath, fileName } = res.data;
+      const obj = {
+        popPath: filePath,
+      };
       axios
-        .patch(`http://localhost:4000/receipts/updatePopPath`, {
-          popPath: filePath,
-          ...currentReceipt,
-        })
+        .patch(
+          `http://localhost:4000/receipts/updatePopPath/${currentReceipt._id}`,
+          obj
+        )
         .then((res) => {
           console.log("edit popPath successful!!", res.data);
           setLoading(false);
+          window.location.reload();
         });
     } catch (error) {
       if (error.response.status === 500) {
@@ -119,6 +118,7 @@ function Dashboard() {
       .patch("http://localhost:4000/receipts/confirmfee", currentReceipt)
       .then((res) => {
         console.log("confirm receipt successful!!", res.data);
+        window.location.reload();
       })
       .catch((err) => {
         console.log("error from confirm receipt: ", err.response);
@@ -126,24 +126,16 @@ function Dashboard() {
   };
   const purgeHandler = () => {
     axios
-      .patch(
-        `http://localhost:4000/receipts/purge/${currentReceipt._id}`,
-        currentReceipt
-      )
+      .patch(`http://localhost:4000/receipts/purge`, currentReceipt)
       .then((res) => {
         console.log("purge successful!!", res.data);
+        window.location.reload();
       })
       .catch((err) => {
         console.log("error from purge: ", err.response);
       });
   };
-  const phReceiptArr = receipt.filter((el) => el.pher_email === email);
-  const ghReceiptArr = receipt.filter(
-    (el) => el.gher_email === email && el.isActivationFee === false
-  );
-  const FeeArr = receipt.filter(
-    (el) => el.gher_email === email && el.isActivationFee === true
-  );
+
   const getUserData = () => {
     console.log("get userData running");
     if (user.user._id) {
@@ -167,7 +159,7 @@ function Dashboard() {
             console.log("receipt data", res.data);
             setUser((prevState) => ({
               ...prevState,
-              receipt: [...res.data],
+              ...res.data,
             }));
           });
         setLoading(false);
@@ -183,15 +175,19 @@ function Dashboard() {
     getUserData();
   }, []);
 
-  return loading ? (
-    redirect ? (
-      <Redirect to="/login" />
-    ) : (
-      <Spinner />
-    )
-  ) : !isBlocked ? (
+  const isEmpty = (obj) => {
+    for (var i in obj) {
+      return false;
+    }
+    return true;
+  };
+  if (isEmpty(user.user)) return <Spinner />;
+
+  return (
     <div>
-      {error ? (
+      {redirect && <Redirect to="/login" />}
+      {loading && <Spinner />}
+      {error && (
         <Error
           response={response}
           setError={() => {
@@ -199,100 +195,98 @@ function Dashboard() {
             setRedirect(true);
           }}
         />
-      ) : null}
+      )}
       <header className="inner_page_header">
         <Header />
 
         <section className="admin_body">
           <NavBar />
 
-          {!isActivated
-            ? phReceiptArr.map((el) => (
-                <Ph
-                  IdSet={() => setCurrentReceipt(el)}
-                  title="Please pay an activation fee to be activated"
-                  fileUpload={fileUploadHandler}
-                  fileSelect={fileSelecthandler}
-                  accountName={el.gher_accountName}
-                  accountNumber={el.gher_accountNo}
-                  bank={el.gher_bank}
-                  phone={el.gher_phone}
-                  pop={el.popPath}
-                  amount={1000}
-                  time={el.createdAt}
-                />
-              ))
-            : null}
+          {!isActivated && !isEmpty(activationFee) && (
+            <Ph
+              IdSet={() => setCurrentReceipt(activationFee)}
+              title="Please pay an activation fee to be activated"
+              fileUpload={fileUploadHandler}
+              fileSelect={fileSelecthandler}
+              accountName={activationFee.gher_accountName}
+              accountNumber={activationFee.gher_accountNo}
+              bank={activationFee.gher_bank}
+              phone={activationFee.gher_phone}
+              pop={activationFee.popPath}
+              amount={1000}
+              time={format(
+                addHours(new Date(activationFee.createdAt), 8),
+                "MMM-dd' 'hh:mm aaaa"
+              )}
+            />
+          )}
 
-          {isActivated && !wantToInvest ? (
+          {!wantToInvest && (
             <SelectAmount
               submitAmount={submitAmountHandler}
               SelectAmount={selectAmountHandler}
+              recommit={recommit}
             />
-          ) : null}
-          {isActivated && wantToInvest && phReceiptArr.length
-            ? //    ITERATE THROUGH LIST
-              phReceiptArr.map((el) => (
-                <Ph
-                  title="You have been matched to make payment"
-                  fileUpload={fileUploadHandler}
-                  fileSelect={fileSelecthandler}
-                  accountName={el.gher_accountName}
-                  accountNumber={el.gher_accountNo}
-                  bank={el.gher_bank}
-                  phone={el.gher_phone}
-                  amount={el.amount}
-                  pop={el.popPath}
-                  time={el.createdAt}
-                  IdSet={() => setCurrentReceipt(el)}
-                />
-              ))
-            : null}
-          {isActivated && wantToInvest && !phReceiptArr.length ? (
+          )}
+          {payArr.length && //    ITERATE THROUGH LIST
+            payArr.map((el) => (
+              <Ph
+                title="You have been matched to make payment"
+                fileUpload={fileUploadHandler}
+                fileSelect={fileSelecthandler}
+                accountName={el.gher_accountName}
+                accountNumber={el.gher_accountNo}
+                bank={el.gher_bank}
+                phone={el.gher_phone}
+                amount={el.amount}
+                pop={el.popPath}
+                time={format(
+                  addHours(new Date(el.createdAt), 8),
+                  "MMM-dd' 'hh:mm aaaa"
+                )}
+                IdSet={() => setCurrentReceipt(el)}
+              />
+            ))}
+          {isActivated && wantToInvest && !payArr.length && (
             //    ITERATE THROUGH LIST
             <h4>You will be Matched within the next few hours</h4>
-          ) : null}
-          {!isActivated && FeeArr.length
-            ? //ITERATE THROUGH LIST FOR GUIDER
-              FeeArr.map((el) => (
-                <Gh
-                  name={el.pher_name}
-                  phone={el.pher_phone}
-                  amount={el.amount}
-                  time={el.createdAt}
-                  confirm={confirmFeeHandler}
-                  purge={() => console.log("cant purge new user")}
-                  pop={el.popPath}
-                  IdSet={() => setCurrentReceipt(el)}
-                />
-              ))
-            : null}
-          {isActivated && wantToCashout && ghReceiptArr.length
-            ? //ITERATE THROUGH LIST,CHECK IF ACTIVATED and PAIRED
-              phReceiptArr.map((el) => (
-                <Gh
-                  name={el.pher_name}
-                  phone={el.pher_phone}
-                  amount={el.amount}
-                  time={el.createdAt}
-                  confirm={confirmPaymentHandler}
-                  purge={purgeHandler}
-                  pop={el.popPath}
-                  IdSet={() => setCurrentReceipt(el)}
-                />
-              ))
-            : null}
+          )}
+          {guiderArr.length && //ITERATE THROUGH LIST FOR GUIDER
+            guiderArr.map((el) => (
+              <Gh
+                name={el.pher_name}
+                phone={el.pher_phone}
+                amount={el.amount}
+                time={format(
+                  addHours(new Date(el.createdAt), 8),
+                  "MMM-dd' 'hh:mm aaaa"
+                )}
+                confirm={confirmFeeHandler}
+                purge={purgeHandler}
+                pop={el.popPath}
+                IdSet={() => setCurrentReceipt(el)}
+              />
+            ))}
+          {getArr.length && //ITERATE THROUGH LIST,CHECK IF ACTIVATED and PAIRED
+            getArr.map((el) => (
+              <Gh
+                name={el.pher_name}
+                phone={el.pher_phone}
+                amount={el.amount}
+                time={format(
+                  addHours(new Date(el.createdAt), 8),
+                  "MMM-dd' 'hh:mm aaaa"
+                )}
+                confirm={confirmPaymentHandler}
+                purge={purgeHandler}
+                pop={el.popPath}
+                IdSet={() => setCurrentReceipt(el)}
+              />
+            ))}
         </section>
         <Footer />
       </header>
     </div>
-  ) : (
-    <Error
-      response="Your Account have been Blocked, Please write to support for verification and reactivation"
-      setError={() => {
-        history.push("/login");
-      }}
-    />
   );
 }
 

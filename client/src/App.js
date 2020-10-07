@@ -28,17 +28,20 @@ const Terms = asyncComponent(() => import("./components/Terms"));
 function App() {
   const [user, setUser] = useState({
     user: {
-      name: "Loading",
-      username: "Loading",
-      isActivated: false,
-      InvestAmt: "Loading",
-      updatedAt: "Loading",
-      pendingInvestAmt: "Loading",
-      pendingCashoutAmt: "Loading",
-      isBlocked: false,
-      createdAt: "Loading",
+      //   name: "Loading",
+      //   username: "Loading",
+      //   isActivated: false,
+      //   InvestAmt: "Loading",
+      //   updatedAt: "Loading",
+      //   pendingInvestAmt: "Loading",
+      //   pendingCashoutAmt: "Loading",
+      //   isBlocked: false,
+      //   createdAt: "Loading",
     },
-    receipt: [],
+    payArr: [],
+    getArr: [],
+    guiderArr: [],
+    activationFee: {},
   });
   return (
     <div className="App">
@@ -50,9 +53,8 @@ function App() {
           <Route path="/support" exact component={Support} />
           <Route path="/signup=:ref" exact component={SignUp} />
           <Route path="/rules" exact component={Terms} />
-
+          <Route path="/login" exact component={Login} />
           <UserContext.Provider value={{ user, setUser }}>
-            <Route path="/login" exact component={Login} />
             <ErrorHandler>
               <Route path="/edit_account" exact component={Profile} />
 
@@ -63,7 +65,7 @@ function App() {
               <Route path="/transactions" exact component={Transactions} />
             </ErrorHandler>
           </UserContext.Provider>
-          <Route component={Login} />
+          {/* <Route component={() => <h1>Page not found</h1>} /> */}
         </Switch>
       </BrowserRouter>
     </div>

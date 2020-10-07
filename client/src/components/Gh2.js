@@ -12,6 +12,7 @@ function PhComponent({
   IdSet,
 }) {
   const [button, setbutton] = useState(false);
+  const [button2, setbutton2] = useState(false);
   const working = () => IdSet();
   return (
     <div
@@ -38,7 +39,10 @@ function PhComponent({
       </h5>
       <h5 style={{ marginLeft: "0.5rem", marginBottom: "0.3rem" }}>
         You have until{" "}
-        {` ${format(addHours(new Date(time), 8), "MMM-dd' 'hh:mm aaaa")} `}
+        {
+          time
+          /* {` ${format(addHours(new Date(time), 8), "MMM-dd' 'hh:mm aaaa")} `} */
+        }
         to recieve this Payment or Purge User.
       </h5>
       <div className="row">
@@ -57,7 +61,10 @@ function PhComponent({
           <button
             style={{ background: "red" }}
             className="btn btn-danger"
-            onClick={purge}
+            onClick={() => {
+              setbutton2(true);
+              working();
+            }}
           >
             Purge
           </button>
@@ -87,8 +94,31 @@ function PhComponent({
           </p>
         </div>
       ) : null}
+      {button2 && (
+        <div className="ml-2">
+          <p>
+            Are you Sure ?{" "}
+            <button
+              style={{ background: "green" }}
+              type="button"
+              className="btn btn-success"
+              onClick={purge}
+            >
+              Yes
+            </button>
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={() => setbutton2(false)}
+              style={{ background: "red" }}
+            >
+              No
+            </button>{" "}
+          </p>
+        </div>
+      )}
 
-      {pop == null ? (
+      {!pop ? (
         <p>No POP available</p>
       ) : (
         <div className="row">

@@ -93,16 +93,12 @@ function Login() {
       });
     }
   }, []);
-  let redirecting = null;
-  if (redirect) {
-    redirecting = <Redirect to="/dashboard" />;
-  }
 
   return (
     <div>
-      {redirecting}
-      {loading ? <Spinner /> : null}
-      {error ? (
+      {redirect && <Redirect to="/dashboard" />}
+      {loading && <Spinner />}
+      {error && (
         <Error
           response={response}
           setError={() => {
@@ -110,7 +106,7 @@ function Login() {
             window.location.reload();
           }}
         />
-      ) : null}
+      )}
       <header className="inner_page_header">
         <div className="header_top">
           <div className="container">

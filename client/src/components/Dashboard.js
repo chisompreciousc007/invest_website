@@ -27,10 +27,7 @@ function Dashboard() {
     pledge,
     email,
   } = user.user;
-  const { receipt } = user;
-  const ghReceiptArr = receipt.filter(
-    (el) => el.gher_email === email && el.isActivationFee === false
-  );
+  const { getArr, payArr } = user;
 
   const getUserData = () => {
     console.log("get userData running");
@@ -55,7 +52,7 @@ function Dashboard() {
             console.log("receipt data", res.data);
             setUser((prevState) => ({
               ...prevState,
-              receipt: [...res.data],
+              ...res.data,
             }));
           });
         setLoading(false);
@@ -70,11 +67,18 @@ function Dashboard() {
   useEffect(() => {
     getUserData();
   }, []);
+  const isEmpty = (obj) => {
+    for (var i in obj) {
+      return false;
+    }
+    return true;
+  };
+  if (isEmpty(user.user)) return <Spinner />;
 
   return (
     <div>
-      {redirect ? <Redirect to="/login" /> : null}
-      {error ? (
+      {redirect && <Redirect to="/login" />}
+      {error && (
         <Error
           response={response}
           setError={() => {
@@ -82,10 +86,9 @@ function Dashboard() {
             setRedirect(true);
           }}
         />
-      ) : null}
-      {loading ? (
-        <Spinner />
-      ) : (
+      )}
+      {loading && <Spinner />}
+      {!loading && !isEmpty(user.user) && (
         <div>
           <header className="inner_page_header">
             <Header />
@@ -127,7 +130,13 @@ function Dashboard() {
                           <h3>Pending PH</h3>
                           <h6>
                             NGN
-                            <b id="total_balance">{pledge}</b>
+                            <b id="total_balance">
+                              {payArr !== []
+                                ? payArr
+                                    .map((el) => el.amount)
+                                    .reduce((a, b) => a + b, 0)
+                                : 0}
+                            </b>
                           </h6>
                         </div>
                       </div>
@@ -138,8 +147,8 @@ function Dashboard() {
                           <h6>
                             NGN
                             <b>
-                              {ghReceiptArr !== []
-                                ? ghReceiptArr
+                              {getArr !== []
+                                ? getArr
                                     .map((el) => el.amount)
                                     .reduce((a, b) => a + b, 0)
                                 : 0}

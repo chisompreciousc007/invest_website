@@ -45,7 +45,10 @@ function PhComponent({
       </h5>
       <h5 style={{ marginLeft: "0.5rem", marginBottom: "0.3rem" }}>
         You have until{" "}
-        {` ${format(addHours(new Date(time), 8), "MMM-dd' 'hh:mm aaaa")} `}
+        {
+          time
+          /* {` ${format(addHours(new Date(time), 8), "MMM-dd' 'hh:mm aaaa")} `} */
+        }
         to make this Payment.
       </h5>
       <div

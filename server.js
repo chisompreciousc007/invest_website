@@ -54,13 +54,7 @@ app.use(
     extended: false,
   })
 );
-// app.use(
-//   session({
-//     secret: "keyboard catsskhgdsna",
-//     resave: true,
-//     saveUninitialized: true,
-//   })
-// );
+
 app.use(errors());
 app.use("/receipts", apiLimiter);
 app.use("/users", apiLimiter);

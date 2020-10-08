@@ -72,7 +72,7 @@ app.use("/phers", pherRouter);
 app.use("/ghers", gherRouter);
 app.use("/guiders", guiderRouter);
 app.use("/committers", committerRouter);
-// app.use('/public', express.static('public'));
+app.use("/public", express.static("public"));
 
 if ((process.env.NODE_ENV || "").trim() === "production") {
   app.use(express.static("client/build"));

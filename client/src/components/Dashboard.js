@@ -25,13 +25,9 @@ function Dashboard() {
     name,
     username,
     isActivated,
-    InvestAmt,
-    pendingCashoutAmt,
     createdAt,
     cashoutHistory,
     investHistory,
-    pledge,
-    email,
   } = user.user;
   const { getArr, payArr } = user;
 
@@ -45,6 +41,7 @@ function Dashboard() {
       .get("http://localhost:4000/users/user", { withCredentials: true })
       .then((res) => {
         console.log("user data", res.data);
+        if (res.data === "blocked") return history.push("/contactSupport");
         setUser((prevState) => ({
           ...prevState,
           user: { ...res.data },
@@ -65,14 +62,12 @@ function Dashboard() {
       })
       .catch((err) => {
         console.log(err.response);
-        if (err.response.data == "blocked") {
-          return history.push("/contactSupport");
-        }
-        if (err.response.data == "ACCESS DENIED") {
-          const errmsg = err.response.data;
-          setResponse(errmsg);
+        if (err.response.data === "ACCESS DENIED") {
+          setResponse(err.response.data);
           return setError(true);
         }
+        setResponse("err.message");
+        setError(true);
       });
   };
   useEffect(() => {

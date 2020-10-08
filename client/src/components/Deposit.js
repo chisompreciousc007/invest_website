@@ -15,21 +15,13 @@ import { addHours, format } from "date-fns";
 function Dashboard() {
   const history = useHistory();
   const [error, setError] = useState(false);
-  const [uploadedFile, setUploadedFile] = useState({});
   const [loading, setLoading] = useState(false);
   const [currentReceipt, setCurrentReceipt] = useState(null);
   const [file, setFile] = useState(null);
   const [selectAmount, setSelectAmount] = useState(5000);
   const { user, setUser } = useContext(UserContext);
   const [response, setResponse] = useState(null);
-  const {
-    _id,
-    email,
-    isActivated,
-    wantToCashout,
-    wantToInvest,
-    recommit,
-  } = user.user;
+  const { _id, email, isActivated, wantToInvest, recommit } = user.user;
   const { payArr, getArr, guiderArr, activationFee } = user;
   const isEmpty = (obj) => {
     for (var i in obj) {
@@ -57,7 +49,7 @@ function Dashboard() {
         },
       });
 
-      const { filePath, fileName } = res.data;
+      const { filePath } = res.data;
       const obj = {
         popPath: filePath,
       };
@@ -75,9 +67,11 @@ function Dashboard() {
       if (error.response.status === 500) {
         console.log("there was a problem with the server");
         setError(true);
+        window.scrollTo(0, 0);
       } else {
         console.log(error.response.data.msg);
         setError(true);
+        window.scrollTo(0, 0);
       }
     }
   };
@@ -98,6 +92,7 @@ function Dashboard() {
         console.log(err.response);
         setResponse(err.response.data);
         setError(true);
+        window.scrollTo(0, 0);
       });
   };
   const selectAmountHandler = (e) => {
@@ -128,9 +123,9 @@ function Dashboard() {
       })
       .catch((err) => {
         console.log("error from confirm receipt: ", err.response);
-        console.log(err);
         setResponse("Request Failed");
         setError(true);
+        window.scrollTo(0, 0);
       });
   };
   const purgeHandler = () => {
@@ -138,18 +133,14 @@ function Dashboard() {
     axios
       .patch("http://localhost:4000/receipts/purge", currentReceipt)
       .then((res) => {
-        console.log(res.data);
-        if (res.data.message != "success") {
-          setResponse(res.data.message);
-          return setError(true);
-        }
         console.log("purge successful!!", res.data.message);
         window.location.reload();
       })
       .catch((err) => {
         console.log(err);
-        setResponse("Request Failed!!");
+        setResponse("Kindly wait until the time have expired.");
         setError(true);
+        window.scrollTo(0, 0);
       });
   };
 
@@ -163,6 +154,7 @@ function Dashboard() {
       .get("http://localhost:4000/users/user", { withCredentials: true })
       .then((res) => {
         console.log("user data", res.data);
+        if (res.data === "blocked") return history.push("/contactSupport");
         setUser((prevState) => ({
           ...prevState,
           user: { ...res.data },
@@ -182,15 +174,10 @@ function Dashboard() {
         setLoading(false);
       })
       .catch((err) => {
-        console.log(err.response);
-        if (err.response.data == "blocked") {
-          return history.push("/contactSupport");
-        }
-        if (err.response.data == "ACCESS DENIED") {
-          const errmsg = err.response.data;
-          setResponse(errmsg);
-          return setError(true);
-        }
+        console.log(err);
+        setResponse("Request Failed");
+        setError(true);
+        window.scrollTo(0, 0);
       });
   };
   useEffect(() => {

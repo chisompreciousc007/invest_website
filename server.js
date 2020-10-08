@@ -5,11 +5,9 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
-const flash = require("connect-flash");
-const session = require("express-session");
-// const ejwt = require("express-jwt");
+const { errors } = require("celebrate");
 require("dotenv/config");
-// const path = require("path");
+const path = require("path");
 const rateLimit = require("express-rate-limit");
 const userRouter = require("./routes/User");
 const uploadRouter = require("./routes/Upload");
@@ -56,14 +54,14 @@ app.use(
     extended: false,
   })
 );
-app.use(
-  session({
-    secret: "keyboard catsskhgdsna",
-    resave: true,
-    saveUninitialized: true,
-  })
-);
-app.use(flash());
+// app.use(
+//   session({
+//     secret: "keyboard catsskhgdsna",
+//     resave: true,
+//     saveUninitialized: true,
+//   })
+// );
+app.use(errors());
 app.use("/receipts", apiLimiter);
 app.use("/users", apiLimiter);
 app.use("/uploads", apiLimiter);
@@ -76,14 +74,12 @@ app.use("/guiders", guiderRouter);
 app.use("/committers", committerRouter);
 // app.use('/public', express.static('public'));
 
-// app.use('/pop', popRouter)
-
-// if ((process.env.NODE_ENV || "").trim() === "production") {
-//   app.use(express.static("client/build"));
-//   app.get("/", (req, res) => {
-//     res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
-//   });
-// }
+if ((process.env.NODE_ENV || "").trim() === "production") {
+  app.use(express.static("client/build"));
+  app.get("/", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+}
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);

@@ -23,6 +23,12 @@ function Referals() {
     email,
     phone,
   } = user.user;
+  const isEmpty = (obj) => {
+    for (var i in obj) {
+      return false;
+    }
+    return true;
+  };
   const getUserData = () => {
     console.log("get userData running");
     if (user.user._id) {
@@ -33,6 +39,7 @@ function Referals() {
       .get("http://localhost:4000/users/user", { withCredentials: true })
       .then((res) => {
         console.log("user data", res.data);
+        if (res.data === "blocked") return history.push("/contactSupport");
         setUser((prevState) => ({
           ...prevState,
           user: { ...res.data },
@@ -53,25 +60,19 @@ function Referals() {
       })
       .catch((err) => {
         console.log(err.response);
-        if (err.response.data == "blocked") {
-          return history.push("/contactSupport");
-        }
-        if (err.response.data == "ACCESS DENIED") {
-          const errmsg = err.response.data;
-          setResponse(errmsg);
+        if (err.response.data === "ACCESS DENIED") {
+          setResponse(err.response.data);
           return setError(true);
         }
+        setResponse("err.message");
+        setError(true);
       });
   };
   useEffect(() => {
+    console.log("useeffect running");
     getUserData();
   }, []);
-  const isEmpty = (obj) => {
-    for (var i in obj) {
-      return false;
-    }
-    return true;
-  };
+
   if (isEmpty(user.user)) return <Spinner />;
   return (
     <div>

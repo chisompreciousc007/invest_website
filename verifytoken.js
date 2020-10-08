@@ -39,7 +39,7 @@ module.exports = function (req, res, next) {
           next();
         } else {
           console.log("user Blocked");
-          return res.status(400).send("blocked");
+          return res.status(200).send("blocked");
         }
       }
     });

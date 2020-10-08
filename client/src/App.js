@@ -1,15 +1,5 @@
 import React, { useState } from "react";
-// import Home from "./components/Home";
-// import Login from "./components/Login";
-// import SignUp from "./components/SignUp";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-// import Dashboard from "./components/Dashboard";
-// import Deposit from "./components/Deposit";
-// import Profile from "./components/Profile";
-// import About from "./components/About";
-// import Transactions from "./components/Transactions";
-// import FAQ from "./components/FAQ";
-// import Support from "./components/Support";
 import asyncComponent from "./components/asyncComponent";
 import { UserContext } from "./components/UserContext";
 import ErrorHandler from "./components/ErrorHandler";

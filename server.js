@@ -56,9 +56,9 @@ app.use(
 );
 
 app.use(errors());
-app.use("/receipts", apiLimiter);
-app.use("/users", apiLimiter);
-app.use("/uploads", apiLimiter);
+// app.use("/receipts", apiLimiter);
+// app.use("/users", apiLimiter);
+// app.use("/uploads", apiLimiter);
 app.use("/users", userRouter);
 app.use("/uploads", uploadRouter);
 app.use("/receipts", receiptRouter);

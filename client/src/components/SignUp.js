@@ -120,8 +120,8 @@ function SignUp({ match }) {
 
   return (
     <div>
-      {loading ? <Spinner /> : null}
-      {error ? (
+      {loading && <Spinner />}
+      {error && (
         <Error
           response={response}
           setError={() => {
@@ -129,8 +129,8 @@ function SignUp({ match }) {
             window.location.reload();
           }}
         />
-      ) : null}
-      {success ? <Success savedUser={savedUser} history={history} /> : null}
+      )}
+      {success && <Success savedUser={savedUser} history={history} />}
 
       <header className="inner_page_header">
         <div className="header_top">

@@ -17,6 +17,6 @@ const GherSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-GherSchema.plugin(uniqueValidator, { message: "is already taken." });
+GherSchema.plugin(uniqueValidator, { message: "is already existing." });
 
 module.exports = mongoose.model("Gher", GherSchema);

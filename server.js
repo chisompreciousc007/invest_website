@@ -4,7 +4,9 @@ const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-bodyParser = require("body-parser");
+const bodyParser = require("body-parser");
+const flash = require("connect-flash");
+const session = require("express-session");
 // const ejwt = require("express-jwt");
 require("dotenv/config");
 // const path = require("path");
@@ -54,6 +56,14 @@ app.use(
     extended: false,
   })
 );
+app.use(
+  session({
+    secret: "keyboard catsskhgdsna",
+    resave: true,
+    saveUninitialized: true,
+  })
+);
+app.use(flash());
 app.use("/receipts", apiLimiter);
 app.use("/users", apiLimiter);
 app.use("/uploads", apiLimiter);

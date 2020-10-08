@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Redirect } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import NavBar from "./NavBar";
@@ -9,11 +9,11 @@ import axios from "axios";
 import Spinner from "./Spinner";
 
 function Referals() {
+  const history = useHistory();
   const { user, setUser } = useContext(UserContext);
   const [error, setError] = useState(false);
   const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [redirect, setRedirect] = useState(false);
   const {
     name,
     username,
@@ -52,15 +52,20 @@ function Referals() {
         setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
-        const errmsg = err.response.data;
-        setResponse(errmsg);
-        setError(true);
+        console.log(err.response);
+        if (err.response.data == "blocked") {
+          return history.push("/contactSupport");
+        }
+        if (err.response.data == "ACCESS DENIED") {
+          const errmsg = err.response.data;
+          setResponse(errmsg);
+          return setError(true);
+        }
       });
   };
   useEffect(() => {
     getUserData();
-  }, [user]);
+  }, []);
   const isEmpty = (obj) => {
     for (var i in obj) {
       return false;
@@ -70,13 +75,12 @@ function Referals() {
   if (isEmpty(user.user)) return <Spinner />;
   return (
     <div>
-      {redirect ? <Redirect to="/login" /> : null}
       {error ? (
         <Error
           response={response}
           setError={() => {
             setError(false);
-            setRedirect(true);
+            window.location.reload();
           }}
         />
       ) : null}

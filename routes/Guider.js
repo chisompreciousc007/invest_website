@@ -3,38 +3,24 @@ const router = express.Router();
 const Guider = require("../models/guider");
 const User = require("../models/user");
 
-router.post("/:id", async (req, res) => {
+router.post("/:email", async (req, res) => {
   try {
-    const regGuider = await User.findByIdAndUpdate(
-      req.params.id,
-      {
-        isGuider: true,
-      },
-      { new: true, runValidators: true, context: "query" }
-    );
+    const regGuider = await User.findOne({ email: req.params.email });
     const newGuider = new Guider({
-      username: regGuider.username,
       email: regGuider.email,
     });
     const savedGuider = await newGuider.save();
     res.json(savedGuider);
-    console.log("Guider saved");
   } catch (err) {
     res.json({ message: err });
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:email", async (req, res) => {
   try {
-    const reversedGuider = await User.findByIdAndUpdate(
-      req.params.id,
-      {
-        isGuider: false,
-      },
-      { new: true, runValidators: true, context: "query" }
-    );
-    const deletedGuider = await Guider.findByIdAndDelete(req.params.id);
-    res.json("user is deleted");
+    const reversedGuider = await User.findOneAndDelete({
+      email: req.params.email,
+    }).exec();
   } catch (err) {
     res.json({ message: err });
   }
@@ -42,7 +28,7 @@ router.delete("/:id", async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const foundGuider = await Guider.find();
+    const foundGuider = await Guider.find({}).exec();
     res.json(foundGuider);
   } catch (err) {
     res.json({ message: err });

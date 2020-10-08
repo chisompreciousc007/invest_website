@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { Redirect, Link } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 import Spinner from "./Spinner";
 import Error from "./Error";
 import Footer from "./Footer";
@@ -10,11 +10,17 @@ import NavBar from "./NavBar";
 import { addHours, format } from "date-fns";
 
 function Dashboard() {
+  const history = useHistory();
   const [loading, setLoading] = useState(true);
-  const [redirect, setRedirect] = useState(false);
   const { user, setUser } = useContext(UserContext);
   const [error, setError] = useState(false);
   const [response, setResponse] = useState(null);
+  const isEmpty = (obj) => {
+    for (var i in obj) {
+      return false;
+    }
+    return true;
+  };
   const {
     name,
     username,
@@ -58,32 +64,31 @@ function Dashboard() {
         setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
-        const errmsg = err.response.data;
-        setResponse(errmsg);
-        setError(true);
+        console.log(err.response);
+        if (err.response.data == "blocked") {
+          return history.push("/contactSupport");
+        }
+        if (err.response.data == "ACCESS DENIED") {
+          const errmsg = err.response.data;
+          setResponse(errmsg);
+          return setError(true);
+        }
       });
   };
   useEffect(() => {
     getUserData();
   }, []);
-  const isEmpty = (obj) => {
-    for (var i in obj) {
-      return false;
-    }
-    return true;
-  };
+
   if (isEmpty(user.user)) return <Spinner />;
 
   return (
     <div>
-      {redirect && <Redirect to="/login" />}
       {error && (
         <Error
           response={response}
           setError={() => {
             setError(false);
-            setRedirect(true);
+            window.location.reload();
           }}
         />
       )}

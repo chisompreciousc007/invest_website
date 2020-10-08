@@ -181,12 +181,6 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: "new",
     },
-
-    guiderMatch: [
-      {
-        name: { type: String },
-      },
-    ],
     pledge: { type: Number, default: 0 },
 
     wantToInvest: {

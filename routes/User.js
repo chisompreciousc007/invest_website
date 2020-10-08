@@ -4,21 +4,20 @@ const jwt = require("jsonwebtoken");
 const router = express.Router();
 const User = require("../models/user");
 const Pher = require("../models/pher");
-const Gher = require("../models/gher");
+// const Gher = require("../models/gher");
 const Guider = require("../models/guider");
 const verify = require("../verifytoken");
-const { loginValidation } = require("../validation");
-const { findOne } = require("../models/user");
+const {
+  loginValidation,
+  newUserValidation,
+  receiptValidation,
+} = require("../validation");
 const Receipt = require("../models/receipt");
-const Committer = require("../models/committer");
-const Nexmo = require("nexmo");
-const { addHours, format } = require("date-fns");
+// const Committer = require("../models/committer");
+// const { addHours, format } = require("date-fns");
 require("dotenv/config");
 const rateLimit = require("express-rate-limit");
 const BOT_TOKEN = process.env.BOT_TOKEN;
-// const accountSid = process.env.TWILIO_ACCOUNT_SID;
-// const autheToken = process.env.TWILIO_AUTHE_TOKEN;
-// const client = require("twilio")(accountSid, autheToken);
 const { TelegramClient } = require("messaging-api-telegram");
 const clientTelegram = new TelegramClient({
   accessToken: BOT_TOKEN,
@@ -37,7 +36,7 @@ router.get("/user", verify, async (req, res) => {
     const user = await User.findOne({ _id: req.user._id });
     res.json(user);
   } catch (err) {
-    res.json({ message: err });
+    res.json({ message: err.message });
   }
 });
 // CREATE USER
@@ -81,7 +80,6 @@ router.post("/", createAccountLimiter, async (req, res) => {
       bank: bank,
     });
     const savedUser = await newUser.save();
-    console.log("new User saved");
 
     // UPDATE REFERRALS
 
@@ -142,8 +140,6 @@ router.post("/", createAccountLimiter, async (req, res) => {
     );
     const postTelegramPromise = await postTelegram;
     const editGuiderPromise = await editGuider;
-    console.log("Telegram Posted");
-    console.log("guiderMatch Updated");
     res.json(savedUser);
   } catch (err) {
     res.json({ message: err });
@@ -151,48 +147,64 @@ router.post("/", createAccountLimiter, async (req, res) => {
 });
 //LOGIN
 router.post("/login", async (req, res) => {
-  //validate data before sending
-  const { error } = loginValidation(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-  // check if user is registered
-  const user = await User.findOne({ username: req.body.username });
+  try {
+    //validate data before sending
+    const { error } = loginValidation(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+    // check if user is registered
+    const user = await User.findOne({ username: req.body.username });
 
-  if (!user) return res.status(400).send("username not found");
+    if (!user) return res.status(400).send("username not found");
 
-  // hash password
-  const validPass = await bcrypt.compare(req.body.password, user.password);
-  if (!validPass) return res.status(400).send("Incorrect password");
-  //CREATE AND ASSIGN A TOKEN
-  const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
-    expiresIn: "24h",
-  });
+    // hash password
+    const validPass = await bcrypt.compare(req.body.password, user.password);
+    if (!validPass) return res.status(400).send("Incorrect password");
+    //CREATE AND ASSIGN A TOKEN
+    const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
+      expiresIn: "24h",
+    });
 
-  // res.setHeader("set-cookie", [`jwtToken=${token}`]);
+    // res.setHeader("set-cookie", [`jwtToken=${token}`]);
 
-  res.status(200).send(token);
+    res.status(200).send(token);
+  } catch (error) {
+    res.json({ message: error });
+  }
 });
 
 router.post("/username", async (req, res) => {
-  // check if username is taken
-  console.log(req.body.username);
-  const user = await User.findOne({ username: req.body.username });
+  try {
+    // check if username is taken
+    console.log(req.body.username);
+    const user = await User.findOne({ username: req.body.username });
 
-  if (user) return res.send(true);
-  if (!user) return res.send(false);
+    if (user) return res.send(true);
+    if (!user) return res.send(false);
+  } catch (error) {
+    res.json({ message: err });
+  }
 });
 router.post("/phone", async (req, res) => {
-  // check if username is taken
-  const user = await User.findOne({ phone: req.body.phone });
+  try {
+    // check if username is taken
+    const user = await User.findOne({ phone: req.body.phone });
 
-  if (user) return res.send(true);
-  return res.send(false);
+    if (user) return res.send(true);
+    return res.send(false);
+  } catch (error) {
+    res.json({ message: error });
+  }
 });
 router.post("/email", async (req, res) => {
-  // check if email is taken
-  const user = await User.findOne({ email: req.body.email });
+  try {
+    // check if email is taken
+    const user = await User.findOne({ email: req.body.email });
 
-  if (user) return res.send(true);
-  if (!user) return res.send(false);
+    if (user) return res.send(true);
+    if (!user) return res.send(false);
+  } catch (error) {
+    res.json({ message: error });
+  }
 });
 router.get("/", async (req, res) => {
   try {
@@ -206,7 +218,7 @@ router.patch("/wantToInvest", async (req, res) => {
   try {
     // INPUTS
     const { _id: id, email, investAmt } = req.body;
-
+    console.log(investAmt);
     const updatedUser = await User.findByIdAndUpdate(
       id,
       {
@@ -216,7 +228,7 @@ router.patch("/wantToInvest", async (req, res) => {
       { new: true, runValidators: true, context: "query" }
     );
     console.log("Pledge/ wantToInvest Updated");
-    const checkDB = await Pher.findOne({ email: email });
+    const checkDB = await Pher.findOne({ email: email }).exec();
     if (!checkDB) {
       const createPher = await new Pher({
         email: email,
@@ -235,6 +247,7 @@ router.patch("/wantToInvest", async (req, res) => {
       res.json(updatePher);
     }
   } catch (error) {
+    console.log("error from submit amount");
     res.status(400).send(error);
   }
 });

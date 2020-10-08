@@ -1,20 +1,15 @@
 const mongoose = require("mongoose");
+var uniqueValidator = require("mongoose-unique-validator");
 
 const GuiderSchema = new mongoose.Schema(
   {
     email: {
       type: String,
-    },
-    username: {
-      type: String,
-    },
-    amount: {
-      type: Number,
-      default: 1000,
+      unique: true,
     },
   },
   { timestamps: true }
 );
-// GuiderSchema.plugin(uniqueValidator, { message: "is already taken." });
+GuiderSchema.plugin(uniqueValidator, { message: "already exist." });
 
 module.exports = mongoose.model("Guider", GuiderSchema);

@@ -6,6 +6,7 @@ const Pher = require("../models/pher");
 const Guider = require("../models/guider");
 const User = require("../models/user");
 const Committer = require("../models/committer");
+const { compareAsc, addHours } = require("date-fns");
 require("dotenv/config");
 const fs = require("fs");
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -53,13 +54,13 @@ router.get("/foruser/:email", async (req, res) => {
     const feeArr = receipt.filter(
       (el) => el.pher_email === email && el.isActivationFee === true
     );
+    const feeObj = feeArr[0];
     const resultObj = {
-      payArr: [...phReceiptArr],
-      getArr: [...ghReceiptArr],
-      guiderArr: [...guiderReceiptArr],
-      activationFee: { ...feeArr },
+      payArr: phReceiptArr,
+      getArr: ghReceiptArr,
+      guiderArr: guiderReceiptArr,
+      activationFee: feeObj,
     };
-
     res.json(resultObj);
   } catch (err) {
     res.json({ message: err });
@@ -278,6 +279,8 @@ router.patch("/confirmfee/", async (req, res) => {
       pher_name,
       popPath,
     } = req.body;
+    if (!gher_email || !pher_email || !amount || !receiptId || !pher_name)
+      throw new Error("Request Body Incomplete");
     // SET PHER TO ISACTIVATED
     const activateNewUser = await User.findOneAndUpdate(
       { email: pher_email },
@@ -307,18 +310,22 @@ router.patch("/confirmfee/", async (req, res) => {
 
     //
     // DELETE POP IMAGE
-    fs.unlink(`client/public/uploads/${popPath}`, (err) => {
-      if (err) throw err;
-      console.log("POP was deleted");
-    });
+    if (!popPath) {
+      fs.unlink(`client/public/uploads/${popPath}`, (err) => {
+        if (err) throw err;
+        console.log("POP was deleted");
+      });
+    }
     //
     console.log("Fee Confirm Process Completed");
+    res.json({ message: "Success" });
   } catch (error) {
-    res.json({ message: err });
+    res.json({ message: error.message });
   }
 });
 router.patch("/purge", async (req, res) => {
   try {
+    console.log("purge started");
     const {
       _id: receiptId,
       gher_email,
@@ -326,15 +333,21 @@ router.patch("/purge", async (req, res) => {
       pher_name,
       amount,
       isActivationFee,
-      gherCollectionID,
+      createdAt,
     } = req.body;
 
+    const expDate = addHours(new Date(createdAt), 8);
+    const timecompare = compareAsc(new Date(), expDate);
+    console.log(timecompare, new Date(), expDate);
+    // if (timecompare != 1)
+    //   throw new Error("Kindly Wait Until deadline before Purge");
     if (isActivationFee) {
+      console.log("activation fee");
       const blockPher = await User.findOneAndUpdate(
         { email: pher_email },
         { isBlocked: true }
       );
-      console.log("user blocked");
+      console.log("new user blocked");
       const addToGherPurgeHistory = await User.findOneAndUpdate(
         { email: gher_email },
         {
@@ -346,28 +359,28 @@ router.patch("/purge", async (req, res) => {
           },
         }
       );
-      console.log("guider purge updated");
       const deleteReceipt = await Receipt.findByIdAndDelete(receiptId);
       console.log("delete receipt and Guider Fee Purge successful");
-      res.send("success");
+      res.json({ message: "Success" });
     } else {
+      console.log("payment purge");
       // PAYMENT PURGE
       const blockPher = await User.findOneAndUpdate(
         { email: pher_email },
         { isBlocked: true }
       );
       console.log("blocked payment user");
-      const reverseGherCollection = await Gher.findByIdAndUpdate(
-        gherCollectionID,
+      const reverseGherCollection = await Gher.findOneAndUpdate(
+        { email: gher_email },
         { $inc: { amount: amount }, isPaired: false }
       );
       console.log("gher reversed");
       const deleteReceipt = await Receipt.findByIdAndDelete(receiptId);
       console.log("delete receipt and Payment Purge successful");
-      res.send("success");
+      res.json({ message: "Success" });
     }
-  } catch (error) {
-    res.json({ message: err });
+  } catch (err) {
+    res.json({ message: err.message });
   }
 });
 router.get("/", async (req, res) => {

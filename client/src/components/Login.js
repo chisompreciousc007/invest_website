@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Redirect } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import Spinner from "./Spinner";
 import axios from "axios";
 import Error from "./Error";
 // import { UserContext } from "./UserContext";
 
 function Login() {
-  // const history = useHistory();
+  const history = useHistory();
   const [loginData, setLoginData] = useState({
     username: "",
     password: "",
@@ -14,7 +14,6 @@ function Login() {
   const [isChecked, setIsChecked] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [redirect, setRedirect] = useState(false);
   const [showPassword, setShowpassword] = useState(false);
   const [response, setResponse] = useState(null);
   // const { user, setUser } = useContext(UserContext);
@@ -49,36 +48,11 @@ function Login() {
       .then((res) => {
         document.cookie = `token=${res.data}`;
         console.log("token from server", res);
-        setRedirect(true);
-        // axios
-        //   .get("http://localhost:4000/users/user", { withCredentials: true })
-        //   .then((res) => {
-        //     console.log("user data", res.data);
-        //     setUser((prevState) => ({
-        //       ...prevState,
-        //       user: { ...res.data },
-        //       // authenticated: true,
-        //     }));
-
-        //     axios
-        //       .get(`http://localhost:4000/receipts/foruser/${res.data.email}`, {
-        //         withCredentials: true,
-        //       })
-        //       .then((res) => {
-        //         console.log("receipt data", res.data);
-        //         setUser((prevState) => ({
-        //           ...prevState,
-        //           receipt: [...res.data],
-        //         }));
-        //         sessionStorage.setItem("authenticated", "true");
-        //         setRedirect(true);
-        //         console.log("finalState", user);
-        //       });
-        //   });
+        history.push("/dashboard");
       })
       .catch((err) => {
         setLoading(false);
-        console.log(err);
+        console.log("error", err);
         const errmsg = err.response.data;
         setResponse(errmsg);
         setError(true);
@@ -96,7 +70,6 @@ function Login() {
 
   return (
     <div>
-      {redirect && <Redirect to="/dashboard" />}
       {loading && <Spinner />}
       {error && (
         <Error

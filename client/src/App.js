@@ -54,6 +54,17 @@ function App() {
           <Route path="/signup=:ref" exact component={SignUp} />
           <Route path="/rules" exact component={Terms} />
           <Route path="/login" exact component={Login} />
+          <Route
+            path="/contactSupport"
+            exact
+            render={() => (
+              <h1>
+                Your Account is Blocked,Contact Support at email:
+                Support@splashcash247.com, Telegram: SplashCash247_Support,
+                Whatsapp: +2348031245678
+              </h1>
+            )}
+          />
           <UserContext.Provider value={{ user, setUser }}>
             <ErrorHandler>
               <Route path="/edit_account" exact component={Profile} />

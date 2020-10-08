@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Redirect } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import axios from "axios";
 import Error from "./Error";
 import Header from "./Header";
@@ -9,9 +9,9 @@ import NavBar from "./NavBar";
 import Spinner from "./Spinner";
 
 function Transactions() {
+  const history = useHistory();
   const { user, setUser } = useContext(UserContext);
   const { downline, investHistory, cashoutHistory } = user.user;
-  const [redirect, setRedirect] = useState(false);
   const [error, setError] = useState(false);
   const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -45,15 +45,20 @@ function Transactions() {
         setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
-        const errmsg = err.response.data;
-        setResponse(errmsg);
-        setError(true);
+        console.log(err.response);
+        if (err.response.data == "blocked") {
+          return history.push("/contactSupport");
+        }
+        if (err.response.data == "ACCESS DENIED") {
+          const errmsg = err.response.data;
+          setResponse(errmsg);
+          return setError(true);
+        }
       });
   };
   useEffect(() => {
     getUserData();
-  }, [user]);
+  }, []);
   const isEmpty = (obj) => {
     for (var i in obj) {
       return false;
@@ -63,13 +68,12 @@ function Transactions() {
   if (isEmpty(user.user)) return <Spinner />;
   return (
     <div>
-      {redirect && <Redirect to="/login" />}
       {error && (
         <Error
           response={response}
           setError={() => {
             setError(false);
-            setRedirect(true);
+            window.location.reload();
           }}
         />
       )}

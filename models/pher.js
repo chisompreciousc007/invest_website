@@ -16,6 +16,6 @@ const PherSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-PherSchema.plugin(uniqueValidator, { message: "is already taken." });
+PherSchema.plugin(uniqueValidator, { message: "is already existing." });
 
 module.exports = mongoose.model("Pher", PherSchema);

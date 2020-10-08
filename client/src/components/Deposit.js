@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
-import { useHistory, Redirect } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import SelectAmount from "./SelectAmount";
 import Ph from "./Ph";
 import Gh from "./Gh2";
@@ -22,18 +22,21 @@ function Dashboard() {
   const [selectAmount, setSelectAmount] = useState(5000);
   const { user, setUser } = useContext(UserContext);
   const [response, setResponse] = useState(null);
-  const [redirect, setRedirect] = useState(false);
   const {
     _id,
     email,
     isActivated,
     wantToCashout,
     wantToInvest,
-    createdAt,
-    investList,
     recommit,
   } = user.user;
   const { payArr, getArr, guiderArr, activationFee } = user;
+  const isEmpty = (obj) => {
+    for (var i in obj) {
+      return false;
+    }
+    return true;
+  };
   const fileSelecthandler = (e) => {
     // const filename = e.target.files[0].name;
     const file = e.target.files[0];
@@ -82,7 +85,7 @@ function Dashboard() {
     e.preventDefault();
     axios
       .patch(`http://localhost:4000/users/wantToInvest`, {
-        InvestAmt: +selectAmount,
+        investAmt: +selectAmount,
         _id: _id,
         email: email,
       })
@@ -91,7 +94,9 @@ function Dashboard() {
         window.location.reload();
       })
       .catch((err) => {
-        console.log("error from edit wwantToInvest: ", err.response);
+        console.log("error from edit wwantToInvest");
+        console.log(err.response);
+        setResponse(err.response.data);
         setError(true);
       });
   };
@@ -117,22 +122,34 @@ function Dashboard() {
     axios
       .patch("http://localhost:4000/receipts/confirmfee", currentReceipt)
       .then((res) => {
+        console.log(res);
         console.log("confirm receipt successful!!", res.data);
         window.location.reload();
       })
       .catch((err) => {
         console.log("error from confirm receipt: ", err.response);
+        console.log(err);
+        setResponse("Request Failed");
+        setError(true);
       });
   };
   const purgeHandler = () => {
+    console.log(currentReceipt);
     axios
-      .patch(`http://localhost:4000/receipts/purge`, currentReceipt)
+      .patch("http://localhost:4000/receipts/purge", currentReceipt)
       .then((res) => {
-        console.log("purge successful!!", res.data);
+        console.log(res.data);
+        if (res.data.message != "success") {
+          setResponse(res.data.message);
+          return setError(true);
+        }
+        console.log("purge successful!!", res.data.message);
         window.location.reload();
       })
       .catch((err) => {
-        console.log("error from purge: ", err.response);
+        console.log(err);
+        setResponse("Request Failed!!");
+        setError(true);
       });
   };
 
@@ -165,34 +182,32 @@ function Dashboard() {
         setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
-        const errmsg = err.response.data;
-        setResponse(errmsg);
-        setError(true);
+        console.log(err.response);
+        if (err.response.data == "blocked") {
+          return history.push("/contactSupport");
+        }
+        if (err.response.data == "ACCESS DENIED") {
+          const errmsg = err.response.data;
+          setResponse(errmsg);
+          return setError(true);
+        }
       });
   };
   useEffect(() => {
     getUserData();
   }, []);
 
-  const isEmpty = (obj) => {
-    for (var i in obj) {
-      return false;
-    }
-    return true;
-  };
   if (isEmpty(user.user)) return <Spinner />;
 
   return (
     <div>
-      {redirect && <Redirect to="/login" />}
       {loading && <Spinner />}
       {error && (
         <Error
           response={response}
           setError={() => {
             setError(false);
-            setRedirect(true);
+            window.location.reload();
           }}
         />
       )}
@@ -221,7 +236,7 @@ function Dashboard() {
             />
           )}
 
-          {!wantToInvest && (
+          {isActivated && !wantToInvest && (
             <SelectAmount
               submitAmount={submitAmountHandler}
               SelectAmount={selectAmountHandler}
@@ -231,6 +246,7 @@ function Dashboard() {
           {payArr.length && //    ITERATE THROUGH LIST
             payArr.map((el) => (
               <Ph
+                key={el._id}
                 title="You have been matched to make payment"
                 fileUpload={fileUploadHandler}
                 fileSelect={fileSelecthandler}
@@ -254,6 +270,7 @@ function Dashboard() {
           {guiderArr.length && //ITERATE THROUGH LIST FOR GUIDER
             guiderArr.map((el) => (
               <Gh
+                key={el._id}
                 name={el.pher_name}
                 phone={el.pher_phone}
                 amount={el.amount}
@@ -270,6 +287,7 @@ function Dashboard() {
           {getArr.length && //ITERATE THROUGH LIST,CHECK IF ACTIVATED and PAIRED
             getArr.map((el) => (
               <Gh
+                key={el._id}
                 name={el.pher_name}
                 phone={el.pher_phone}
                 amount={el.amount}

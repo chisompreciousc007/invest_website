@@ -9,7 +9,7 @@ const Committer = require("../models/committer");
 const { compareAsc, addHours } = require("date-fns");
 require("dotenv/config");
 const fs = require("fs");
-const { celebrate, Joi, errors, Segments } = require("celebrate");
+const { celebrate, Joi, Segments } = require("celebrate");
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const autheToken = process.env.TWILIO_AUTHE_TOKEN;
 const client = require("twilio")(accountSid, autheToken);

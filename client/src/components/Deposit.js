@@ -11,7 +11,6 @@ import Header from "./Header";
 import { UserContext } from "./UserContext";
 import NavBar from "./NavBar";
 import { addHours, format } from "date-fns";
-const baseUrl = process.env.baseURL;
 
 function Dashboard() {
   const history = useHistory();

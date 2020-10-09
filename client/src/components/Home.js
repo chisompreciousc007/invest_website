@@ -170,7 +170,7 @@ function Home() {
                     <li>
                       <h4>
                         INVESTMENT PLAN <br />
-                        <h2>Earn 50% ROI every 48 hours.</h2>
+                        <p>Earn 50% ROI every 48 hours.</p>
                       </h4>
                       <br />
                       <h4 style={{ marginLeft: "106px" }}>

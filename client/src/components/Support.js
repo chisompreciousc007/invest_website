@@ -102,13 +102,13 @@ function Support() {
       </section>
 
       <div className="bottom_body inner_page_body">
-        <section class="common_page">
-          <div class="container">
-            <div class="inside_inner">
+        <section className="common_page">
+          <div className="container">
+            <div className="inside_inner">
               <div style={{ margin: "0 0 30px" }}></div>
-              <div class="support-right">
-                <div class="contacts">
-                  <div class="address">
+              <div className="support-right">
+                {/* <div className="contacts">
+                  <div className="address">
                     <h2>Company Details:</h2>
                     <h4
                       style={{
@@ -121,9 +121,9 @@ function Support() {
                     </h4>
                     <p>P2P Investment Platform for Financial growth</p>
                   </div>
-                </div>
-                <div class="contacts">
-                  <div class="email">
+                </div> */}
+                <div className="contacts" style={{ width: "auto" }}>
+                  <div className="email">
                     <h2 style={{ display: "inline-flex" }}>
                       Our E-mail:<span style={{ color: "white" }}> </span>
                     </h2>
@@ -136,78 +136,79 @@ function Support() {
             </div>
           </div>
 
-          <h2 class="common_heading" style={{ marginTop: "190px" }}>
+          <h2 className="common_heading" style={{ marginTop: "190px" }}>
             Contact Form
           </h2>
 
-          <div class="register_form_inner clearfix" style={{ width: "100%" }}>
-            <div class="row">
+          <div
+            className="register_form_inner clearfix"
+            style={{ width: "100%" }}
+          >
+            <div className="row">
               <form method="post" name="mainform">
-                <div class="col-sm-12 col-xs-12">
+                <div className="col-sm-12 col-xs-12">
                   {" "}
-                  <div class="col-sm-6 col-xs-6">
+                  <div className="col-sm-6 col-xs-6">
                     {" "}
-                    <div class="form_box formsupport">
+                    <div className="form_box formsupport">
                       <span>
-                        <i class="fa fa-user"></i>
+                        <i className="fa fa-user"></i>
 
                         <input
                           placeholder="Username"
                           type="text"
                           name="name"
-                          value=""
                           size="30"
-                          class="inpts"
+                          className="inpts"
                         />
                       </span>
                     </div>{" "}
                   </div>
-                  <div class="col-sm-6 col-xs-6">
+                  <div className="col-sm-6 col-xs-6">
                     {" "}
-                    <div class="form_box formsupport">
+                    <div className="form_box formsupport">
                       <span>
-                        <i class="fa fa-envelope"></i>
+                        <i className="fa fa-envelope"></i>
 
                         <input
                           placeholder="Your Email"
                           type="email"
                           name="email"
-                          value=""
                           size="30"
-                          class="inpts"
+                          className="inpts"
                         />
                       </span>
                     </div>{" "}
                   </div>
-                  <div class="form_box" style={{ width: "97.5%" }}>
+                  <div className="form_box" style={{ width: "97.5%" }}>
                     <span>
-                      <i class="fa  fa-list-alt"></i>
+                      <i className="fa  fa-list-alt"></i>
 
                       <textarea
                         style={{ paddingTop: "5px" }}
                         placeholder="Your Message"
                         name="message"
-                        class="inpts"
+                        className="inpts"
                       ></textarea>
                     </span>
                   </div>
-                  <div class="form_box">
+                  <div className="form_box">
                     <b>
                       <input
-                        class="btn btn-primary"
+                        className="btn btn-primary"
                         type="submit"
                         value="Send"
-                        class="sbmt"
+                        className="sbmt"
                       />
                     </b>
                   </div>
                 </div>
 
-                <div class="col-sm-6 col-xs-6"> </div>
+                <div className="col-sm-6 col-xs-6"> </div>
 
-                <div class="col-sm-12 col-xs-12"> </div>
+                <div className="col-sm-12 col-xs-12"> </div>
 
-                <div class="col-sm-12 col-xs-12"></div>
+                <div className="col-sm-12 col-xs-12"></div>
               </form>
             </div>
           </div>

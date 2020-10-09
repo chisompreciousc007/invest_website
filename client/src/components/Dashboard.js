@@ -66,7 +66,7 @@ function Dashboard() {
           setResponse(err.response.data);
           return setError(true);
         }
-        setResponse("err.message");
+        setResponse("Request failed!!");
         setError(true);
       });
   };

@@ -1,14 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+  <script>
+    (function (d, h, w) {
+      var gist = (w.gist = w.gist || []);
+      gist.methods = ["trackPageView", "identify", "track", "setAppId"];
+      gist.factory = function (t) {
+        return function () {
+          var e = Array.prototype.slice.call(arguments);
+          e.unshift(t);
+          gist.push(e);
+          return gist;
+        };
+      };
+      for (var i = 0; i < gist.methods.length; i++) {
+        var c = gist.methods[i];
+        gist[c] = gist.factory(c);
+      }
+      (s = d.createElement("script")),
+        (s.src = "https://widget.getgist.com"),
+        (s.async = !0),
+        (e = d.getElementsByTagName(h)[0]),
+        e.appendChild(s),
+        s.addEventListener("load", function (e) {}, !1),
+        gist.setAppId("c62ycdea"),
+        gist.trackPageView();
+    })(document, "head", window);
+  </script>
   <head>
     <meta charset="utf-8" />
+    <!-- <link rel="manifest" href="%PUBLIC_URL%/manifest.json" /> -->
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta name="description" content="P2P Invest Platform" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
 
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Splashcash247</title>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />

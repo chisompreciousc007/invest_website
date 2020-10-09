@@ -43,7 +43,7 @@ function SignUp({ match }) {
     setLoading(true);
     console.log(user);
     axios
-      .post("http://localhost:4000/users", user)
+      .post("/users", user)
       .then((res) => {
         const resUser = res.data.name;
         setSavedUser(resUser);
@@ -64,7 +64,7 @@ function SignUp({ match }) {
       case "username":
         console.log(user);
         axios
-          .post("http://localhost:4000/users/username", user)
+          .post("/users/username", user)
           .then((res) => {
             console.log("res from check username", res);
             if (res.data === true)
@@ -81,7 +81,7 @@ function SignUp({ match }) {
         break;
       case "email":
         axios
-          .post("http://localhost:4000/users/email", user)
+          .post("/users/email", user)
           .then((res) => {
             if (res.data === true)
               setEmailStatus("Already Exists, try another!");
@@ -97,7 +97,7 @@ function SignUp({ match }) {
         break;
       case "phone":
         axios
-          .post("http://localhost:4000/users/phone", user)
+          .post("/users/phone", user)
           .then((res) => {
             if (res.data === true)
               setPhoneStatus("Already Exists, try another!");

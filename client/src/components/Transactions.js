@@ -7,7 +7,7 @@ import Footer from "./Footer";
 import { UserContext } from "./UserContext";
 import NavBar from "./NavBar";
 import Spinner from "./Spinner";
-const baseUrl = process.env.baseURL || "http://localhost:4000";
+const baseUrl = process.env.baseURL;
 
 function Transactions() {
   const history = useHistory();

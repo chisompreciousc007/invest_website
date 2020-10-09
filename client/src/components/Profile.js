@@ -7,7 +7,7 @@ import { UserContext } from "./UserContext";
 import Error from "./Error";
 import axios from "axios";
 import Spinner from "./Spinner";
-const baseUrl = process.env.baseURL || "http://localhost:4000";
+const baseUrl = process.env.baseURL;
 
 function Referals() {
   const history = useHistory();

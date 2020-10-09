@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import Spinner from "./Spinner";
 import axios from "axios";
 import Error from "./Error";
-const baseUrl = process.env.baseURL || "http://localhost:4000";
+const baseUrl = process.env.baseURL;
 
 function Login() {
   const history = useHistory();

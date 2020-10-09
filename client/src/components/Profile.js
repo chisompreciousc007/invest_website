@@ -7,6 +7,7 @@ import { UserContext } from "./UserContext";
 import Error from "./Error";
 import axios from "axios";
 import Spinner from "./Spinner";
+const baseUrl = process.env.baseURL || "http://localhost:4000",
 
 function Referals() {
   const history = useHistory();
@@ -36,7 +37,7 @@ function Referals() {
       return console.log("already gotten user data");
     }
     axios
-      .get("http://localhost:4000/users/user", { withCredentials: true })
+      .get(baseUrl+"/users/user", { withCredentials: true })
       .then((res) => {
         console.log("user data", res.data);
         if (res.data === "blocked") return history.push("/contactSupport");
@@ -46,7 +47,7 @@ function Referals() {
         }));
 
         axios
-          .get(`http://localhost:4000/receipts/foruser/${res.data.email}`, {
+          .get(`${baseUrl}/receipts/foruser/${res.data.email}`, {
             withCredentials: true,
           })
           .then((res) => {

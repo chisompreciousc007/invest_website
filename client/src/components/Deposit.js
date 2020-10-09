@@ -11,6 +11,7 @@ import Header from "./Header";
 import { UserContext } from "./UserContext";
 import NavBar from "./NavBar";
 import { addHours, format } from "date-fns";
+const baseUrl = process.env.baseURL || "http://localhost:4000",
 
 function Dashboard() {
   const history = useHistory();
@@ -43,7 +44,7 @@ function Dashboard() {
     formData.append("file", file);
     console.log("formdata: ", formData);
     try {
-      const res = await axios.post("http://localhost:4000/uploads", formData, {
+      const res = await axios.post(baseUrl+"/uploads", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -55,7 +56,7 @@ function Dashboard() {
       };
       axios
         .patch(
-          `http://localhost:4000/receipts/updatePopPath/${currentReceipt._id}`,
+          `${baseUrl}/receipts/updatePopPath/${currentReceipt._id}`,
           obj
         )
         .then((res) => {
@@ -78,7 +79,7 @@ function Dashboard() {
   const submitAmountHandler = (e) => {
     e.preventDefault();
     axios
-      .patch(`http://localhost:4000/users/wantToInvest`, {
+      .patch(`${baseUrl}/users/wantToInvest`, {
         investAmt: +selectAmount,
         _id: _id,
         email: email,
@@ -104,7 +105,7 @@ function Dashboard() {
   };
   const confirmPaymentHandler = () => {
     axios
-      .patch(`http://localhost:4000/receipts/confirmpayment`, currentReceipt)
+      .patch(`${baseUrl}/receipts/confirmpayment`, currentReceipt)
       .then((res) => {
         console.log("confirm receipt successful!!", res.data);
         window.location.reload();
@@ -115,7 +116,7 @@ function Dashboard() {
   };
   const confirmFeeHandler = () => {
     axios
-      .patch("http://localhost:4000/receipts/confirmfee", currentReceipt)
+      .patch(baseUrl+"/receipts/confirmfee", currentReceipt)
       .then((res) => {
         console.log(res);
         console.log("confirm receipt successful!!", res.data);
@@ -131,7 +132,7 @@ function Dashboard() {
   const purgeHandler = () => {
     console.log(currentReceipt);
     axios
-      .patch("http://localhost:4000/receipts/purge", currentReceipt)
+      .patch(baseUrl+"/receipts/purge", currentReceipt)
       .then((res) => {
         console.log("purge successful!!", res.data.message);
         window.location.reload();
@@ -151,7 +152,7 @@ function Dashboard() {
       return console.log("already gotten user data");
     }
     axios
-      .get("http://localhost:4000/users/user", { withCredentials: true })
+      .get(baseUrl+"/users/user", { withCredentials: true })
       .then((res) => {
         console.log("user data", res.data);
         if (res.data === "blocked") return history.push("/contactSupport");
@@ -161,7 +162,7 @@ function Dashboard() {
         }));
 
         axios
-          .get(`http://localhost:4000/receipts/foruser/${res.data.email}`, {
+          .get(`${baseUrl}/receipts/foruser/${res.data.email}`, {
             withCredentials: true,
           })
           .then((res) => {

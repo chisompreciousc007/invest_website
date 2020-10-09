@@ -39,7 +39,7 @@ router.post(
     [Segments.BODY]: Joi.object().keys({
       name: Joi.string().required(),
       username: Joi.string().required(),
-      email: Joi.string().required(),
+      email: Joi.string().email().required(),
       password: Joi.string().required(),
       phone: Joi.string().required(),
       upline: Joi.string().required(),
@@ -199,7 +199,6 @@ router.post(
   async (req, res) => {
     try {
       // check if username is taken
-      console.log(req.body.username);
       const user = await User.findOne({ username: req.body.username });
 
       if (user) return res.send(true);
@@ -232,7 +231,7 @@ router.post(
   "/email",
   celebrate({
     [Segments.BODY]: Joi.object().keys({
-      email: Joi.string().required(),
+      email: Joi.string().email().required(),
     }),
   }),
   async (req, res) => {
@@ -261,7 +260,7 @@ router.patch(
     [Segments.BODY]: Joi.object().keys({
       _id: Joi.string().required(),
 
-      email: Joi.string().required(),
+      email: Joi.string().email().required(),
       investAmt: Joi.number().integer().required(),
     }),
   }),

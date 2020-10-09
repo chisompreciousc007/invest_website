@@ -23,8 +23,6 @@ function SignUp({ match }) {
     email: "",
     password: "",
     phone: "",
-    age: "",
-    gender: "",
     upline: `${ref}`,
     accountName: "",
     accountNo: "",
@@ -62,53 +60,56 @@ function SignUp({ match }) {
   const checkIfExist = (key) => {
     switch (key) {
       case "username":
-        console.log(user);
-        axios
-          .post("/users/username", user)
-          .then((res) => {
-            console.log("res from check username", res);
-            if (res.data === true)
-              setUsernameStatus("Already Exists, try another!");
-            if (res.data === false) setUsernameStatus("Available");
-          })
-          .catch((err) => {
-            const errmsg = err.response.data;
-            setResponse(errmsg);
-            setError(true);
-            window.scrollTo(0, 0);
-          });
-
+        if (user.username.length >= 3) {
+          axios
+            .post("/users/username", { username: user.username })
+            .then((res) => {
+              console.log("res from check username", res);
+              if (res.data === true)
+                setUsernameStatus("Already Exists, try another!");
+              if (res.data === false) setUsernameStatus("Available");
+            })
+            .catch((err) => {
+              // const errmsg = err.response.data;
+              setResponse(err.message);
+              setError(true);
+              window.scrollTo(0, 0);
+            });
+        }
         break;
       case "email":
-        axios
-          .post("/users/email", user)
-          .then((res) => {
-            if (res.data === true)
-              setEmailStatus("Already Exists, try another!");
-            if (res.data === false) setEmailStatus("Available");
-          })
-          .catch((err) => {
-            const errmsg = err.response.data;
-            setResponse(errmsg);
-            setError(true);
-            window.scrollTo(0, 0);
-          });
+        if (user.email.length > 5) {
+          axios
+            .post("/users/email", { email: user.email })
+            .then((res) => {
+              if (res.data === true)
+                setEmailStatus("Already Exists, try another!");
+              if (res.data === false) setEmailStatus("Available");
+            })
+            .catch((err) => {
+              // const errmsg = err.response.data;
+              setResponse(err.message);
+              setError(true);
+              window.scrollTo(0, 0);
+            });
+        }
 
         break;
       case "phone":
-        axios
-          .post("/users/phone", user)
-          .then((res) => {
-            if (res.data === true)
-              setPhoneStatus("Already Exists, try another!");
-            if (res.data === false) setPhoneStatus("Available");
-          })
-          .catch((err) => {
-            const errmsg = err.response.data;
-            setResponse(errmsg);
-            setError(true);
-            window.scrollTo(0, 0);
-          });
+        if (user.phone.length >= 11) {
+          axios
+            .post("/users/phone", { phone: user.phone })
+            .then((res) => {
+              if (res.data === true)
+                setPhoneStatus("Already Exists, try another!");
+              if (res.data === false) setPhoneStatus("Available");
+            })
+            .catch((err) => {
+              setResponse(err.message);
+              setError(true);
+              window.scrollTo(0, 0);
+            });
+        }
 
         break;
 

@@ -8,7 +8,6 @@ import Header from "./Header";
 import { UserContext } from "./UserContext";
 import NavBar from "./NavBar";
 import { addHours, format } from "date-fns";
-const baseUrl = process.env.baseURL;
 
 function Dashboard() {
   const history = useHistory();
@@ -39,7 +38,7 @@ function Dashboard() {
       return console.log("already gotten user data");
     }
     axios
-      .get(baseUrl + "/users/user", { withCredentials: true })
+      .get("/users/user", { withCredentials: true })
       .then((res) => {
         console.log("user data", res.data);
         if (res.data === "blocked") return history.push("/contactSupport");
@@ -49,7 +48,7 @@ function Dashboard() {
         }));
 
         axios
-          .get(`${baseUrl}/receipts/foruser/${res.data.email}`, {
+          .get(`/receipts/foruser/${res.data.email}`, {
             withCredentials: true,
           })
           .then((res) => {

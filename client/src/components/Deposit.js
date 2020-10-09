@@ -44,7 +44,7 @@ function Dashboard() {
     formData.append("file", file);
     console.log("formdata: ", formData);
     try {
-      const res = await axios.post(baseUrl + "/uploads", formData, {
+      const res = await axios.post("/uploads", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -55,7 +55,7 @@ function Dashboard() {
         popPath: filePath,
       };
       axios
-        .patch(`${baseUrl}/receipts/updatePopPath/${currentReceipt._id}`, obj)
+        .patch(`/receipts/updatePopPath/${currentReceipt._id}`, obj)
         .then((res) => {
           console.log("edit popPath successful!!", res.data);
           setLoading(false);
@@ -76,7 +76,7 @@ function Dashboard() {
   const submitAmountHandler = (e) => {
     e.preventDefault();
     axios
-      .patch(`${baseUrl}/users/wantToInvest`, {
+      .patch(`/users/wantToInvest`, {
         investAmt: +selectAmount,
         _id: _id,
         email: email,
@@ -102,7 +102,7 @@ function Dashboard() {
   };
   const confirmPaymentHandler = () => {
     axios
-      .patch(`${baseUrl}/receipts/confirmpayment`, currentReceipt)
+      .patch(`/receipts/confirmpayment`, currentReceipt)
       .then((res) => {
         console.log("confirm receipt successful!!", res.data);
         window.location.reload();
@@ -113,7 +113,7 @@ function Dashboard() {
   };
   const confirmFeeHandler = () => {
     axios
-      .patch(baseUrl + "/receipts/confirmfee", currentReceipt)
+      .patch("/receipts/confirmfee", currentReceipt)
       .then((res) => {
         console.log(res);
         console.log("confirm receipt successful!!", res.data);
@@ -129,7 +129,7 @@ function Dashboard() {
   const purgeHandler = () => {
     console.log(currentReceipt);
     axios
-      .patch(baseUrl + "/receipts/purge", currentReceipt)
+      .patch("/receipts/purge", currentReceipt)
       .then((res) => {
         console.log("purge successful!!", res.data.message);
         window.location.reload();
@@ -149,7 +149,7 @@ function Dashboard() {
       return console.log("already gotten user data");
     }
     axios
-      .get(baseUrl + "/users/user", { withCredentials: true })
+      .get("/users/user", { withCredentials: true })
       .then((res) => {
         console.log("user data", res.data);
         if (res.data === "blocked") return history.push("/contactSupport");
@@ -159,7 +159,7 @@ function Dashboard() {
         }));
 
         axios
-          .get(`${baseUrl}/receipts/foruser/${res.data.email}`, {
+          .get(`/receipts/foruser/${res.data.email}`, {
             withCredentials: true,
           })
           .then((res) => {

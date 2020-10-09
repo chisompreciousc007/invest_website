@@ -3,7 +3,6 @@ import { useHistory } from "react-router-dom";
 import Spinner from "./Spinner";
 import axios from "axios";
 import Error from "./Error";
-const baseUrl = process.env.baseURL;
 
 function Login() {
   const history = useHistory();
@@ -42,7 +41,7 @@ function Login() {
       localStorage.checkbox = isChecked;
     }
     axios
-      .post(baseUrl + "/users/login", loginData, {
+      .post("/users/login", loginData, {
         withCredentials: true,
       })
       .then((res) => {
@@ -59,6 +58,7 @@ function Login() {
       });
   };
   useEffect(() => {
+    console.log(process.env.SECRET);
     if (localStorage.checkbox && localStorage.username !== "") {
       setIsChecked(true);
       setLoginData({

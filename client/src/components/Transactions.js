@@ -7,7 +7,6 @@ import Footer from "./Footer";
 import { UserContext } from "./UserContext";
 import NavBar from "./NavBar";
 import Spinner from "./Spinner";
-const baseUrl = process.env.baseURL;
 
 function Transactions() {
   const history = useHistory();
@@ -22,7 +21,7 @@ function Transactions() {
       return console.log("already gotten user data");
     }
     axios
-      .get(baseUrl + "/users/user", { withCredentials: true })
+      .get("/users/user", { withCredentials: true })
       .then((res) => {
         console.log("user data", res.data);
         if (res.data === "blocked") return history.push("/contactSupport");
@@ -32,7 +31,7 @@ function Transactions() {
         }));
 
         axios
-          .get(`${baseUrl}/receipts/foruser/${res.data.email}`, {
+          .get(`/receipts/foruser/${res.data.email}`, {
             withCredentials: true,
           })
           .then((res) => {

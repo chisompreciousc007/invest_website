@@ -7,7 +7,7 @@ import Footer from "./Footer";
 import { UserContext } from "./UserContext";
 import NavBar from "./NavBar";
 import Spinner from "./Spinner";
-const baseUrl = process.env.baseURL || "http://localhost:4000",
+const baseUrl = process.env.baseURL || "http://localhost:4000";
 
 function Transactions() {
   const history = useHistory();
@@ -22,7 +22,7 @@ function Transactions() {
       return console.log("already gotten user data");
     }
     axios
-      .get(baseUrl+"/users/user", { withCredentials: true })
+      .get(baseUrl + "/users/user", { withCredentials: true })
       .then((res) => {
         console.log("user data", res.data);
         if (res.data === "blocked") return history.push("/contactSupport");

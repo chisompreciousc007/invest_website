@@ -11,7 +11,7 @@ import Header from "./Header";
 import { UserContext } from "./UserContext";
 import NavBar from "./NavBar";
 import { addHours, format } from "date-fns";
-const baseUrl = process.env.baseURL || "http://localhost:4000",
+const baseUrl = process.env.baseURL || "http://localhost:4000";
 
 function Dashboard() {
   const history = useHistory();
@@ -44,7 +44,7 @@ function Dashboard() {
     formData.append("file", file);
     console.log("formdata: ", formData);
     try {
-      const res = await axios.post(baseUrl+"/uploads", formData, {
+      const res = await axios.post(baseUrl + "/uploads", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -55,10 +55,7 @@ function Dashboard() {
         popPath: filePath,
       };
       axios
-        .patch(
-          `${baseUrl}/receipts/updatePopPath/${currentReceipt._id}`,
-          obj
-        )
+        .patch(`${baseUrl}/receipts/updatePopPath/${currentReceipt._id}`, obj)
         .then((res) => {
           console.log("edit popPath successful!!", res.data);
           setLoading(false);
@@ -116,7 +113,7 @@ function Dashboard() {
   };
   const confirmFeeHandler = () => {
     axios
-      .patch(baseUrl+"/receipts/confirmfee", currentReceipt)
+      .patch(baseUrl + "/receipts/confirmfee", currentReceipt)
       .then((res) => {
         console.log(res);
         console.log("confirm receipt successful!!", res.data);
@@ -132,7 +129,7 @@ function Dashboard() {
   const purgeHandler = () => {
     console.log(currentReceipt);
     axios
-      .patch(baseUrl+"/receipts/purge", currentReceipt)
+      .patch(baseUrl + "/receipts/purge", currentReceipt)
       .then((res) => {
         console.log("purge successful!!", res.data.message);
         window.location.reload();
@@ -152,7 +149,7 @@ function Dashboard() {
       return console.log("already gotten user data");
     }
     axios
-      .get(baseUrl+"/users/user", { withCredentials: true })
+      .get(baseUrl + "/users/user", { withCredentials: true })
       .then((res) => {
         console.log("user data", res.data);
         if (res.data === "blocked") return history.push("/contactSupport");

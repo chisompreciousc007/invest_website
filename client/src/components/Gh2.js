@@ -124,9 +124,9 @@ function PhComponent({
           <div className="col-md-4 col-sm-6 col-xs-12  ml-2">
             {" "}
             <img
-              src={require(`../../public/uploads/${pop}`)}
-              style={{ height: "400px", width: "100%" }}
-              alt="pop"
+              src={`${window.location.origin }/uploads/${pop}`}
+              style={{ height: "400px", width: "100%",paddingBottom: "8px" }}
+              alt="POP-Image"
             />
           </div>{" "}
         </div>

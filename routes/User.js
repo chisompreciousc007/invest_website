@@ -151,7 +151,7 @@ router.post(
       const editGuiderPromise = await editGuider;
       res.json(savedUser);
     } catch (err) {
-      res.json({ message: err });
+      res.json({ message: err.message });
     }
   }
 );

@@ -72,6 +72,7 @@ function PhComponent({
                 <div className="input-group mb-3">
                   <div className="custom-file">
                     <input
+                      accept="image/x-png,image/gif,image/jpeg"
                       onClick={() => IdSet()}
                       type="file"
                       className="custom-file-input"

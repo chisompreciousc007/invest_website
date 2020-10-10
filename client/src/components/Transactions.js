@@ -110,7 +110,7 @@ function Transactions() {
                           <b>{index+1}</b>
                         </td>
                         <td className="inheader" width="200">
-                          <b>{el.gher_name}</b>
+                          <b>{el.name}</b>
                         </td>
                         <td className="inheader" width="170">
                           <b>{el.amount}</b>
@@ -147,7 +147,7 @@ function Transactions() {
                           <b>{index+1}</b>
                         </td>
                         <td className="inheader" width="200">
-                          <b>{el.pher_name}</b>
+                          <b>{el.name}</b>
                         </td>
                         <td className="inheader" width="170">
                           <b>{el.amount}</b>
@@ -209,8 +209,8 @@ function Transactions() {
                         <b>Bonus</b>
                       </td>
                     </tr>
-                    {guiderHistory.map((el) => (
-                      <tr>
+                    {guiderHistory.map((el,index) => (
+                      <tr key={index}>
                         <td className="inheader">
                           <b>{el.name}</b>
                         </td>

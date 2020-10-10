@@ -58,6 +58,17 @@ function Dashboard() {
               ...res.data,
             }));
           });
+          axios
+          .get(`/ghers/${res.data.email}`, {
+            withCredentials: true,
+          })
+          .then((res) => {
+            console.log("gher data", res.data);
+            setUser((prevState) => ({
+              ...prevState,
+              ...res.data,
+            }));
+          }) 
         setLoading(false);
       })
       .catch((err) => {

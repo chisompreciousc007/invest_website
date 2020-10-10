@@ -2,8 +2,14 @@ const express = require("express");
 const router = express.Router();
 const Guider = require("../models/guider");
 const User = require("../models/user");
+const { celebrate, Joi, Segments } = require("celebrate");
 
-router.post("/:email", async (req, res) => {
+router.post("/:email",celebrate({
+  [Segments.PARAMS]: Joi.object().keys({
+    email: Joi.string().email().required(),
+  }),
+}),
+ async (req, res) => {
   try {
     const regGuider = await User.findOne({ email: req.params.email });
     const newGuider = new Guider({
@@ -16,7 +22,11 @@ router.post("/:email", async (req, res) => {
   }
 });
 
-router.delete("/:email", async (req, res) => {
+router.delete("/:email",celebrate({
+  [Segments.PARAMS]: Joi.object().keys({
+    email: Joi.string().email().required(),
+  }),
+}), async (req, res) => {
   try {
     const reversedGuider = await User.findOneAndDelete({
       email: req.params.email,

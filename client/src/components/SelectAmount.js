@@ -36,7 +36,7 @@ function SelectAmount({ submitAmount, SelectAmount, recommit }) {
       <button
         type="button"
         style={{ color: "black" }}
-        class="btn btn-primary"
+        className="btn btn-primary"
         onClick={submitAmount}
       >
         {recommit ? "Recommit" : "Commit"}

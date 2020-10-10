@@ -8,7 +8,7 @@ function PhComponent({
   confirm,
   purge,
   pop,
-  IdSet,
+  IdSet, title
 }) {
   const [button, setbutton] = useState(false);
   const [button2, setbutton2] = useState(false);
@@ -26,7 +26,7 @@ function PhComponent({
         fontWeight: "bolder",
       }}
     >
-      <h4>You have been matched to GH</h4>
+      <h4>{title}</h4>
       <h5 style={{ marginLeft: "0.5rem", marginBottom: "0.3rem" }}>
         Name:{name}
       </h5>

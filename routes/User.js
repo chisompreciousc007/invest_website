@@ -261,14 +261,16 @@ router.patch(
       _id: Joi.string().required(),
 
       email: Joi.string().email().required(),
-      investAmt: Joi.number().integer().required(),
+      investAmt: Joi.number().integer().min(4999).required(),
+      pledge: Joi.number().integer().required(),
     }),
   }),
   async (req, res) => {
     try {
       // INPUTS
-      const { _id: id, email, investAmt } = req.body;
+      const { _id: id, email, investAmt,pledge } = req.body;
       console.log(investAmt);
+      if(pledge>investAmt){ return res.status(400).send(`Recommit must be greater than ${pledge}`)}
       const updatedUser = await User.findByIdAndUpdate(
         id,
         {
@@ -279,13 +281,13 @@ router.patch(
       );
       console.log("Pledge/ wantToInvest Updated");
       const checkDB = await Pher.findOne({ email: email }).exec();
-      if (!checkDB) {
+      if (checkDB ===null) {
         const createPher = await new Pher({
           email: email,
           amount: investAmt,
         }).save();
         console.log("Created Pher for User");
-        res.json(createPher);
+        res.status(200).json(createPher);
       } else {
         const updatePher = await Pher.findOneAndUpdate(
           {
@@ -294,7 +296,7 @@ router.patch(
           { amount: investAmt, isPaired: false }
         );
         console.log("Updated Pher Amt for User");
-        res.json(updatePher);
+        res.status(200).json(updatePher);
       }
     } catch (error) {
       console.log("error from submit amount");

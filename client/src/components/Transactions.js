@@ -11,7 +11,7 @@ import Spinner from "./Spinner";
 function Transactions() {
   const history = useHistory();
   const { user, setUser } = useContext(UserContext);
-  const { downline, investHistory, cashoutHistory } = user.user;
+  const { downline, investHistory, cashoutHistory, guiderHistory } = user.user;
   const [error, setError] = useState(false);
   const [response, setResponse] = useState(null);
 
@@ -98,22 +98,22 @@ function Transactions() {
                         <b>PH</b>
                       </td>
                       <td className="inheader" width="200">
-                        <b>Amount</b>
+                        <b>Name</b>
                       </td>
                       <td className="inheader" width="170">
-                        <b>Date</b>
+                        <b>Amount</b>
                       </td>
                     </tr>
-                    {investHistory.map((el) => (
-                      <tr>
+                    {investHistory.map((el, index) => (
+                      <tr key={index}>
                         <td className="inheader">
-                          <b>{el.gher_accountName}</b>
+                          <b>{index+1}</b>
                         </td>
                         <td className="inheader" width="200">
-                          <b>{el.amount}</b>
+                          <b>{el.gher_name}</b>
                         </td>
                         <td className="inheader" width="170">
-                          <b>{el.updatedAt}</b>
+                          <b>{el.amount}</b>
                         </td>
                       </tr>
                     ))}
@@ -135,22 +135,22 @@ function Transactions() {
                         <b>GH</b>
                       </td>
                       <td className="inheader" width="200">
-                        <b>Amount</b>
+                        <b>Name</b>
                       </td>
                       <td className="inheader" width="170">
-                        <b>Date</b>
+                        <b>Amount</b>
                       </td>
                     </tr>
-                    {cashoutHistory.map((el) => (
-                      <tr>
+                    {cashoutHistory.map((el,index) => (
+                      <tr key = {index}>
                         <td className="inheader">
-                          <b>{el.pher_name}</b>
+                          <b>{index+1}</b>
                         </td>
                         <td className="inheader" width="200">
-                          <b>{el.amount}</b>
+                          <b>{el.pher_name}</b>
                         </td>
                         <td className="inheader" width="170">
-                          <b>{el.updatedAt}</b>
+                          <b>{el.amount}</b>
                         </td>
                       </tr>
                     ))}
@@ -184,7 +184,38 @@ function Transactions() {
                           <b>{el.name}</b>
                         </td>
                         <td className="inheader" width="200">
-                          <b>{el.amount * 0.1}</b>
+                          <b>{el.amount * 0.05}</b>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <br/>
+              <div className="col-md-10 col-sm-12">
+                <table
+                  cellSpacing="1"
+                  cellPadding="2"
+                  border="0"
+                  width="100%"
+                  className="tab"
+                >
+                  <tbody>
+                    <tr>
+                      <td className="inheader">
+                        <b>Guider Payments</b>
+                      </td>
+                      <td className="inheader" width="200">
+                        <b>Bonus</b>
+                      </td>
+                    </tr>
+                    {guiderHistory.map((el) => (
+                      <tr>
+                        <td className="inheader">
+                          <b>{el.name}</b>
+                        </td>
+                        <td className="inheader" width="200">
+                          <b>{el.amount}</b>
                         </td>
                       </tr>
                     ))}

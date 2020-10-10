@@ -16,12 +16,13 @@ function Dashboard() {
   const history = useHistory();
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [ghstatus,setGhStatus] = useState({})
   const [currentReceipt, setCurrentReceipt] = useState(null);
   const [file, setFile] = useState(null);
   const [selectAmount, setSelectAmount] = useState(5000);
   const { user, setUser } = useContext(UserContext);
   const [response, setResponse] = useState(null);
-  const { _id, email, isActivated, wantToInvest, recommit } = user.user;
+  const { _id, email, isActivated, wantToInvest, recommit,pledge } = user.user;
   const { payArr, getArr, guiderArr, activationFee } = user;
   const isEmpty = (obj) => {
     for (var i in obj) {
@@ -76,9 +77,10 @@ function Dashboard() {
     e.preventDefault();
     axios
       .patch(`/users/wantToInvest`, {
-        investAmt: +selectAmount,
+        investAmt: selectAmount,
         _id: _id,
         email: email,
+        pledge:pledge,
       })
       .then((res) => {
         console.log("edit wantToInvest successful!!", res.data);
@@ -100,9 +102,11 @@ function Dashboard() {
     console.log(val);
   };
   const confirmPaymentHandler = () => {
+    setLoading(true)
     axios
       .patch(`/receipts/confirmpayment`, currentReceipt)
       .then((res) => {
+        setLoading(false)
         console.log("confirm receipt successful!!", res.data);
         window.location.reload();
       })
@@ -135,7 +139,7 @@ function Dashboard() {
       })
       .catch((err) => {
         console.log(err);
-        setResponse("Kindly wait until the time have expired.");
+        setResponse(err.message);
         setError(true);
         window.scrollTo(0, 0);
       });
@@ -168,6 +172,17 @@ function Dashboard() {
               ...res.data,
             }));
           });
+          axios
+          .get(`/ghers/${res.data.email}`, {
+            withCredentials: true,
+          })
+          .then((res) => {
+            console.log("gher data", res.data);
+            setUser((prevState) => ({
+              ...prevState,
+              ...res.data,
+            }));
+          }) 
         setLoading(false);
       })
       .catch((err) => {
@@ -177,8 +192,9 @@ function Dashboard() {
         window.scrollTo(0, 0);
       });
   };
-  useEffect(() => {
-    getUserData();
+ 
+  useEffect( () => {
+    getUserData();    
   }, []);
 
   if (isEmpty(user.user)) return <Spinner />;
@@ -219,7 +235,8 @@ function Dashboard() {
               )}
             />
           )}
-
+{isActivated && !isEmpty(user.ghStatus) && !getArr.length &&
+<h4 style={{color: "goldenrod"}}>Your are now eligible for GH of NGN{user.ghStatus.amount}, You will be matched shortly.</h4>}
           {isActivated && !wantToInvest && (
             <SelectAmount
               submitAmount={submitAmountHandler}
@@ -227,7 +244,7 @@ function Dashboard() {
               recommit={recommit}
             />
           )}
-          {payArr.length && //    ITERATE THROUGH LIST
+          {isActivated && payArr.length && //    ITERATE THROUGH LIST
             payArr.map((el) => (
               <Ph
                 key={el._id}
@@ -249,11 +266,11 @@ function Dashboard() {
             ))}
           {isActivated && wantToInvest && !payArr.length && (
             //    ITERATE THROUGH LIST
-            <h4>You will be Matched within the next few hours</h4>
+            <h4 style={{color: "goldenrod"}}>You will be Matched within the next few hours for your PH</h4>
           )}
-          {guiderArr.length && //ITERATE THROUGH LIST FOR GUIDER
+          {isActivated && guiderArr.length && //ITERATE THROUGH LIST FOR GUIDER
             guiderArr.map((el) => (
-              <Gh
+              <Gh title = "You have been matched to get activation fee payment"
                 key={el._id}
                 name={el.pher_name}
                 phone={el.pher_phone}
@@ -270,7 +287,7 @@ function Dashboard() {
             ))}
           {getArr.length && //ITERATE THROUGH LIST,CHECK IF ACTIVATED and PAIRED
             getArr.map((el) => (
-              <Gh
+              <Gh title = "You have been matched to GH"
                 key={el._id}
                 name={el.pher_name}
                 phone={el.pher_phone}

@@ -126,7 +126,7 @@ function PhComponent({
             <img
               src={`${window.location.origin }/uploads/${pop}`}
               style={{ height: "400px", width: "100%",paddingBottom: "8px" }}
-              alt="POP-Image"
+              alt="POP"
             />
           </div>{" "}
         </div>

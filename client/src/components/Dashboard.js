@@ -11,7 +11,7 @@ import { addHours, format } from "date-fns";
 
 function Dashboard() {
   const history = useHistory();
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const { user, setUser } = useContext(UserContext);
   const [error, setError] = useState(false);
   const [response, setResponse] = useState(null);
@@ -34,7 +34,7 @@ function Dashboard() {
   const getUserData = () => {
     console.log("get userData running");
     if (user.user._id) {
-      setLoading(false);
+      // setLoading(false);
       return console.log("already gotten user data");
     }
     axios
@@ -68,17 +68,19 @@ function Dashboard() {
               ...prevState,
               ...res.data,
             }));
+            // setLoading(false);
           }) 
-        setLoading(false);
+        
       })
       .catch((err) => {
-        console.log(err.response);
-        if (err.response.data === "ACCESS DENIED") {
-          setResponse(err.response.data);
-          return setError(true);
+        if (err.response.status === 500) {
+          console.log("there was a problem with the server");
+          return window.location.reload()
         }
-        setResponse("Request failed!!");
+        console.log(err);
+        setResponse("Request Failed");
         setError(true);
+        window.scrollTo(0, 0);
       });
   };
   useEffect(() => {
@@ -98,8 +100,7 @@ function Dashboard() {
           }}
         />
       )}
-      {loading && <Spinner />}
-      {!loading && !isEmpty(user.user) && (
+    
         <div>
           <header className="inner_page_header">
             <Header />
@@ -258,7 +259,7 @@ function Dashboard() {
             <Footer />
           </header>
         </div>
-      )}
+    
     </div>
   );
 }

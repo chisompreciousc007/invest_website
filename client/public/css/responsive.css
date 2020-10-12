@@ -43,6 +43,7 @@
   }
   .admin_menu ul li {
     margin: 5px 0;
+    width: 75px;
   }
   .currency_hashrate_inner h3 {
     font-size: 20px;

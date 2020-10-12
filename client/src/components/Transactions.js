@@ -11,6 +11,7 @@ import Spinner from "./Spinner";
 function Transactions() {
   const history = useHistory();
   const { user, setUser } = useContext(UserContext);
+  // const [loading, setLoading] = useState(false);
   const { downline, investHistory, cashoutHistory, guiderHistory } = user.user;
   const [error, setError] = useState(false);
   const [response, setResponse] = useState(null);
@@ -18,6 +19,7 @@ function Transactions() {
   const getUserData = () => {
     console.log("get userData running");
     if (user.user._id) {
+      // setLoading(false);
       return console.log("already gotten user data");
     }
     axios
@@ -51,16 +53,19 @@ function Transactions() {
               ...prevState,
               ...res.data,
             }));
+            // setLoading(false);
           }) 
+        
       })
       .catch((err) => {
-        console.log(err.response);
-        if (err.response.data === "ACCESS DENIED") {
-          setResponse(err.response.data);
-          return setError(true);
+        if (err.response.status === 500) {
+          console.log("there was a problem with the server");
+          return window.location.reload()
         }
-        setResponse("err.message");
+        console.log(err);
+        setResponse("Request Failed");
         setError(true);
+        window.scrollTo(0, 0);
       });
   };
   useEffect(() => {
@@ -75,6 +80,7 @@ function Transactions() {
   if (isEmpty(user.user)) return <Spinner />;
   return (
     <div>
+       {/* {loading && <Spinner />} */}
       {error && (
         <Error
           response={response}

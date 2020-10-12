@@ -16,7 +16,6 @@ function Dashboard() {
   const history = useHistory();
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [ghstatus,setGhStatus] = useState({})
   const [currentReceipt, setCurrentReceipt] = useState(null);
   const [file, setFile] = useState(null);
   const [selectAmount, setSelectAmount] = useState(5000);
@@ -182,10 +181,15 @@ function Dashboard() {
               ...prevState,
               ...res.data,
             }));
+            setLoading(false);
           }) 
-        setLoading(false);
+        
       })
       .catch((err) => {
+        if (err.response.status === 500) {
+          console.log("there was a problem with the server");
+          return window.location.reload()
+        }
         console.log(err);
         setResponse("Request Failed");
         setError(true);

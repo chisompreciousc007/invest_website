@@ -13,7 +13,7 @@ function Referals() {
   const { user, setUser } = useContext(UserContext);
   const [error, setError] = useState(false);
   const [response, setResponse] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const {
     name,
     username,
@@ -32,7 +32,7 @@ function Referals() {
   const getUserData = () => {
     console.log("get userData running");
     if (user.user._id) {
-      setLoading(false);
+      // setLoading(false);
       return console.log("already gotten user data");
     }
     axios
@@ -66,21 +66,22 @@ function Referals() {
               ...prevState,
               ...res.data,
             }));
+            // setLoading(false);
           }) 
-        setLoading(false);
+        
       })
       .catch((err) => {
-        console.log(err.response);
-        if (err.response.data === "ACCESS DENIED") {
-          setResponse(err.response.data);
-          return setError(true);
+        if (err.response.status === 500) {
+          console.log("there was a problem with the server");
+          return window.location.reload()
         }
-        setResponse("err.message");
+        console.log(err);
+        setResponse("Request Failed");
         setError(true);
+        window.scrollTo(0, 0);
       });
   };
   useEffect(() => {
-    console.log("useeffect running");
     getUserData();
   }, []);
 
@@ -96,9 +97,7 @@ function Referals() {
           }}
         />
       ) : null}
-      {loading ? (
-        <Spinner />
-      ) : (
+    
         <header className="inner_page_header">
           <Header />
 
@@ -187,7 +186,7 @@ function Referals() {
                         <tr>
                           <td>&nbsp;</td>
                           <td>
-                            <input
+                            <input disabled
                               type="submit"
                               value="Change Account data"
                               className="sbmt"
@@ -203,7 +202,8 @@ function Referals() {
           </section>
           <Footer />
         </header>
-      )}
+  
+      
     </div>
   );
 }

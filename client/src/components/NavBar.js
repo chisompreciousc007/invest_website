@@ -15,22 +15,22 @@ function NavBar() {
             </li>
             <li>
               <Link to="/deposit" style={{ width: "80px" }}>
-                <i className="ti-cloud"></i>
-                <span>Deposit</span>
+                <i className="ti-money"></i>
+                <span>PH/GH</span>
               </Link>
             </li>
 
             <li>
               <Link to="/transactions" style={{ width: "80px" }}>
-                <i className="ti-briefcase"></i>
-                <span>Transactions</span>
+                <i className="ti-stats-up"></i>
+                <span>Transacts</span>
               </Link>
             </li>
 
             <li>
               <Link to="/edit_account" style={{ width: "80px" }}>
-                <i className="ti-lock"></i>
-                <span>Account</span>
+                <i className="ti-user"></i>
+                <span>Profile</span>
               </Link>
             </li>
           </ul>

@@ -195,10 +195,9 @@ function Support() {
                   <div className="form_box">
                     <b>
                       <input
-                        className="btn btn-primary"
+                        className="btn btn-primary sbmt"
                         type="submit"
                         value="Send"
-                        className="sbmt"
                       />
                     </b>
                   </div>

@@ -58,7 +58,6 @@ function Login() {
       });
   };
   useEffect(() => {
-    console.log(process.env.SECRET);
     if (localStorage.checkbox && localStorage.username !== "") {
       setIsChecked(true);
       setLoginData({

@@ -519,6 +519,7 @@ router.get("/automatch", async (req, res) => {
         _id: firstPherID,
         email: firstPherEmail,
       } = pherSorted[0];
+      console.log("selected gher", gherSorted[0], firstGherAmt,"...Selected pher",pherSorted[0], firstPherAmt);
 
       const gh = await User.findOne({ email: firstGherEmail });
       const ph = await User.findOne({ email: firstPherEmail });
@@ -631,7 +632,7 @@ router.get("/automatch", async (req, res) => {
           pher_name: ph.name,
           pher_email: ph.email,
           pher_phone: ph.phone,
-          amount: firstPherAmt,
+          amount: firstGherAmt,
           isActivationFee: false,
         };
         const makeReceipt = await new Receipt(obj).save();

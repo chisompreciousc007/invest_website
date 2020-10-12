@@ -235,7 +235,7 @@ function Dashboard() {
               )}
             />
           )}
-{isActivated && !isEmpty(user.ghStatus) && !getArr.length &&
+{isActivated && !isEmpty(user.ghStatus) && 
 <h4 style={{color: "goldenrod"}}>Your are now eligible for GH of NGN{user.ghStatus.amount}, You will be matched shortly.</h4>}
           {isActivated && !wantToInvest && (
             <SelectAmount

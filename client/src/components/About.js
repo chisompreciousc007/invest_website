@@ -104,10 +104,10 @@ function About() {
       <div className="bottom_body inner_page_body">
         <section className="index_about">
           <div className="container">
-            <div className="index_about_inner">
+            <div className="index_about_inner" style={{background:"#0e010100"}}>
               <div className="row">
                 <div className="col-sm-12">
-                  <h2 className="common_heading">Welcome to Splashcash</h2>
+                  <h2 className="common_heading">Welcome to Splashcash247</h2>
                 </div>
                 <div className="col-sm-7">
                   <div className="about_left">

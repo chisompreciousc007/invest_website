@@ -62,7 +62,8 @@
 @media only screen and (max-width: 991px) {
   header {
     position: inherit;
-    background: #000;
+    background: url(../images/index_banner.jpg) #141414;
+    background-position: center;
   }
   .packages_inner {
     margin-top: 30px;

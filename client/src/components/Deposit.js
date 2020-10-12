@@ -53,6 +53,7 @@ function Dashboard() {
       const obj = {
         popPath: filePath,
       };
+      console.log("saved image obj",obj)
       axios
         .patch(`/receipts/updatePopPath/${currentReceipt._id}`, obj)
         .then((res) => {
@@ -63,6 +64,7 @@ function Dashboard() {
     } catch (error) {
       if (error.response.status === 500) {
         console.log("there was a problem with the server");
+        setResponse("Request Failed")
         setError(true);
         window.scrollTo(0, 0);
       } else {

@@ -82,10 +82,14 @@ router.patch(
     [Segments.PARAMS]: Joi.object().keys({
       id: Joi.string().required(),
     }),
+    [Segments.BODY]: Joi.object().keys({
+      popPath: Joi.string().required(),
+    }),
   }),
   async (req, res) => {
     const { popPath } = req.body;
     // UPDATE RECEIPT WITH POP-PATH
+    console.log("editing pop Path")
     try {
       const result = await Receipt.findByIdAndUpdate(
         req.params.id,
@@ -97,7 +101,7 @@ router.patch(
       console.log("Pop Uploaded");
       res.status(200).send(result);
     } catch (err) {
-      res.json({ message: err });
+      res.json({ message: err.message });
     }
   }
 );

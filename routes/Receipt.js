@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Receipt = require("../models/receipt");
 const Gher = require("../models/gher");
+const PendingGher = require("../models/pendingGher");
 const Pher = require("../models/pher");
 const Guider = require("../models/guider");
 const User = require("../models/user");
@@ -35,6 +36,23 @@ const postTelegram = (phername, ghername, amount) =>
       disableNotification: true,
     }
   );
+const setWantToInvest = (email, boolean) => {
+  if (boolean === true) {
+    return User.findOneAndUpdate({ email: email }, { wantToInvest: true });
+    // console.log("User set wantToInvest:true");
+  }
+  if (boolean === false) {
+    return User.findOneAndUpdate({ email: email }, { wantToInvest: false });
+  }
+};
+const setCommitIsFulfilled = (email, boolean) => {
+  if (boolean === true) {
+    return Committer.findOneAndUpdate({ email: email }, { isFufilled: true });
+  }
+  if (boolean === false) {
+    return Committer.findOneAndUpdate({ email: email }, { isFufilled: false });
+  }
+};
 
 router.get(
   "/foruser/:email",
@@ -68,7 +86,7 @@ router.get(
         getArr: ghReceiptArr,
         guiderArr: guiderReceiptArr,
         activationFee: feeObj,
-        email:email
+        email: email,
       };
       res.json(resultObj);
     } catch (err) {
@@ -89,7 +107,7 @@ router.patch(
   async (req, res) => {
     const { popPath } = req.body;
     // UPDATE RECEIPT WITH POP-PATH
-    console.log("editing pop Path")
+    console.log("editing pop Path");
     try {
       const result = await Receipt.findByIdAndUpdate(
         req.params.id,
@@ -116,18 +134,18 @@ router.patch(
       _id: Joi.string().required(),
       amount: Joi.number().integer().required(),
       __v: Joi.number().integer().required(),
-createdAt: Joi.date().required(),
-gher_accountName: Joi.string().required(),
-gher_accountNo: Joi.string().required(),
-gher_bank:Joi.string().required(),
-gher_name: Joi.string().required(),
-gher_phone: Joi.string().required(),
-isActivationFee: Joi.boolean().required(),
-isConfirmed: Joi.boolean().required(),
-isPurged: Joi.boolean().required(),
-pher_phone: Joi.string().required(),
-popPath: Joi.string().allow(null).required(),
-updatedAt: Joi.date().required(),
+      createdAt: Joi.date().required(),
+      gher_accountName: Joi.string().required(),
+      gher_accountNo: Joi.string().required(),
+      gher_bank: Joi.string().required(),
+      gher_name: Joi.string().required(),
+      gher_phone: Joi.string().required(),
+      isActivationFee: Joi.boolean().required(),
+      isConfirmed: Joi.boolean().required(),
+      isPurged: Joi.boolean().required(),
+      pher_phone: Joi.string().required(),
+      popPath: Joi.string().allow(null).required(),
+      updatedAt: Joi.date().required(),
     }),
   }),
   async (req, res) => {
@@ -142,8 +160,11 @@ updatedAt: Joi.date().required(),
         popPath,
         amount,
       } = req.body;
-      const oneuser = await User.findOne({ email: pher_email }, "pledge");
-      const pledge = oneuser.pledge;
+      const oneuser = await User.findOne(
+        { email: pher_email },
+        "pledge upline"
+      );
+      const { pledge, upline } = oneuser;
       // UPDATE HISTORY OF GHER AND PHER
       const addToPherHistory = await User.findOneAndUpdate(
         { email: pher_email },
@@ -173,8 +194,8 @@ updatedAt: Joi.date().required(),
       const exist = await Committer.findOne({ email: pher_email });
 
       // FIRST TIME COMMIT
-      if (exist ===null) {
-        console.log("no old commit")
+      if (exist === null) {
+        console.log("no old commit");
         // CREATE NEW COMMIT
         const newCommitter = new Committer({
           email: pher_email,
@@ -183,141 +204,186 @@ updatedAt: Joi.date().required(),
         });
         const savedCommit = await newCommitter.save();
         console.log("new Commit Created");
+        const setRecommitTrue = await User.findOneAndUpdate(
+          { email: pher_email },
+          { recommit: true }
+        );
         //CHECKS AND SETUP
         if (savedCommit.amount == pledge) {
-          const setisFufilledTrue = await Committer.findOneAndUpdate(
-            { email: pher_email },
-            { isFufilled: true }
+          console.log("commit equals pledge");
+          const setisFufilledTrue = setCommitIsFulfilled(pher_email, true);
+          const setWantToInvestFalse = setWantToInvest(pher_email, false);
+          const setisFufilledTruePromise = await setisFufilledTrue;
+          const setWantToInvestFalsePromise = await setWantToInvestFalse;
+          console.log(
+            "Commit set isfulfilled:true, wantToInvest:false, ready for recommit"
           );
-          console.log("set isFufilled true")
-          const setRecommitTrue = await User.findOneAndUpdate(
-            { email: pher_email },
-            { recommit: true, wantToInvest: false }
-          );
-          console.log("ready for recommit");
         }
         if (savedCommit.amount < pledge) {
-          const setisFufilledTrue = await Committer.findOneAndUpdate(
-            { email: pher_email },
-            { isFufilled: false }
+          console.log("commit less than pledge");
+          const setisFufilledFalse = setCommitIsFulfilled(pher_email, false);
+          const setWantToInvestTrue = setWantToInvest(pher_email, true);
+          const setisFufilledFalsePromise = await setisFufilledFalse;
+          const setWantToInvestTruePromise = await setWantToInvestTrue;
+          console.log(
+            "Commit set isfulfilled:false, wantToInvest:true, not ready for recommit"
           );
-          const setRecommitTrue = await User.findOneAndUpdate(
-            { email: pher_email },
-            { recommit: false, wantToInvest: false }
-          );
-          console.log("not ready for recommit");
         }
         //ADD TO DOWNLINE
-        const userF = await User.findOne({ email: pher_email }, "upline");
-        const { upline } = userF;
-        const updateDownline = await User.findOneAndUpdate(
-          { username: upline },
-          {
-            $push: {
-              downline: {
-                name: pher_name,
-                amount: amount * 0.05,
+        if (upline !== "new") {
+          const updateDownline = await User.findOneAndUpdate(
+            { username: upline },
+            {
+              $push: {
+                downline: {
+                  name: pher_name,
+                  amount: amount * 0.05,
+                },
               },
-            },
-          }
-        );
-        console.log("Added to Downline");
+            }
+          );
+          console.log("Added to Downline");
+        }
         res.status(200).send("Success!");
       } else {
         console.log("old commit exists");
-        const checkisFulfil = await exist.isFufilled;
+        const checkisFulfil = exist.isFufilled;
+
         if (checkisFulfil) {
           console.log("old commit is fulfilled");
-          // CREATE NEW/UPDATE GHER WITH OLD COMMIT AMOUNT
-          const existingGher = await Gher.findOne({email:pher_email})
-          if(existingGher ===null)
-         { const GherAmt = exist.amount * 1.5;
-          const moveOldCommitToGherCollection = await new Gher({
-            email: pher_email,
-            amount: GherAmt,
-          }).save();
-          console.log("old commit used to create Gher Collection")}
-          if(existingGher !==null)
-         { const GherAmt = exist.amount * 1.5;
-          const moveOldCommitToGherCollection = await Gher.findOneAndUpdate(
-            {email: pher_email},
-            {$inc:{amount: GherAmt}}
-          );
-          console.log("old commit used to update Gher Collection")}
-          // RESET COMMIT
-          const savedCommit = await Committer.findOneAndUpdate(
-            { email: pher_email },
-            { amount: amount, isFufilled:false },
-            { new: true, runValidators: true, context: "query" }
-          );
-          console.log("commit reset");
+
           //CHECKS AND SETUP
-          if (savedCommit.amount == pledge) {
-            const setisFufilledTrue = await Committer.findOneAndUpdate(
+          if (amount == pledge) {
+            console.log("current commit is fulfilled");
+            // CREATE NEW/UPDATE GHER WITH OLD COMMIT AMOUNT
+            const existingGher = await Gher.findOne({ email: pher_email });
+            const GherAmt = exist.amount * 1.5;
+            if (existingGher === null) {
+              const moveOldCommitToGherCollection = await new Gher({
+                email: pher_email,
+                amount: GherAmt,
+              }).save();
+              console.log("old commit used to create Gher Collection");
+            }
+            if (existingGher !== null) {
+              const moveOldCommitToGherCollection = await Gher.findOneAndUpdate(
+                { email: pher_email },
+                { $inc: { amount: GherAmt } }
+              );
+              console.log("old commit used to update Gher Collection");
+            }
+            // RESET COMMIT
+            const savedCommit = await Committer.findOneAndUpdate(
               { email: pher_email },
-              { isFufilled: true }
+              { amount: amount, isFufilled: false },
+              { new: true, runValidators: true, context: "query" }
             );
-            const setRecommitTrue = await User.findOneAndUpdate(
-              { email: pher_email },
-              { wantToInvest: false }
-            );
-            console.log("new commit set isfulfilled");
+            console.log("commit reset");
+            const setisFufilledTrue = setCommitIsFulfilled(pher_email, true);
+            const setWantToInvestFalse = setWantToInvest(pher_email, false);
+            const setisFufilledTruePromise = await setisFufilledTrue;
+            const setWantToInvestFalsePromise = await setWantToInvestFalse;
+            console.log("commit set isfulfilled:true, wantToInvest:false");
           }
-          if (savedCommit.amount < pledge) {
-            const setisFufilledTrue = await Committer.findOneAndUpdate(
+          if (amount < pledge) {
+            console.log("curent commit is not fulfilled");
+            // CREATE NEW/UPDATE pENDING GHER WITH OLD COMMIT AMOUNT
+            const existingPendingGher = await PendingGher.findOne({
+              email: pher_email,
+            });
+            const pendingGherAmt = exist.amount * 1.5;
+            if (existingPendingGher === null) {
+              const moveOldCommitToPendingGherCollection = await new PendingGher(
+                {
+                  email: pher_email,
+                  amount: pendingGherAmt,
+                }
+              ).save();
+              console.log("old commit used to create pending Gher Collection");
+            }
+            if (existingPendingGher !== null) {
+              const moveOldCommitToPendingGherCollection = await PendingGher.findOneAndUpdate(
+                { email: pher_email },
+                { $inc: { amount: pendingGherAmt } }
+              );
+              console.log("old commit used to update pending Gher Collection");
+            }
+            // RESET COMMIT
+            const savedCommit = await Committer.findOneAndUpdate(
               { email: pher_email },
-              { isFufilled: false }
+              { amount: amount, isFufilled: false },
+              { new: true, runValidators: true, context: "query" }
             );
-            const setRecommitTrue = await User.findOneAndUpdate(
-              { email: pher_email },
-              { wantToInvest: false, }
-            );
-            console.log("new commit is not fulfilled");
+            console.log("commit reset");
+            const setisFufilledFalse = setCommitIsFulfilled(pher_email, false);
+            const setwantToInvestTrue = setWantToInvest(pher_email, true);
+            const setisFufilledFalsePromise = await setisFufilledFalse;
+            const setwantToInvestTruePromise = await setwantToInvestTrue;
+            console.log("commit set isfulfilled:false, wantToInvest:true");
           }
         }
         if (!checkisFulfil) {
+          console.log("old commit is not fulfilled");
           //INCREMENT TO COMMIT
-          console.log("add to existing commit");
+          console.log("increment existing commit");
           const savedCommit = await Committer.findOneAndUpdate(
             { email: pher_email },
             { $inc: { amount: amount } },
             { new: true, runValidators: true, context: "query" }
           );
-          console.log("total new inc. commit", savedCommit.amount);
+          console.log("total new incremented commit :", savedCommit.amount);
           //CHECKS AND SETUP
           if (savedCommit.amount == pledge) {
-            const setisFufilledTrue = await Committer.findOneAndUpdate(
-              { email: pher_email },
-              { isFufilled: true }
-            );
-            const setRecommitTrue = await User.findOneAndUpdate(
-              { email: pher_email },
-              { recommit: true, wantToInvest: false }
-            );
-            console.log("new total commit set isfulfilled");
+            console.log("total new commit is fulfilled");
+            // CHECK FOR PENDING GHER AND CONFIRM IF ANY
+            const existingPendingGher = await PendingGher.findOne({
+              email: pher_email,
+            });
+            if (existingPendingGher !== null) {
+              //  CONFIRM PENDING GHER TO MAIN GHER
+              const existingGher2 = await Gher.findOne({ email: pher_email });
+              if (existingGher2 === null) {
+                const moveOldCommitToGherCollection = await new Gher({
+                  email: existingGher2.email,
+                  amount: existingGher2.amount,
+                }).save();
+                console.log("old commit used to create Gher Collection");
+              }
+              if (existingGher2 !== null) {
+                const moveOldCommitToGherCollection = await Gher.findOneAndUpdate(
+                  { email: existingGher2.email },
+                  { $inc: { amount: existingGher2.amount } }
+                );
+                console.log("old commit used to update Gher Collection");
+              }
+            }
+            const setisFufilledTrue = setCommitIsFulfilled(pher_email, true);
+            const setwantToInvestFalse = setWantToInvest(pher_email, false);
+            const setIsFulfilledTruePromise = await setisFufilledTrue;
+            const setwantToInvestFalsePromise = await setwantToInvestFalse;
+            console.log("commit set isfulfilled:true, wantToInvest:false");
           }
           if (savedCommit.amount < pledge) {
-            const setisFufilledTrue = await Committer.findOneAndUpdate(
-              { email: pher_email },
-              { isFufilled: false }
-            );
-            const setRecommitTrue = await User.findOneAndUpdate(
-              { email: pher_email },
-              { recommit: true, wantToInvest: true }
-            );
-            console.log("new total commit is not fulfilled");
+            const setisFufilledFalse = setCommitIsFulfilled(pher_email, false);
+            const setwantToInvestTrue = setWantToInvest(pher_email, true);
+            const setIsFulfilledFalsePromise = await setisFufilledFalse;
+            const setwantToInvestTruePromise = await setwantToInvestTrue;
+            console.log("commit set isfulfilled:false, wantToInvest:true");
           }
         }
       }
-     
+
       // DELETE RECEIPT
       const deleteReceipt = await Receipt.findByIdAndDelete(receiptId);
       console.log("Receipt Deleted");
- // DELETE POP IMAGE
+      // DELETE POP IMAGE
       if (popPath !== null) {
         fs.unlink(`client/public/uploads/${popPath}`, (err) => {
-          if (err) {console.log(err)} 
-         else {console.log("POP was deleted")};
+          if (err) {
+            console.log(err);
+          } else {
+            console.log("POP was deleted");
+          }
         });
       }
       res.status(200).send("Success!");
@@ -336,18 +402,18 @@ router.patch(
       _id: Joi.string().required(),
       amount: Joi.number().integer().required(),
       __v: Joi.number().integer().required(),
-createdAt: Joi.date().required(),
-gher_accountName: Joi.string().required(),
-gher_accountNo: Joi.string().required(),
-gher_bank:Joi.string().required(),
-gher_name: Joi.string().required(),
-gher_phone: Joi.string().required(),
-isActivationFee: Joi.boolean().required(),
-isConfirmed: Joi.boolean().required(),
-isPurged: Joi.boolean().required(),
-pher_phone: Joi.string().required(),
-popPath: Joi.string().allow(null).required(),
-updatedAt: Joi.date().required(),
+      createdAt: Joi.date().required(),
+      gher_accountName: Joi.string().required(),
+      gher_accountNo: Joi.string().required(),
+      gher_bank: Joi.string().required(),
+      gher_name: Joi.string().required(),
+      gher_phone: Joi.string().required(),
+      isActivationFee: Joi.boolean().required(),
+      isConfirmed: Joi.boolean().required(),
+      isPurged: Joi.boolean().required(),
+      pher_phone: Joi.string().required(),
+      popPath: Joi.string().allow(null).required(),
+      updatedAt: Joi.date().required(),
     }),
   }),
   async (req, res) => {
@@ -414,22 +480,22 @@ router.patch(
       _id: Joi.string().required(),
       amount: Joi.number().integer().required(),
       __v: Joi.number().integer().required(),
-createdAt: Joi.date().required(),
-gher_accountName: Joi.string().required(),
-gher_accountNo: Joi.string().required(),
-gher_bank:Joi.string().required(),
-gher_name: Joi.string().required(),
-gher_phone: Joi.string().required(),
-isActivationFee: Joi.boolean().required(),
-isConfirmed: Joi.boolean().required(),
-isPurged: Joi.boolean().required(),
-pher_phone: Joi.string().required(),
-popPath: Joi.string().allow(null).required(),
-updatedAt: Joi.date().required(),
+      createdAt: Joi.date().required(),
+      gher_accountName: Joi.string().required(),
+      gher_accountNo: Joi.string().required(),
+      gher_bank: Joi.string().required(),
+      gher_name: Joi.string().required(),
+      gher_phone: Joi.string().required(),
+      isActivationFee: Joi.boolean().required(),
+      isConfirmed: Joi.boolean().required(),
+      isPurged: Joi.boolean().required(),
+      pher_phone: Joi.string().required(),
+      popPath: Joi.string().allow(null).required(),
+      updatedAt: Joi.date().required(),
     }),
   }),
   async (req, res) => {
-    try { 
+    try {
       const {
         _id: receiptId,
         gher_email,
@@ -523,7 +589,14 @@ router.get("/automatch", async (req, res) => {
         _id: firstPherID,
         email: firstPherEmail,
       } = pherSorted[0];
-      console.log("selected gher", gherSorted[0], firstGherAmt,"...Selected pher",pherSorted[0], firstPherAmt);
+      console.log(
+        "selected gher",
+        gherSorted[0],
+        firstGherAmt,
+        "...Selected pher",
+        pherSorted[0],
+        firstPherAmt
+      );
 
       const gh = await User.findOne({ email: firstGherEmail });
       const ph = await User.findOne({ email: firstPherEmail });

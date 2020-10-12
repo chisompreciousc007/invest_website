@@ -71,10 +71,10 @@ router.get("/", async (req, res) => {
 });
 router.get("/:email", async (req, res) => {
   try {
-    const foundGher = await Gher.findOne({email:req.params.email},"amount");
-    if (foundGher==null)return res.status(200).send({ghStatus:{}})
-    if (foundGher.amount==0)return res.status(200).send({ghStatus:{}})
-    res.status(200).json({ghStatus:foundGher});
+    const foundGher = await Gher.findOne({ email: req.params.email }, "amount");
+    if (foundGher == null) return res.status(200).send({ ghStatus: {} });
+    if (foundGher.amount == 0) return res.status(200).send({ ghStatus: {} });
+    res.status(200).json({ ghStatus: foundGher });
   } catch (err) {
     res.status(400).json({ message: err });
   }

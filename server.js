@@ -8,6 +8,7 @@ const bodyParser = require("body-parser");
 const { errors } = require("celebrate");
 require("dotenv/config");
 const path = require("path");
+const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 const userRouter = require("./routes/User");
 const uploadRouter = require("./routes/Upload");
@@ -54,7 +55,12 @@ app.use(
     extended: false,
   })
 );
-
+app.use(
+  compression({
+    level: 6,
+    threshold: 0,
+  })
+);
 app.use(errors());
 // app.use("/receipts", apiLimiter);
 // app.use("/users", apiLimiter);

@@ -16,6 +16,7 @@ const autheToken = process.env.TWILIO_AUTHE_TOKEN;
 const client = require("twilio")(accountSid, autheToken);
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const { TelegramClient } = require("messaging-api-telegram");
+const { create } = require("domain");
 const clientTelegram = new TelegramClient({
   accessToken: BOT_TOKEN,
 });
@@ -53,6 +54,34 @@ const setCommitIsFulfilled = (email, boolean) => {
     return Committer.findOneAndUpdate({ email: email }, { isFufilled: false });
   }
 };
+const createUpdateGher = async (email, amount) => {
+  const existingGher = await Gher.findOne({ email: email });
+  const GherAmt = amount * 1.5;
+  if (existingGher === null) {
+    const moveOldCommitToGherCollection = await new Gher({
+      email: email,
+      amount: GherAmt,
+      isFirst: true,
+    }).save();
+    console.log("old commit used to create Gher Collection");
+  }
+  if (existingGher !== null) {
+    if (existingGher.amount === 0 && existingGher.isPaired === true) {
+      const moveOldCommitToGherCollection = await Gher.findOneAndUpdate(
+        { email: email },
+        { $inc: { amount: GherAmt }, isFirst: false }
+      );
+      console.log("old commit used to update Gher Collection");
+    }
+    if (existingGher.amount != 0 && existingGher.isPaired === false) {
+      const moveOldCommitToGherCollection = await Gher.findOneAndUpdate(
+        { email: email },
+        { $inc: { amount: GherAmt } }
+      );
+      console.log("old commit used to update Gher Collection");
+    }
+  }
+};
 
 router.get(
   "/foruser/:email",
@@ -88,9 +117,9 @@ router.get(
         activationFee: feeObj,
         email: email,
       };
-      res.json(resultObj);
+      res.status(200).json(resultObj);
     } catch (err) {
-      res.json({ message: err });
+      res.status(400).send(err.message);
     }
   }
 );
@@ -107,7 +136,6 @@ router.patch(
   async (req, res) => {
     const { popPath } = req.body;
     // UPDATE RECEIPT WITH POP-PATH
-    console.log("editing pop Path");
     try {
       const result = await Receipt.findByIdAndUpdate(
         req.params.id,
@@ -116,10 +144,9 @@ router.patch(
         },
         { new: true, runValidators: true, context: "query" }
       );
-      console.log("Pop Uploaded");
-      res.status(200).send(result);
+      res.status(200).send("POP Uploaded");
     } catch (err) {
-      res.json({ message: err.message });
+      res.status(400).send(err.message);
     }
   }
 );
@@ -200,16 +227,12 @@ router.patch(
         const newCommitter = new Committer({
           email: pher_email,
           amount: amount,
-          isFufilled: false,
         });
-        const savedCommit = await newCommitter.save();
+        const savedCommit = newCommitter.save();
         console.log("new Commit Created");
-        const setRecommitTrue = await User.findOneAndUpdate(
-          { email: pher_email },
-          { recommit: true }
-        );
+        const savedCommitPromise = await savedCommit;
         //CHECKS AND SETUP
-        if (savedCommit.amount == pledge) {
+        if (savedCommit.amount >= pledge) {
           console.log("commit equals pledge");
           const setisFufilledTrue = setCommitIsFulfilled(pher_email, true);
           const setWantToInvestFalse = setWantToInvest(pher_email, false);
@@ -218,15 +241,14 @@ router.patch(
           console.log(
             "Commit set isfulfilled:true, wantToInvest:false, ready for recommit"
           );
-        }
-        if (savedCommit.amount < pledge) {
+        } else {
           console.log("commit less than pledge");
-          const setisFufilledFalse = setCommitIsFulfilled(pher_email, false);
-          const setWantToInvestTrue = setWantToInvest(pher_email, true);
-          const setisFufilledFalsePromise = await setisFufilledFalse;
-          const setWantToInvestTruePromise = await setWantToInvestTrue;
+          // const setisFufilledFalse = setCommitIsFulfilled(pher_email, false);
+          // const setWantToInvestTrue = setWantToInvest(pher_email, true);
+          // const setisFufilledFalsePromise = await setisFufilledFalse;
+          // const setWantToInvestTruePromise = await setWantToInvestTrue;
           console.log(
-            "Commit set isfulfilled:false, wantToInvest:true, not ready for recommit"
+            "Commit is retained as isfulfilled:false & wantToInvest:true, not ready for recommit"
           );
         }
         //ADD TO DOWNLINE
@@ -237,14 +259,14 @@ router.patch(
               $push: {
                 downline: {
                   name: pher_name,
-                  amount: amount * 0.05,
+                  amount: pledge * 0.05,
                 },
               },
             }
           );
           console.log("Added to Downline");
         }
-        res.status(200).send("Success!");
+        // res.status(200).send("Success!");
       } else {
         console.log("old commit exists");
         const checkisFulfil = exist.isFufilled;
@@ -253,122 +275,179 @@ router.patch(
           console.log("old commit is fulfilled");
 
           //CHECKS AND SETUP
-          if (amount == pledge) {
+          if (amount >= pledge) {
             console.log("current commit is fulfilled");
             // CREATE NEW/UPDATE GHER WITH OLD COMMIT AMOUNT
+            // const handleGher = await createUpdateGher(pher_email, exist.amount);
+
             const existingGher = await Gher.findOne({ email: pher_email });
             const GherAmt = exist.amount * 1.5;
             if (existingGher === null) {
+              console.log("No existing Gh");
               const moveOldCommitToGherCollection = await new Gher({
                 email: pher_email,
                 amount: GherAmt,
+                isFirst: true,
               }).save();
-              console.log("old commit used to create Gher Collection");
+              console.log("old commit used to create brand new Gher");
             }
             if (existingGher !== null) {
-              const moveOldCommitToGherCollection = await Gher.findOneAndUpdate(
+              console.log("old Gh exists");
+              // check cashout history and decide if isFirst
+
+              const user3 = await User.findOne(
                 { email: pher_email },
-                { $inc: { amount: GherAmt } }
+                "cashoutHistory"
               );
-              console.log("old commit used to update Gher Collection");
+
+              if (user3.cashoutHistory.length > 0) {
+                console.log("there is cashout history");
+                const moveOldCommitToGherCollection = await Gher.findOneAndUpdate(
+                  { email: pher_email },
+                  { $inc: { amount: GherAmt }, isFirst: false, isPaired: false }
+                );
+                console.log("old commit used to update Gher & isFirst:false");
+              } else {
+                console.log("there is no cashout history");
+                const moveOldCommitToGherCollection = await Gher.findOneAndUpdate(
+                  { email: pher_email },
+                  { $inc: { amount: GherAmt }, isFirst: true, isPaired: false }
+                );
+                console.log(
+                  "old commit used to update a running Gher and isFirst:true"
+                );
+              }
             }
             // RESET COMMIT
             const savedCommit = await Committer.findOneAndUpdate(
               { email: pher_email },
-              { amount: amount, isFufilled: false },
-              { new: true, runValidators: true, context: "query" }
+              { amount: amount, isFufilled: true }
             );
             console.log("commit reset");
-            const setisFufilledTrue = setCommitIsFulfilled(pher_email, true);
+            // const setisFufilledTrue = setCommitIsFulfilled(pher_email, true);
             const setWantToInvestFalse = setWantToInvest(pher_email, false);
-            const setisFufilledTruePromise = await setisFufilledTrue;
+            // const setisFufilledTruePromise = await setisFufilledTrue;
             const setWantToInvestFalsePromise = await setWantToInvestFalse;
             console.log("commit set isfulfilled:true, wantToInvest:false");
           }
           if (amount < pledge) {
             console.log("curent commit is not fulfilled");
             // CREATE NEW/UPDATE pENDING GHER WITH OLD COMMIT AMOUNT
-            const existingPendingGher = await PendingGher.findOne({
-              email: pher_email,
-            });
+            // const existingPendingGher = await PendingGher.findOne({
+            //   email: pher_email,
+            // });
             const pendingGherAmt = exist.amount * 1.5;
-            if (existingPendingGher === null) {
-              const moveOldCommitToPendingGherCollection = await new PendingGher(
-                {
-                  email: pher_email,
-                  amount: pendingGherAmt,
-                }
-              ).save();
-              console.log("old commit used to create pending Gher Collection");
-            }
-            if (existingPendingGher !== null) {
-              const moveOldCommitToPendingGherCollection = await PendingGher.findOneAndUpdate(
-                { email: pher_email },
-                { $inc: { amount: pendingGherAmt } }
-              );
-              console.log("old commit used to update pending Gher Collection");
-            }
+            // if (existingPendingGher === null) {
+            const moveOldCommitToPendingGherCollection = await new PendingGher({
+              email: pher_email,
+              amount: pendingGherAmt,
+            }).save();
+            console.log("old commit used to create pending Gher");
+            // }
+            // if (existingPendingGher !== null) {
+            //   const moveOldCommitToPendingGherCollection = await PendingGher.findOneAndUpdate(
+            //     { email: pher_email },
+            //     { $inc: { amount: pendingGherAmt } }
+            //   );
+            //   console.log("old commit used to update pending Gher");
+            // }
             // RESET COMMIT
             const savedCommit = await Committer.findOneAndUpdate(
               { email: pher_email },
-              { amount: amount, isFufilled: false },
-              { new: true, runValidators: true, context: "query" }
+              { amount: amount, isFufilled: false }
             );
             console.log("commit reset");
-            const setisFufilledFalse = setCommitIsFulfilled(pher_email, false);
+            // const setisFufilledFalse = setCommitIsFulfilled(pher_email, false);
             const setwantToInvestTrue = setWantToInvest(pher_email, true);
-            const setisFufilledFalsePromise = await setisFufilledFalse;
+            // const setisFufilledFalsePromise = await setisFufilledFalse;
             const setwantToInvestTruePromise = await setwantToInvestTrue;
             console.log("commit set isfulfilled:false, wantToInvest:true");
           }
-        }
-        if (!checkisFulfil) {
+        } else {
           console.log("old commit is not fulfilled");
           //INCREMENT TO COMMIT
           console.log("increment existing commit");
-          const savedCommit = await Committer.findOneAndUpdate(
+          const incCommit = await Committer.findOneAndUpdate(
             { email: pher_email },
             { $inc: { amount: amount } },
             { new: true, runValidators: true, context: "query" }
           );
-          console.log("total new incremented commit :", savedCommit.amount);
+          console.log("total new incremented commit :", incCommit.amount);
           //CHECKS AND SETUP
-          if (savedCommit.amount == pledge) {
-            console.log("total new commit is fulfilled");
+          if (incCommit.amount >= pledge) {
+            console.log("total increased commit is fulfilled");
             // CHECK FOR PENDING GHER AND CONFIRM IF ANY
             const existingPendingGher = await PendingGher.findOne({
               email: pher_email,
             });
             if (existingPendingGher !== null) {
+              console.log("pending Gh exist");
               //  CONFIRM PENDING GHER TO MAIN GHER
               const existingGher2 = await Gher.findOne({ email: pher_email });
               if (existingGher2 === null) {
+                console.log("no existing Gh");
                 const moveOldCommitToGherCollection = await new Gher({
-                  email: existingGher2.email,
-                  amount: existingGher2.amount,
+                  email: existingPendingGher.email,
+                  amount: existingPendingGher.amount,
+                  isFirst: true,
                 }).save();
-                console.log("old commit used to create Gher Collection");
+                console.log(
+                  "pending Gher used to create fresh Gher with isFirst:true"
+                );
               }
               if (existingGher2 !== null) {
-                const moveOldCommitToGherCollection = await Gher.findOneAndUpdate(
-                  { email: existingGher2.email },
-                  { $inc: { amount: existingGher2.amount } }
+                console.log("there is existing Gh");
+                //  CHECK     CASHOUT HISTORY AND DECIDE IF ITS FIRST COMMIT
+                const user3 = await User.findOne(
+                  { email: pher_email },
+                  "cashoutHistory"
                 );
-                console.log("old commit used to update Gher Collection");
+
+                if (user3.cashoutHistory.length > 0) {
+                  console.log("user have cashout history ");
+                  const moveOldCommitToGherCollection = await Gher.findOneAndUpdate(
+                    { email: pher_email },
+                    {
+                      amount: existingPendingGher.amount,
+                      isFirst: false,
+                      isPaired: false,
+                    }
+                  );
+                  console.log(
+                    "pending Gher used to create new Gher from alreay paired gher, setting isFirst:false"
+                  );
+                } else {
+                  console.log("user do not have cashout history ");
+                  const moveOldCommitToGherCollection = await Gher.findOneAndUpdate(
+                    { email: pher_email },
+                    {
+                      $inc: { amount: existingPendingGher.amount },
+                      isFirst: true,
+                      isPaired: false,
+                    }
+                  );
+                  console.log(
+                    "pending Gher used to update a running Gher & isFirst:true "
+                  );
+                }
               }
+            } else {
+              console.log("no existing pendingGh ");
             }
             const setisFufilledTrue = setCommitIsFulfilled(pher_email, true);
             const setwantToInvestFalse = setWantToInvest(pher_email, false);
             const setIsFulfilledTruePromise = await setisFufilledTrue;
             const setwantToInvestFalsePromise = await setwantToInvestFalse;
             console.log("commit set isfulfilled:true, wantToInvest:false");
-          }
-          if (savedCommit.amount < pledge) {
-            const setisFufilledFalse = setCommitIsFulfilled(pher_email, false);
-            const setwantToInvestTrue = setWantToInvest(pher_email, true);
-            const setIsFulfilledFalsePromise = await setisFufilledFalse;
-            const setwantToInvestTruePromise = await setwantToInvestTrue;
-            console.log("commit set isfulfilled:false, wantToInvest:true");
+          } else {
+            console.log("total increased commit is not fulfilled");
+            // const setisFufilledFalse = setCommitIsFulfilled(pher_email, false);
+            // const setwantToInvestTrue = setWantToInvest(pher_email, true);
+            // const setIsFulfilledFalsePromise = await setisFufilledFalse;
+            // const setwantToInvestTruePromise = await setwantToInvestTrue;
+            console.log(
+              "commit retained as  isfulfilled:false, wantToInvest:true"
+            );
           }
         }
       }
@@ -385,10 +464,12 @@ router.patch(
             console.log("POP was deleted");
           }
         });
+      } else {
+        console.log("POP is null");
       }
-      res.status(200).send("Success!");
+      res.status(200).send("Payment Confirmed!");
     } catch (error) {
-      res.json({ message: err });
+      res.status(400).send(error.message);
     }
   }
 );
@@ -458,15 +539,20 @@ router.patch(
       // DELETE POP IMAGE
       if (popPath !== null) {
         fs.unlink(`client/public/uploads/${popPath}`, (err) => {
-          if (err) return res.status(500).send("Server");
-          console.log("POP deleted");
+          if (err) {
+            console.log(err);
+          } else {
+            console.log("POP was deleted");
+          }
         });
+      } else {
+        console.log("POP is null");
       }
       //
       console.log("Fee Confirm Process Completed");
-      res.json({ message: "Success" });
+      res.status(200).send("Payment Confirmed");
     } catch (error) {
-      res.json({ message: error.message });
+      res.status(400).send(error.message);
     }
   }
 );
@@ -479,7 +565,7 @@ router.patch(
       pher_name: Joi.string().required(),
       _id: Joi.string().required(),
       amount: Joi.number().integer().required(),
-      __v: Joi.number().integer().required(),
+      __v: Joi.number().integer(),
       createdAt: Joi.date().required(),
       gher_accountName: Joi.string().required(),
       gher_accountNo: Joi.string().required(),
@@ -487,8 +573,8 @@ router.patch(
       gher_name: Joi.string().required(),
       gher_phone: Joi.string().required(),
       isActivationFee: Joi.boolean().required(),
-      isConfirmed: Joi.boolean().required(),
-      isPurged: Joi.boolean().required(),
+      isConfirmed: Joi.boolean(),
+      isPurged: Joi.boolean(),
       pher_phone: Joi.string().required(),
       popPath: Joi.string().allow(null).required(),
       updatedAt: Joi.date().required(),
@@ -508,8 +594,10 @@ router.patch(
 
       const expDate = addHours(new Date(createdAt), 8);
       const timecompare = compareAsc(new Date(), expDate);
-      if (timecompare != 1)
+      if (timecompare != 1) {
+        console.log("not time for purge");
         return res.status(400).send("Kindly Wait Until deadline before Purge");
+      }
       if (isActivationFee) {
         console.log("activation fee");
         const blockPher = await User.findOneAndUpdate(
@@ -530,7 +618,7 @@ router.patch(
         );
         const deleteReceipt = await Receipt.findByIdAndDelete(receiptId);
         console.log("delete receipt and Guider Fee Purge successful");
-        res.json({ message: "Success" });
+        res.status(200).send("Payment Purged");
       } else {
         console.log("payment purge");
         // PAYMENT PURGE
@@ -546,10 +634,10 @@ router.patch(
         console.log("gher reversed");
         const deleteReceipt = await Receipt.findByIdAndDelete(receiptId);
         console.log("delete receipt and Payment Purge successful");
-        res.json({ message: "Success" });
+        res.status(200).send("Payment Purged");
       }
     } catch (err) {
-      res.json({ message: err.message });
+      res.status(400).send(err.message);
     }
   }
 );
@@ -562,11 +650,17 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/automatch", async (req, res) => {
+router.get("/automatch-otherCommits", async (req, res) => {
   // INPUTS
   const matchAuto = async () => {
     try {
-      const gherSorted = await Gher.find({ isPaired: false })
+      const gherSorted = await Gher.find({
+        isPaired: false,
+        isFirst: false,
+        // updatedAt: {
+        //   $lte: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000),
+        // },
+      })
         .sort({
           updatedAt: -1,
         })
@@ -576,9 +670,10 @@ router.get("/automatch", async (req, res) => {
           updatedAt: -1,
         })
         .exec();
-
-      if (!gherSorted.length || !pherSorted.length)
-        return res.status(200).send("Empty Gher/Pher Collection");
+      if (!gherSorted.length)
+        return res.status(200).send("Empty Gher Collection");
+      if (!pherSorted.length)
+        return res.status(200).send("Empty Pher Collection");
       var {
         amount: firstGherAmt,
         _id: firstGherID,
@@ -591,13 +686,173 @@ router.get("/automatch", async (req, res) => {
       } = pherSorted[0];
       console.log(
         "selected gher",
-        gherSorted[0],
+        gherSorted[0].email,
         firstGherAmt,
         "...Selected pher",
-        pherSorted[0],
+        pherSorted[0].email,
         firstPherAmt
       );
+      if (firstGherEmail === firstPherEmail) {
+        console.log("Gh & Ph email is same user!!");
+        if (pherSorted[1] === undefined || pherSorted[1] === null) {
+          return res.status(200).send("No more Ph to pair");
+        }
+        var {
+          amount: firstPherAmt,
+          _id: firstPherID,
+          email: firstPherEmail,
+        } = pherSorted[1];
+        console.log("new pher selected", firstPherEmail);
+        const gh = await User.findOne({ email: firstGherEmail });
+        const ph = await User.findOne({ email: firstPherEmail });
+        if (firstGherAmt == firstPherAmt) {
+          console.log("is equal");
+          let obj = {
+            gher_name: gh.name,
+            gher_email: gh.email,
+            gher_accountName: gh.accountName,
+            gher_accountNo: gh.accountNo,
+            gher_bank: gh.bank,
+            gher_phone: gh.phone,
+            pher_name: ph.name,
+            pher_email: ph.email,
+            pher_phone: ph.phone,
+            amount: firstPherAmt,
+            isActivationFee: false,
+          };
+          const makeReceipt = await new Receipt(obj).save();
+          const updateIsPairedGher = await Gher.findByIdAndUpdate(
+            firstGherID,
+            {
+              isPaired: true,
+              amount: 0,
+            },
+            { new: true, runValidators: true, context: "query" }
+          );
+          const updateIsPairedPher = await Pher.findByIdAndUpdate(
+            firstPherID,
+            {
+              isPaired: true,
+              amount: 0,
+            },
+            { new: true, runValidators: true, context: "query" }
+          );
+          // SEND TEXT AND TELEGRAM
+          // let phonee = "08036734191";
+          // const textnumber = `+234${phonee.substr(1)}`;
+          // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
+          const waitForTeegram = await postTelegram(
+            makeReceipt.pher_name,
+            makeReceipt.gher_name,
+            makeReceipt.amount
+          );
 
+          console.log(
+            `Balance after Pairing...Gher: ${updateIsPairedGher.amount}, Pher:  ${updateIsPairedPher.amount}`
+          );
+          // res.status(200).send("success");
+        }
+        if (firstPherAmt < firstGherAmt) {
+          console.log("pher is lesser");
+          let obj = {
+            gher_name: gh.name,
+            gher_email: gh.email,
+            gher_accountName: gh.accountName,
+            gher_accountNo: gh.accountNo,
+            gher_bank: gh.bank,
+            gher_phone: gh.phone,
+            pher_name: ph.name,
+            pher_email: ph.email,
+            pher_phone: ph.phone,
+            amount: firstPherAmt,
+            isActivationFee: false,
+          };
+
+          const makeReceipt = await new Receipt(obj).save();
+
+          const updateGherBalance = await Gher.findByIdAndUpdate(
+            firstGherID,
+            {
+              $inc: { amount: -firstPherAmt },
+              isPaired: false,
+            },
+            { new: true, runValidators: true, context: "query" }
+          );
+          const updateIsPairedPher = await Pher.findByIdAndUpdate(
+            firstPherID,
+            {
+              isPaired: true,
+              amount: 0,
+            },
+            { new: true, runValidators: true, context: "query" }
+          );
+          // SEND TEXT AND TELEGRAM
+          // let phonee = "08036734191";
+          // const textnumber = `+234${phonee.substr(1)}`;
+          // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
+          const waitForTeegram = await postTelegram(
+            makeReceipt.pher_name,
+            makeReceipt.gher_name,
+            makeReceipt.amount
+          );
+
+          console.log(
+            `Balance after Pairing...Gher: ${updateGherBalance.amount}, Pher:  ${updateIsPairedPher.amount}`
+          );
+          // res.status(200).send("success");
+        }
+        if (firstPherAmt > firstGherAmt) {
+          console.log("pher is greater");
+          // PHERAMT > GHERAMT
+          let obj = {
+            gher_name: gh.name,
+            gher_email: gh.email,
+            gher_accountName: gh.accountName,
+            gher_accountNo: gh.accountNo,
+            gher_bank: gh.bank,
+            gher_phone: gh.phone,
+            pher_name: ph.name,
+            pher_email: ph.email,
+            pher_phone: ph.phone,
+            amount: firstGherAmt,
+            isActivationFee: false,
+          };
+          const makeReceipt = await new Receipt(obj).save();
+
+          const updatePherBalance = await Pher.findByIdAndUpdate(
+            firstPherID,
+            {
+              $inc: { amount: -firstGherAmt },
+              isPaired: false,
+            },
+            { new: true, runValidators: true, context: "query" }
+          );
+          const updateIsPairedGher = await Gher.findByIdAndUpdate(
+            firstGherID,
+            {
+              isPaired: true,
+              amount: 0,
+            },
+            { new: true, runValidators: true, context: "query" }
+          );
+          // SEND TEXT AND TELEGRAM
+          // let phonee = "08036734191";
+          // const textnumber = `+234${phonee.substr(1)}`;
+          // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
+          const waitForTeegram = await postTelegram(
+            makeReceipt.pher_name,
+            makeReceipt.gher_name,
+            makeReceipt.amount
+          );
+
+          console.log(
+            `Balance after Pairing...Gher: ${updateIsPairedGher.amount}, Pher:  ${updatePherBalance.amount}`
+          );
+          // res.status(200).send("success");
+        }
+        // RERUN;
+        matchAuto();
+      }
       const gh = await User.findOne({ email: firstGherEmail });
       const ph = await User.findOne({ email: firstPherEmail });
       if (firstGherAmt == firstPherAmt) {
@@ -748,14 +1003,371 @@ router.get("/automatch", async (req, res) => {
       // RERUN;
       matchAuto();
     } catch (error) {
-      console.log("error from automatch start");
+      console.log(error.message);
       res.status(400).send({ message: error.message });
     }
   };
   matchAuto();
-  console.log("MatchAuto Started");
+  console.log("MatchAuto for other commits Started");
 });
+router.get("/automatch-firstcommit", async (req, res) => {
+  // INPUTS
+  const matchAuto = async () => {
+    try {
+      const gherSorted = await Gher.find({ isPaired: false, isFirst: true })
+        .sort({
+          updatedAt: -1,
+        })
+        .exec();
+      const pherSorted = await Pher.find({ isPaired: false })
+        .sort({
+          updatedAt: -1,
+        })
+        .exec();
 
+      if (!gherSorted.length)
+        return res.status(200).send("Empty Gher Collection");
+      if (!pherSorted.length)
+        return res.status(200).send("Empty Pher Collection");
+      var {
+        amount: firstGherAmt,
+        _id: firstGherID,
+        email: firstGherEmail,
+      } = gherSorted[0];
+      var {
+        amount: firstPherAmt,
+        _id: firstPherID,
+        email: firstPherEmail,
+      } = pherSorted[0];
+      console.log(
+        "selected gher",
+        gherSorted[0].email,
+        firstGherAmt,
+        "...Selected pher",
+        pherSorted[0].email,
+        firstPherAmt
+      );
+
+      if (firstGherEmail === firstPherEmail) {
+        console.log("Gh & Ph email is same user!!");
+        if (pherSorted[1] === undefined || pherSorted[1] === null) {
+          return res.status(200).send("No more Ph to pair");
+        }
+
+        var {
+          amount: firstPherAmt,
+          _id: firstPherID,
+          email: firstPherEmail,
+        } = pherSorted[1];
+
+        console.log("new pher selected", firstPherEmail);
+        const gh = await User.findOne({ email: firstGherEmail });
+        const ph = await User.findOne({ email: firstPherEmail });
+        if (firstGherAmt == firstPherAmt) {
+          console.log("is equal");
+          let obj = {
+            gher_name: gh.name,
+            gher_email: gh.email,
+            gher_accountName: gh.accountName,
+            gher_accountNo: gh.accountNo,
+            gher_bank: gh.bank,
+            gher_phone: gh.phone,
+            pher_name: ph.name,
+            pher_email: ph.email,
+            pher_phone: ph.phone,
+            amount: firstPherAmt,
+            isActivationFee: false,
+          };
+          const makeReceipt = await new Receipt(obj).save();
+          const updateIsPairedGher = await Gher.findByIdAndUpdate(
+            firstGherID,
+            {
+              isPaired: true,
+              amount: 0,
+            },
+            { new: true, runValidators: true, context: "query" }
+          );
+          const updateIsPairedPher = await Pher.findByIdAndUpdate(
+            firstPherID,
+            {
+              isPaired: true,
+              amount: 0,
+            },
+            { new: true, runValidators: true, context: "query" }
+          );
+          // SEND TEXT AND TELEGRAM
+          // let phonee = "08036734191";
+          // const textnumber = `+234${phonee.substr(1)}`;
+          // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
+          const waitForTeegram = await postTelegram(
+            makeReceipt.pher_name,
+            makeReceipt.gher_name,
+            makeReceipt.amount
+          );
+
+          console.log(
+            `Balance after Pairing...Gher: ${updateIsPairedGher.amount}, Pher:  ${updateIsPairedPher.amount}`
+          );
+          // res.status(200).send("success");
+        }
+        if (firstPherAmt < firstGherAmt) {
+          console.log("pher is lesser");
+          let obj = {
+            gher_name: gh.name,
+            gher_email: gh.email,
+            gher_accountName: gh.accountName,
+            gher_accountNo: gh.accountNo,
+            gher_bank: gh.bank,
+            gher_phone: gh.phone,
+            pher_name: ph.name,
+            pher_email: ph.email,
+            pher_phone: ph.phone,
+            amount: firstPherAmt,
+            isActivationFee: false,
+          };
+
+          const makeReceipt = await new Receipt(obj).save();
+
+          const updateGherBalance = await Gher.findByIdAndUpdate(
+            firstGherID,
+            {
+              $inc: { amount: -firstPherAmt },
+              isPaired: false,
+            },
+            { new: true, runValidators: true, context: "query" }
+          );
+          const updateIsPairedPher = await Pher.findByIdAndUpdate(
+            firstPherID,
+            {
+              isPaired: true,
+              amount: 0,
+            },
+            { new: true, runValidators: true, context: "query" }
+          );
+          // SEND TEXT AND TELEGRAM
+          // let phonee = "08036734191";
+          // const textnumber = `+234${phonee.substr(1)}`;
+          // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
+          const waitForTeegram = await postTelegram(
+            makeReceipt.pher_name,
+            makeReceipt.gher_name,
+            makeReceipt.amount
+          );
+
+          console.log(
+            `Balance after Pairing...Gher: ${updateGherBalance.amount}, Pher:  ${updateIsPairedPher.amount}`
+          );
+          // res.status(200).send("success");
+        }
+        if (firstPherAmt > firstGherAmt) {
+          console.log("pher is greater");
+          // PHERAMT > GHERAMT
+          let obj = {
+            gher_name: gh.name,
+            gher_email: gh.email,
+            gher_accountName: gh.accountName,
+            gher_accountNo: gh.accountNo,
+            gher_bank: gh.bank,
+            gher_phone: gh.phone,
+            pher_name: ph.name,
+            pher_email: ph.email,
+            pher_phone: ph.phone,
+            amount: firstGherAmt,
+            isActivationFee: false,
+          };
+          const makeReceipt = await new Receipt(obj).save();
+
+          const updatePherBalance = await Pher.findByIdAndUpdate(
+            firstPherID,
+            {
+              $inc: { amount: -firstGherAmt },
+              isPaired: false,
+            },
+            { new: true, runValidators: true, context: "query" }
+          );
+          const updateIsPairedGher = await Gher.findByIdAndUpdate(
+            firstGherID,
+            {
+              isPaired: true,
+              amount: 0,
+            },
+            { new: true, runValidators: true, context: "query" }
+          );
+          // SEND TEXT AND TELEGRAM
+          // let phonee = "08036734191";
+          // const textnumber = `+234${phonee.substr(1)}`;
+          // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
+          const waitForTeegram = await postTelegram(
+            makeReceipt.pher_name,
+            makeReceipt.gher_name,
+            makeReceipt.amount
+          );
+
+          console.log(
+            `Balance after Pairing...Gher: ${updateIsPairedGher.amount}, Pher:  ${updatePherBalance.amount}`
+          );
+          // res.status(200).send("success");
+        }
+        // RERUN;
+        matchAuto();
+      }
+      const gh = await User.findOne({ email: firstGherEmail });
+      const ph = await User.findOne({ email: firstPherEmail });
+      if (firstGherAmt == firstPherAmt) {
+        console.log("is equal");
+        let obj = {
+          gher_name: gh.name,
+          gher_email: gh.email,
+          gher_accountName: gh.accountName,
+          gher_accountNo: gh.accountNo,
+          gher_bank: gh.bank,
+          gher_phone: gh.phone,
+          pher_name: ph.name,
+          pher_email: ph.email,
+          pher_phone: ph.phone,
+          amount: firstPherAmt,
+          isActivationFee: false,
+        };
+        const makeReceipt = await new Receipt(obj).save();
+        const updateIsPairedGher = await Gher.findByIdAndUpdate(
+          firstGherID,
+          {
+            isPaired: true,
+            amount: 0,
+          },
+          { new: true, runValidators: true, context: "query" }
+        );
+        const updateIsPairedPher = await Pher.findByIdAndUpdate(
+          firstPherID,
+          {
+            isPaired: true,
+            amount: 0,
+          },
+          { new: true, runValidators: true, context: "query" }
+        );
+        // SEND TEXT AND TELEGRAM
+        // let phonee = "08036734191";
+        // const textnumber = `+234${phonee.substr(1)}`;
+        // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
+        const waitForTeegram = await postTelegram(
+          makeReceipt.pher_name,
+          makeReceipt.gher_name,
+          makeReceipt.amount
+        );
+
+        console.log(
+          `Balance after Pairing...Gher: ${updateIsPairedGher.amount}, Pher:  ${updateIsPairedPher.amount}`
+        );
+        // res.status(200).send("success");
+      }
+      if (firstPherAmt < firstGherAmt) {
+        console.log("pher is lesser");
+        let obj = {
+          gher_name: gh.name,
+          gher_email: gh.email,
+          gher_accountName: gh.accountName,
+          gher_accountNo: gh.accountNo,
+          gher_bank: gh.bank,
+          gher_phone: gh.phone,
+          pher_name: ph.name,
+          pher_email: ph.email,
+          pher_phone: ph.phone,
+          amount: firstPherAmt,
+          isActivationFee: false,
+        };
+
+        const makeReceipt = await new Receipt(obj).save();
+
+        const updateGherBalance = await Gher.findByIdAndUpdate(
+          firstGherID,
+          {
+            $inc: { amount: -firstPherAmt },
+            isPaired: false,
+          },
+          { new: true, runValidators: true, context: "query" }
+        );
+        const updateIsPairedPher = await Pher.findByIdAndUpdate(
+          firstPherID,
+          {
+            isPaired: true,
+            amount: 0,
+          },
+          { new: true, runValidators: true, context: "query" }
+        );
+        // SEND TEXT AND TELEGRAM
+        // let phonee = "08036734191";
+        // const textnumber = `+234${phonee.substr(1)}`;
+        // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
+        const waitForTeegram = await postTelegram(
+          makeReceipt.pher_name,
+          makeReceipt.gher_name,
+          makeReceipt.amount
+        );
+
+        console.log(
+          `Balance after Pairing...Gher: ${updateGherBalance.amount}, Pher:  ${updateIsPairedPher.amount}`
+        );
+        // res.status(200).send("success");
+      }
+      if (firstPherAmt > firstGherAmt) {
+        console.log("pher is greater");
+        // PHERAMT > GHERAMT
+        let obj = {
+          gher_name: gh.name,
+          gher_email: gh.email,
+          gher_accountName: gh.accountName,
+          gher_accountNo: gh.accountNo,
+          gher_bank: gh.bank,
+          gher_phone: gh.phone,
+          pher_name: ph.name,
+          pher_email: ph.email,
+          pher_phone: ph.phone,
+          amount: firstGherAmt,
+          isActivationFee: false,
+        };
+        const makeReceipt = await new Receipt(obj).save();
+
+        const updatePherBalance = await Pher.findByIdAndUpdate(
+          firstPherID,
+          {
+            $inc: { amount: -firstGherAmt },
+            isPaired: false,
+          },
+          { new: true, runValidators: true, context: "query" }
+        );
+        const updateIsPairedGher = await Gher.findByIdAndUpdate(
+          firstGherID,
+          {
+            isPaired: true,
+            amount: 0,
+          },
+          { new: true, runValidators: true, context: "query" }
+        );
+        // SEND TEXT AND TELEGRAM
+        // let phonee = "08036734191";
+        // const textnumber = `+234${phonee.substr(1)}`;
+        // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
+        const waitForTeegram = await postTelegram(
+          makeReceipt.pher_name,
+          makeReceipt.gher_name,
+          makeReceipt.amount
+        );
+
+        console.log(
+          `Balance after Pairing...Gher: ${updateIsPairedGher.amount}, Pher:  ${updatePherBalance.amount}`
+        );
+        // res.status(200).send("success");
+      }
+      // RERUN;
+      matchAuto();
+    } catch (error) {
+      console.log(error.message);
+      res.status(400).send(error.message);
+    }
+  };
+  matchAuto();
+  console.log("MatchAuto for first commits Started");
+});
 router.post(
   "/match-manual",
   celebrate({
@@ -830,59 +1442,188 @@ router.post(
   }
 );
 
-router.post(
-  "/match-faster",
+router.patch(
+  "/match-a-user-instant",
   celebrate({
     [Segments.BODY]: Joi.object().keys({
-      email: Joi.string().required(),
+      email: Joi.string().email().required(),
     }),
   }),
   async (req, res) => {
     // INPUTS
     const matchFaster = async () => {
       try {
-        const { email: firstGherEmail } = req.body;
-        const toGher = await Gher.findOne({ email: firstGherEmail });
-        if (toGher.amount < 500) return res.status(200).send("fully matched");
+        const { email } = req.body;
+        const toGher = await Gher.findOne({ email: email });
+        if (toGher.amount < 500)
+          return res.status(200).send("User GH amount less than 500");
         const pherSorted = await Pher.find({ isPaired: false })
-          .sort("createdAt 1")
+          .sort({
+            updatedAt: -1,
+          })
           .exec();
         const {
           amount: firstPherAmt,
           _id: firstPherID,
           email: firstPherEmail,
         } = pherSorted[0];
+        const {
+          amount: firstGherAmt,
+          _id: firstGherID,
+          email: firstGherEmail,
+        } = toGher;
 
         const gh = await User.findOne({ email: firstGherEmail });
         const ph = await User.findOne({ email: firstPherEmail });
+        if (firstGherAmt == firstPherAmt) {
+          console.log("is equal");
+          let obj = {
+            gher_name: gh.name,
+            gher_email: gh.email,
+            gher_accountName: gh.accountName,
+            gher_accountNo: gh.accountNo,
+            gher_bank: gh.bank,
+            gher_phone: gh.phone,
+            pher_name: ph.name,
+            pher_email: ph.email,
+            pher_phone: ph.phone,
+            amount: firstPherAmt,
+            isActivationFee: false,
+          };
+          const makeReceipt = await new Receipt(obj).save();
+          const updateIsPairedGher = await Gher.findByIdAndUpdate(
+            firstGherID,
+            {
+              isPaired: true,
+              amount: 0,
+            },
+            { new: true, runValidators: true, context: "query" }
+          );
+          const updateIsPairedPher = await Pher.findByIdAndUpdate(
+            firstPherID,
+            {
+              isPaired: true,
+              amount: 0,
+            },
+            { new: true, runValidators: true, context: "query" }
+          );
+          // SEND TEXT AND TELEGRAM
+          // let phonee = "08036734191";
+          // const textnumber = `+234${phonee.substr(1)}`;
+          // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
+          const waitForTeegram = await postTelegram(
+            makeReceipt.pher_name,
+            makeReceipt.gher_name,
+            makeReceipt.amount
+          );
 
-        const makeReceipt = new Receipt({
-          gher_name: gh.name,
-          gher_email: gh.email,
-          gher_accountName: gh.accountName,
-          gher_accountNo: gh.accountNo,
-          gher_bank: gh.bank,
-          gher_phone: gh.phone,
-          pher_name: ph.name,
-          pher_email: ph.email,
-          pher_phone: ph.phone,
-          amount: firstPherAmt,
-          isActivationFee: false,
-        }).save();
+          console.log(
+            `Balance after Pairing...Gher: ${updateIsPairedGher.amount}, Pher:  ${updateIsPairedPher.amount}`
+          );
+          // res.status(200).send("success");
+        }
+        if (firstPherAmt < firstGherAmt) {
+          console.log("pher is lesser");
+          let obj = {
+            gher_name: gh.name,
+            gher_email: gh.email,
+            gher_accountName: gh.accountName,
+            gher_accountNo: gh.accountNo,
+            gher_bank: gh.bank,
+            gher_phone: gh.phone,
+            pher_name: ph.name,
+            pher_email: ph.email,
+            pher_phone: ph.phone,
+            amount: firstPherAmt,
+            isActivationFee: false,
+          };
 
-        const gherExis = await Gher.findOne({ email: firstGherEmail });
-        const updateIsPairedGher = await Gher.findByIdAndUpdate(gherExis._id, {
-          isPaired: true,
-        });
-        const updateIsPairedPher = await Pher.findByIdAndUpdate(firstPherID, {
-          isPaired: true,
-        });
-        console.log(
-          `Receipt created for ${makeReceipt.pher_name}  to pay  ${makeReceipt.gher_name}   ${amount}`
-        );
+          const makeReceipt = await new Receipt(obj).save();
+
+          const updateGherBalance = await Gher.findByIdAndUpdate(
+            firstGherID,
+            {
+              $inc: { amount: -firstPherAmt },
+              isPaired: false,
+            },
+            { new: true, runValidators: true, context: "query" }
+          );
+          const updateIsPairedPher = await Pher.findByIdAndUpdate(
+            firstPherID,
+            {
+              isPaired: true,
+              amount: 0,
+            },
+            { new: true, runValidators: true, context: "query" }
+          );
+          // SEND TEXT AND TELEGRAM
+          // let phonee = "08036734191";
+          // const textnumber = `+234${phonee.substr(1)}`;
+          // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
+          const waitForTeegram = await postTelegram(
+            makeReceipt.pher_name,
+            makeReceipt.gher_name,
+            makeReceipt.amount
+          );
+
+          console.log(
+            `Balance after Pairing...Gher: ${updateGherBalance.amount}, Pher:  ${updateIsPairedPher.amount}`
+          );
+          // res.status(200).send("success");
+        }
+        if (firstPherAmt > firstGherAmt) {
+          console.log("pher is greater");
+          // PHERAMT > GHERAMT
+          let obj = {
+            gher_name: gh.name,
+            gher_email: gh.email,
+            gher_accountName: gh.accountName,
+            gher_accountNo: gh.accountNo,
+            gher_bank: gh.bank,
+            gher_phone: gh.phone,
+            pher_name: ph.name,
+            pher_email: ph.email,
+            pher_phone: ph.phone,
+            amount: firstGherAmt,
+            isActivationFee: false,
+          };
+          const makeReceipt = await new Receipt(obj).save();
+
+          const updatePherBalance = await Pher.findByIdAndUpdate(
+            firstPherID,
+            {
+              $inc: { amount: -firstGherAmt },
+              isPaired: false,
+            },
+            { new: true, runValidators: true, context: "query" }
+          );
+          const updateIsPairedGher = await Gher.findByIdAndUpdate(
+            firstGherID,
+            {
+              isPaired: true,
+              amount: 0,
+            },
+            { new: true, runValidators: true, context: "query" }
+          );
+          // SEND TEXT AND TELEGRAM
+          // let phonee = "08036734191";
+          // const textnumber = `+234${phonee.substr(1)}`;
+          // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
+          const waitForTeegram = await postTelegram(
+            makeReceipt.pher_name,
+            makeReceipt.gher_name,
+            makeReceipt.amount
+          );
+
+          console.log(
+            `Balance after Pairing...Gher: ${updateIsPairedGher.amount}, Pher:  ${updatePherBalance.amount}`
+          );
+          // res.status(200).send("success");
+        }
         matchFaster();
       } catch (err) {
-        res.status(400).json({ message: err.message });
+        console.log(err.message);
+        res.status(400).send(err.message);
       }
     };
     matchFaster();

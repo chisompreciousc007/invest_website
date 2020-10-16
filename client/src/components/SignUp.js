@@ -39,7 +39,6 @@ function SignUp({ match }) {
   const submitHandler = (e) => {
     e.preventDefault();
     setLoading(true);
-    console.log(user);
     axios
       .post("/users", user)
       .then((res) => {
@@ -47,11 +46,9 @@ function SignUp({ match }) {
         setSavedUser(resUser);
         setLoading(false);
         setSuccess(true);
-        window.scrollTo(0, 0);
       })
       .catch((err) => {
-        const errmsg = err.response.data;
-        setResponse(errmsg);
+        setResponse(err.response.data);
         setLoading(false);
         setError(true);
       });

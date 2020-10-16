@@ -28,10 +28,6 @@ function SelectAmount({ submitAmount, SelectAmount, recommit }) {
         <option value="120000">120,000</option>
         <option value="150000">150,000</option>
         <option value="200000">200,000</option>
-        <option value="250000">250,000</option>
-        <option value="300000">300,000</option>
-        <option value="400000">400,000</option>
-        <option value="500000">500,000</option>
       </select>
       <button
         type="button"

@@ -5,9 +5,9 @@ function Spinner() {
       className="lds-roller"
       style={{
         zIndex: "999",
-        left: "30%",
-        position: "absolute",
-        top: "10%",
+        left: "45%",
+        position: "fixed",
+        top: "45%",
         width: "30%",
       }}
     >

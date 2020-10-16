@@ -61,7 +61,7 @@ function PhComponent({
       >
         {pop == null ? (
           <div className="col-md-4 col-sm-6 col-12">
-            <form onsubmit="return false">
+            <form>
               <div
                 className="form-group"
                 //   style={{

@@ -14,6 +14,7 @@ const Profile = asyncComponent(() => import("./components/Profile"));
 const Transactions = asyncComponent(() => import("./components/Transactions"));
 const Deposit = asyncComponent(() => import("./components/Deposit"));
 const Terms = asyncComponent(() => import("./components/Terms"));
+const Admin = asyncComponent(() => import("./components/Admin"));
 
 function App() {
   const [user, setUser] = useState({
@@ -44,6 +45,7 @@ function App() {
           <Route path="/signup=:ref" exact component={SignUp} />
           <Route path="/rules" exact component={Terms} />
           <Route path="/login" exact component={Login} />
+          <Route path="/admin" exact component={Admin} />
           <Route
             path="/contactSupport"
             exact

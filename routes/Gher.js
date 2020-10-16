@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Gher = require("../models/gher");
+const PendingGher = require("../models/pendingGher");
 const User = require("../models/user");
 const { celebrate, Joi, Segments } = require("celebrate");
 
@@ -69,6 +70,22 @@ router.get("/", async (req, res) => {
     res.json({ message: err });
   }
 });
+router.get("/admin", async (req, res) => {
+  try {
+    const foundGher = await Gher.find({ isPaired: false }, "email amount");
+    res.json(foundGher);
+  } catch (err) {
+    res.json({ message: err });
+  }
+});
+router.get("/pending", async (req, res) => {
+  try {
+    const foundPendingGher = await PendingGher.find({}, "email amount");
+    res.json(foundPendingGher);
+  } catch (err) {
+    res.json({ message: err });
+  }
+});
 router.get("/:email", async (req, res) => {
   try {
     const foundGher = await Gher.findOne({ email: req.params.email }, "amount");
@@ -76,7 +93,7 @@ router.get("/:email", async (req, res) => {
     if (foundGher.amount == 0) return res.status(200).send({ ghStatus: {} });
     res.status(200).json({ ghStatus: foundGher });
   } catch (err) {
-    res.status(400).json({ message: err });
+    res.status(400).send(err.message);
   }
 });
 

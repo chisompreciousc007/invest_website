@@ -29,9 +29,7 @@ module.exports = function (req, res, next) {
     User.findById(verified, "isBlocked", (err, result) => {
       if (err) {
         console.log("error from verify token");
-        return res
-          .status(400)
-          .send("error from verify token, cannot find user by token");
+        return res.status(400).send("Session expired,Kindly login again");
       } else {
         const verifyBlock = result.isBlocked;
         if (!verifyBlock) {
@@ -47,6 +45,6 @@ module.exports = function (req, res, next) {
     // if (req.user._id == "5f00326f41344403fcc7826e") return next();
     // res.status(400).send("ADMIN ONLY");
   } catch (error) {
-    res.status(400).send({ message: error.message });
+    res.status(400).send(error.message);
   }
 };

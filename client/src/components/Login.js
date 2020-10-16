@@ -46,14 +46,11 @@ function Login() {
       })
       .then((res) => {
         document.cookie = `token=${res.data}`;
-        console.log("token from server", res);
         history.push("/dashboard");
       })
       .catch((err) => {
         setLoading(false);
-        console.log("error", err);
-        const errmsg = err.response.data;
-        setResponse(errmsg);
+        setResponse(err.response.data);
         setError(true);
       });
   };

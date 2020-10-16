@@ -5,6 +5,7 @@ import SelectAmount from "./SelectAmount";
 import Ph from "./Ph";
 import Gh from "./Gh2";
 import Spinner from "./Spinner";
+import Success from "./Successful";
 import Error from "./Error";
 import Footer from "./Footer";
 import Header from "./Header";
@@ -15,13 +16,14 @@ import { addHours, format } from "date-fns";
 function Dashboard() {
   const history = useHistory();
   const [error, setError] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [currentReceipt, setCurrentReceipt] = useState(null);
   const [file, setFile] = useState(null);
   const [selectAmount, setSelectAmount] = useState(5000);
   const { user, setUser } = useContext(UserContext);
   const [response, setResponse] = useState(null);
-  const { _id, email, isActivated, wantToInvest, recommit,pledge } = user.user;
+  const { _id, email, isActivated, wantToInvest, recommit, pledge } = user.user;
   const { payArr, getArr, guiderArr, activationFee } = user;
   const isEmpty = (obj) => {
     for (var i in obj) {
@@ -30,15 +32,29 @@ function Dashboard() {
     return true;
   };
   const fileSelecthandler = (e) => {
-    // const filename = e.target.files[0].name;
     const file = e.target.files[0];
-    // setdefaultFileLabel(filename);
     setFile(file);
-    console.log("File Selected");
   };
   const fileUploadHandler = async (e) => {
     e.preventDefault();
+    if (file === null) {
+      setResponse("No file Selected");
+      return setError(true);
+    }
+    if (file.size > 500000) {
+      setResponse("File size exceeds 500KB");
+      return setError(true);
+    }
+    if (
+      file.type !== "image/png" &&
+      file.type !== "image/jpg" &&
+      file.type !== "image/jpeg"
+    ) {
+      setResponse("File is not an image format");
+      return setError(true);
+    }
     setLoading(true);
+
     const formData = new FormData();
     formData.append("file", file);
     console.log("formdata: ", formData);
@@ -53,46 +69,48 @@ function Dashboard() {
       const obj = {
         popPath: filePath,
       };
-      console.log("saved image obj",obj)
+      console.log("image saved!");
       axios
         .patch(`/receipts/updatePopPath/${currentReceipt._id}`, obj)
         .then((res) => {
-          console.log("edit popPath successful!!", res.data);
           setLoading(false);
-          window.location.reload();
+          setResponse(res.data);
+          setSuccess(true);
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
         });
     } catch (error) {
       if (error.response.status === 500) {
-        console.log("there was a problem with the server");
-        setResponse("Request Failed")
+        setResponse("Server Error,Request Failed");
         setError(true);
-        window.scrollTo(0, 0);
       } else {
-        console.log(error.response.data.msg);
+        setResponse(error.response.data);
         setError(true);
-        window.scrollTo(0, 0);
       }
     }
   };
   const submitAmountHandler = (e) => {
     e.preventDefault();
+    setLoading(true);
     axios
       .patch(`/users/wantToInvest`, {
         investAmt: selectAmount,
         _id: _id,
         email: email,
-        pledge:pledge,
+        pledge: pledge,
       })
       .then((res) => {
-        console.log("edit wantToInvest successful!!", res.data);
-        window.location.reload();
+        setLoading(false);
+        setResponse(res.data);
+        setSuccess(true);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       })
       .catch((err) => {
-        console.log("error from edit wwantToInvest");
-        console.log(err.response);
         setResponse(err.response.data);
         setError(true);
-        window.scrollTo(0, 0);
       });
   };
   const selectAmountHandler = (e) => {
@@ -100,56 +118,62 @@ function Dashboard() {
     const v = e.target.value;
     const val = +v;
     setSelectAmount(val);
-    console.log(val);
   };
   const confirmPaymentHandler = () => {
-    setLoading(true)
+    setLoading(true);
     axios
       .patch(`/receipts/confirmpayment`, currentReceipt)
       .then((res) => {
-        setLoading(false)
-        console.log("confirm receipt successful!!", res.data);
-        window.location.reload();
+        setLoading(false);
+        setResponse(res.data);
+        setSuccess(true);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       })
       .catch((err) => {
-        console.log("error from confirm receipt: ", err.response);
+        setResponse(err.response.data);
+        setError(true);
       });
   };
   const confirmFeeHandler = () => {
+    setLoading(true);
     axios
       .patch("/receipts/confirmfee", currentReceipt)
       .then((res) => {
-        console.log(res);
-        console.log("confirm receipt successful!!", res.data);
-        window.location.reload();
+        setLoading(false);
+        setResponse(res.data);
+        setSuccess(true);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       })
       .catch((err) => {
-        console.log("error from confirm receipt: ", err.response);
-        setResponse("Request Failed");
+        setResponse(err.response.data);
         setError(true);
-        window.scrollTo(0, 0);
       });
   };
   const purgeHandler = () => {
-    console.log(currentReceipt);
+    setLoading(true);
     axios
       .patch("/receipts/purge", currentReceipt)
       .then((res) => {
-        console.log("purge successful!!", res.data.message);
-        window.location.reload();
+        setLoading(false);
+        setResponse(res.data);
+        setSuccess(true);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       })
       .catch((err) => {
-        console.log(err);
-        setResponse(err.message);
+        setResponse(err.response.data);
         setError(true);
-        window.scrollTo(0, 0);
       });
   };
 
   const getUserData = () => {
     console.log("get userData running");
     if (user.user._id) {
-      setLoading(false);
       return console.log("already gotten user data");
     }
     axios
@@ -173,7 +197,7 @@ function Dashboard() {
               ...res.data,
             }));
           });
-          axios
+        axios
           .get(`/ghers/${res.data.email}`, {
             withCredentials: true,
           })
@@ -184,23 +208,23 @@ function Dashboard() {
               ...res.data,
             }));
             setLoading(false);
-          }) 
-        
+          });
       })
       .catch((err) => {
         if (err.response.status === 500) {
           console.log("there was a problem with the server");
-          return window.location.reload()
+          return window.location.reload();
         }
-        console.log(err);
-        setResponse("Request Failed");
+        setResponse(err.response.data);
         setError(true);
-        window.scrollTo(0, 0);
+        setTimeout(() => {
+          return history.push("/login");
+        }, 1000);
       });
   };
- 
-  useEffect( () => {
-    getUserData();    
+
+  useEffect(() => {
+    getUserData();
   }, []);
 
   if (isEmpty(user.user)) return <Spinner />;
@@ -208,6 +232,15 @@ function Dashboard() {
   return (
     <div>
       {loading && <Spinner />}
+      {success && (
+        <Success
+          response={response}
+          setError={() => {
+            setSuccess(false);
+            window.location.reload();
+          }}
+        />
+      )}
       {error && (
         <Error
           response={response}
@@ -241,8 +274,12 @@ function Dashboard() {
               )}
             />
           )}
-{isActivated && !isEmpty(user.ghStatus) && 
-<h4 style={{color: "goldenrod"}}>Your are now eligible for GH of NGN{user.ghStatus.amount}, You will be matched shortly.</h4>}
+          {isActivated && !isEmpty(user.ghStatus) && (
+            <h4 style={{ color: "goldenrod" }}>
+              Your are now eligible for GH of NGN{user.ghStatus.amount}, You
+              will be matched shortly.
+            </h4>
+          )}
           {isActivated && !wantToInvest && (
             <SelectAmount
               submitAmount={submitAmountHandler}
@@ -250,7 +287,8 @@ function Dashboard() {
               recommit={recommit}
             />
           )}
-          {isActivated && payArr.length && //    ITERATE THROUGH LIST
+          {isActivated &&
+            payArr.length && //    ITERATE THROUGH LIST
             payArr.map((el) => (
               <Ph
                 key={el._id}
@@ -272,11 +310,15 @@ function Dashboard() {
             ))}
           {isActivated && wantToInvest && !payArr.length && (
             //    ITERATE THROUGH LIST
-            <h4 style={{color: "goldenrod"}}>You will be Matched within the next few hours for your PH</h4>
+            <h4 style={{ color: "goldenrod" }}>
+              You will be Matched within the next few hours for your PH
+            </h4>
           )}
-          {isActivated && guiderArr.length && //ITERATE THROUGH LIST FOR GUIDER
+          {isActivated &&
+            guiderArr.length && //ITERATE THROUGH LIST FOR GUIDER
             guiderArr.map((el) => (
-              <Gh title = "You have been matched to get activation fee payment"
+              <Gh
+                title="You have been matched to get activation fee payment"
                 key={el._id}
                 name={el.pher_name}
                 phone={el.pher_phone}
@@ -293,7 +335,8 @@ function Dashboard() {
             ))}
           {getArr.length && //ITERATE THROUGH LIST,CHECK IF ACTIVATED and PAIRED
             getArr.map((el) => (
-              <Gh title = "You have been matched to GH"
+              <Gh
+                title="You have been matched to GH"
                 key={el._id}
                 name={el.pher_name}
                 phone={el.pher_phone}

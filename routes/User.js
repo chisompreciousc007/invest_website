@@ -27,9 +27,9 @@ const createAccountLimiter = rateLimit({
 router.get("/user", verify, async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.user._id });
-    res.json(user);
+    res.status(200).json(user);
   } catch (err) {
-    res.json({ message: err.message });
+    res.status(400).send(err.message);
   }
 });
 // CREATE USER
@@ -170,11 +170,12 @@ router.post(
       // check if user is registered
       const user = await User.findOne({ username: req.body.username });
 
-      if (!user) return res.status(400).send("username not found");
+      if (!user) return res.status(400).send("Incorrect username or password");
 
       // hash password
       const validPass = await bcrypt.compare(req.body.password, user.password);
-      if (!validPass) return res.status(400).send("Incorrect password");
+      if (!validPass)
+        return res.status(400).send("Incorrect username or password");
       //CREATE AND ASSIGN A TOKEN
       const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
         expiresIn: "24h",
@@ -184,7 +185,7 @@ router.post(
 
       res.status(200).send(token);
     } catch (error) {
-      res.json({ message: error });
+      res.status(400).send(error.message);
     }
   }
 );
@@ -254,40 +255,57 @@ router.get("/", async (req, res) => {
     res.json({ message: err });
   }
 });
+router.get("/admin", async (req, res) => {
+  try {
+    const foundUser = await User.find({}, "isActivated isBlocked");
+    res.json(foundUser);
+  } catch (err) {
+    res.json({ message: err });
+  }
+});
+router.get("/users-with-downlines", async (req, res) => {
+  try {
+    const foundUser = await User.find({ downline: { $ne: [] } }, "downline");
+
+    res.json(foundUser);
+  } catch (err) {
+    res.json({ message: err });
+  }
+});
 router.patch(
   "/wantToInvest",
   celebrate({
     [Segments.BODY]: Joi.object().keys({
       _id: Joi.string().required(),
-
       email: Joi.string().email().required(),
-      investAmt: Joi.number().integer().min(4999).required(),
+      investAmt: Joi.number().integer().min(4999).max(200001).required(),
       pledge: Joi.number().integer().required(),
     }),
   }),
   async (req, res) => {
     try {
       // INPUTS
-      const { _id: id, email, investAmt,pledge } = req.body;
+      const { _id: id, email, investAmt, pledge } = req.body;
       console.log(investAmt);
-      if(pledge>investAmt){ return res.status(400).send(`Recommit must be greater than ${pledge}`)}
+      if (pledge > investAmt) {
+        return res.status(400).send(`Recommit must be greater than ${pledge}`);
+      }
       const updatedUser = await User.findByIdAndUpdate(
         id,
         {
           pledge: investAmt,
           wantToInvest: true,
+          recommit: true,
         },
         { new: true, runValidators: true, context: "query" }
       );
-      console.log("Pledge/ wantToInvest Updated");
-      const checkDB = await Pher.findOne({ email: email }).exec();
-      if (checkDB ===null) {
+      const checkDB = await Pher.countDocuments({ email: email });
+      if (!checkDB) {
         const createPher = await new Pher({
           email: email,
           amount: investAmt,
         }).save();
-        console.log("Created Pher for User");
-        res.status(200).json(createPher);
+        res.status(200).send("Commit Request Successful");
       } else {
         const updatePher = await Pher.findOneAndUpdate(
           {
@@ -300,7 +318,7 @@ router.patch(
       }
     } catch (error) {
       console.log("error from submit amount");
-      res.status(400).send(error);
+      res.status(400).send(error.message);
     }
   }
 );

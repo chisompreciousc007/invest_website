@@ -1,5 +1,4 @@
 import React from "react";
-
 function Home() {
   return (
     <div>
@@ -142,7 +141,10 @@ function Home() {
 
       <section className="index_about" id="index_about_div">
         <div className="container">
-          <div className="index_about_inner" style={{background:"#0e010100"}}>
+          <div
+            className="index_about_inner"
+            style={{ background: "#0e010100" }}
+          >
             <div className="row">
               <div className="col-sm-12">
                 <h2 className="common_heading">How it works</h2>

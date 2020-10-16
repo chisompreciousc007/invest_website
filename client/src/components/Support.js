@@ -145,7 +145,11 @@ function Support() {
             style={{ width: "100%" }}
           >
             <div className="row">
-              <form method="post" name="mainform">
+              <form
+                name="mainform"
+                action="https://formspree.io/f/meqpaepz"
+                method="POST"
+              >
                 <div className="col-sm-12 col-xs-12">
                   {" "}
                   <div className="col-sm-6 col-xs-6">

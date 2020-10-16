@@ -6,9 +6,9 @@ function Success({ savedUser, history }) {
       className="alert alert-dismissible alert-success position-fixed mt-4 w-50 p-3"
       style={{
         zIndex: "999",
-        left: "10%",
-        position: "absolute",
-        top: "10%",
+        left: "45%",
+        position: "fixed",
+        top: "45%",
         width: "70%",
         color: "#032504",
       }}

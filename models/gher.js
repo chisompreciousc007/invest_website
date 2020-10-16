@@ -4,7 +4,6 @@ const GherSchema = new mongoose.Schema(
   {
     email: {
       type: String,
-      unique: true,
     },
     amount: {
       type: Number,
@@ -13,6 +12,9 @@ const GherSchema = new mongoose.Schema(
     isPaired: {
       type: Boolean,
       default: false,
+    },
+    isFirst: {
+      type: Boolean,
     },
   },
   { timestamps: true }

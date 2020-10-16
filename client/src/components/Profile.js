@@ -32,7 +32,6 @@ function Referals() {
   const getUserData = () => {
     console.log("get userData running");
     if (user.user._id) {
-      // setLoading(false);
       return console.log("already gotten user data");
     }
     axios
@@ -56,7 +55,7 @@ function Referals() {
               ...res.data,
             }));
           });
-          axios
+        axios
           .get(`/ghers/${res.data.email}`, {
             withCredentials: true,
           })
@@ -67,18 +66,18 @@ function Referals() {
               ...res.data,
             }));
             // setLoading(false);
-          }) 
-        
+          });
       })
       .catch((err) => {
         if (err.response.status === 500) {
           console.log("there was a problem with the server");
-          return window.location.reload()
+          return window.location.reload();
         }
-        console.log(err);
-        setResponse("Request Failed");
+        setResponse(err.response.data);
         setError(true);
-        window.scrollTo(0, 0);
+        setTimeout(() => {
+          return history.push("/login");
+        }, 1000);
       });
   };
   useEffect(() => {
@@ -97,113 +96,110 @@ function Referals() {
           }}
         />
       ) : null}
-    
-        <header className="inner_page_header">
-          <Header />
 
-          <section className="admin_body">
-            <NavBar />
+      <header className="inner_page_header">
+        <Header />
 
-            <div
-              className="container"
-              style={{ marginTop: " 20px", marginBottom: "20px" }}
-            >
-              <div className="row">
-                <div className="col-md-10 col-sm-12">
-                  <form style={{ textAlign: "left", color: "#fff" }}>
-                    <h3>
-                      <p style={{ color: "#FFFFFF" }}>Your account:</p>
-                    </h3>
+        <section className="admin_body">
+          <NavBar />
 
-                    <table style={{ margin: "auto" }}>
-                      <tbody>
-                        <tr>
-                          <td>
-                            <p style={{ color: "#FFFFFF" }}>Account Name:</p>
-                          </td>
-                          <td>
-                            <p style={{ color: "#FFFFFF" }}>{name}</p>
-                          </td>
-                        </tr>
-                        <br />
-                        <tr>
-                          <td>
-                            <p style={{ color: "#FFFFFF" }}>Username:</p>
-                          </td>
-                          <td>
-                            <p style={{ color: "#FFFFFF" }}>{username}</p>
-                          </td>
-                        </tr>
-                        <br />
-                        <tr>
-                          <td>
-                            <p style={{ color: "#FFFFFF" }}>Phone:</p>
-                          </td>
-                          <td>
-                            <p style={{ color: "#FFFFFF" }}>{phone}</p>
-                          </td>
-                        </tr>
-                        <br />
-                        <tr>
-                          <td>
-                            <p style={{ color: "#FFFFFF" }}>
-                              Bank Account Name:
-                            </p>
-                          </td>
-                          <td>
-                            <p style={{ color: "#FFFFFF" }}>{accountName}</p>
-                          </td>
-                        </tr>
-                        <br />
-                        <tr>
-                          <td>
-                            <p style={{ color: "#FFFFFF" }}>
-                              Bank Account Number:
-                            </p>
-                          </td>
-                          <td>
-                            <p style={{ color: "#FFFFFF" }}>{accountNo}</p>
-                          </td>
-                        </tr>
-                        <br />
-                        <tr>
-                          <td>
-                            <p style={{ color: "#FFFFFF" }}>Bank Name:</p>
-                          </td>
-                          <td>
-                            <p style={{ color: "#FFFFFF" }}>{bank}</p>
-                          </td>
-                        </tr>
-                        <br />
+          <div
+            className="container"
+            style={{ marginTop: " 20px", marginBottom: "20px" }}
+          >
+            <div className="row">
+              <div className="col-md-10 col-sm-12">
+                <form style={{ textAlign: "left", color: "#fff" }}>
+                  <h3>
+                    <p style={{ color: "#FFFFFF" }}>Your account:</p>
+                  </h3>
 
-                        <tr>
-                          <td>
-                            <p style={{ color: "#FFFFFF" }}>E-mail address:</p>
-                          </td>
-                          <td>{email}</td>
-                        </tr>
-                        <br />
-                        <tr>
-                          <td>&nbsp;</td>
-                          <td>
-                            <input disabled
-                              type="submit"
-                              value="Change Account data"
-                              className="sbmt"
-                            />
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </form>
-                </div>
+                  <table style={{ margin: "auto" }}>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <p style={{ color: "#FFFFFF" }}>Account Name:</p>
+                        </td>
+                        <td>
+                          <p style={{ color: "#FFFFFF" }}>{name}</p>
+                        </td>
+                      </tr>
+                      <br />
+                      <tr>
+                        <td>
+                          <p style={{ color: "#FFFFFF" }}>Username:</p>
+                        </td>
+                        <td>
+                          <p style={{ color: "#FFFFFF" }}>{username}</p>
+                        </td>
+                      </tr>
+                      <br />
+                      <tr>
+                        <td>
+                          <p style={{ color: "#FFFFFF" }}>Phone:</p>
+                        </td>
+                        <td>
+                          <p style={{ color: "#FFFFFF" }}>{phone}</p>
+                        </td>
+                      </tr>
+                      <br />
+                      <tr>
+                        <td>
+                          <p style={{ color: "#FFFFFF" }}>Bank Account Name:</p>
+                        </td>
+                        <td>
+                          <p style={{ color: "#FFFFFF" }}>{accountName}</p>
+                        </td>
+                      </tr>
+                      <br />
+                      <tr>
+                        <td>
+                          <p style={{ color: "#FFFFFF" }}>
+                            Bank Account Number:
+                          </p>
+                        </td>
+                        <td>
+                          <p style={{ color: "#FFFFFF" }}>{accountNo}</p>
+                        </td>
+                      </tr>
+                      <br />
+                      <tr>
+                        <td>
+                          <p style={{ color: "#FFFFFF" }}>Bank Name:</p>
+                        </td>
+                        <td>
+                          <p style={{ color: "#FFFFFF" }}>{bank}</p>
+                        </td>
+                      </tr>
+                      <br />
+
+                      <tr>
+                        <td>
+                          <p style={{ color: "#FFFFFF" }}>E-mail address:</p>
+                        </td>
+                        <td>{email}</td>
+                      </tr>
+                      <br />
+                      <tr>
+                        <td>&nbsp;</td>
+                        <td>
+                          <input
+                            disabled
+                            type="submit"
+                            value="Change Account data"
+                            className="sbmt"
+                          />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </form>
               </div>
             </div>
-          </section>
-          <Footer />
-        </header>
-  
-      
+          </div>
+        </section>
+        <Footer />
+      </header>
     </div>
   );
 }

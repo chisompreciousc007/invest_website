@@ -19,7 +19,6 @@ function Transactions() {
   const getUserData = () => {
     console.log("get userData running");
     if (user.user._id) {
-      // setLoading(false);
       return console.log("already gotten user data");
     }
     axios
@@ -43,7 +42,7 @@ function Transactions() {
               ...res.data,
             }));
           });
-          axios
+        axios
           .get(`/ghers/${res.data.email}`, {
             withCredentials: true,
           })
@@ -54,18 +53,18 @@ function Transactions() {
               ...res.data,
             }));
             // setLoading(false);
-          }) 
-        
+          });
       })
       .catch((err) => {
         if (err.response.status === 500) {
           console.log("there was a problem with the server");
-          return window.location.reload()
+          return window.location.reload();
         }
-        console.log(err);
-        setResponse("Request Failed");
+        setResponse(err.response.data);
         setError(true);
-        window.scrollTo(0, 0);
+        setTimeout(() => {
+          return history.push("/login");
+        }, 1000);
       });
   };
   useEffect(() => {
@@ -80,7 +79,7 @@ function Transactions() {
   if (isEmpty(user.user)) return <Spinner />;
   return (
     <div>
-       {/* {loading && <Spinner />} */}
+      {/* {loading && <Spinner />} */}
       {error && (
         <Error
           response={response}
@@ -124,7 +123,7 @@ function Transactions() {
                     {investHistory.map((el, index) => (
                       <tr key={index}>
                         <td className="inheader">
-                          <b>{index+1}</b>
+                          <b>{index + 1}</b>
                         </td>
                         <td className="inheader" width="200">
                           <b>{el.name}</b>
@@ -158,10 +157,10 @@ function Transactions() {
                         <b>Amount</b>
                       </td>
                     </tr>
-                    {cashoutHistory.map((el,index) => (
-                      <tr key = {index}>
+                    {cashoutHistory.map((el, index) => (
+                      <tr key={index}>
                         <td className="inheader">
-                          <b>{index+1}</b>
+                          <b>{index + 1}</b>
                         </td>
                         <td className="inheader" width="200">
                           <b>{el.name}</b>
@@ -208,7 +207,7 @@ function Transactions() {
                   </tbody>
                 </table>
               </div>
-              <br/>
+              <br />
               <div className="col-md-10 col-sm-12">
                 <table
                   cellSpacing="1"
@@ -226,7 +225,7 @@ function Transactions() {
                         <b>Bonus</b>
                       </td>
                     </tr>
-                    {guiderHistory.map((el,index) => (
+                    {guiderHistory.map((el, index) => (
                       <tr key={index}>
                         <td className="inheader">
                           <b>{el.name}</b>

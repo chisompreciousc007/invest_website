@@ -1,9 +1,9 @@
 import React from "react";
 
-function Error({ response, setError }) {
+function Error({ response, setSuccess }) {
   return (
     <div
-      className="alert alert-dismissible alert-danger position-fixed mt-4 w-50 p-3"
+      className="alert alert-dismissible alert-success position-fixed mt-4 w-50 p-3"
       style={{
         zIndex: "999",
         left: "5%",
@@ -16,11 +16,11 @@ function Error({ response, setError }) {
         type="button"
         className="close"
         data-dismiss="alert"
-        onClick={setError}
+        onClick={setSuccess}
       >
         &times;
       </button>
-      <h6 className="alert-heading">Oops! Something went wrong</h6>
+      <h4 className="alert-heading">Successful!!</h4>
       <p className="mb-0">{response} </p>
     </div>
   );

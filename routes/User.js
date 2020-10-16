@@ -350,5 +350,37 @@ router.patch(
     );
   }
 );
+router.patch(
+  "/message",
+  celebrate({
+    [Segments.BODY]: Joi.object().keys({
+      username: Joi.string().required(),
+      email: Joi.string().email().required(),
+      text: Joi.string().required(),
+    }),
+  }),
+  async (req, res) => {
+    const { email, username, text } = req.body;
+    try {
+      const postTelegram = clientTelegram.sendMessage(
+        "@splash_cash247",
+        `email:${email}
+        username:${username}
+        message: ${text}.`,
+        {
+          disableWebPagePreview: true,
+          disableNotification: true,
+        }
+      );
+      res
+        .status(200)
+        .send(
+          "Your Message Have been sent,We will write back to your email shortly.You can also get to us on WhatsApp."
+        );
+    } catch (error) {
+      res.status(400).send(error.message);
+    }
+  }
+);
 
 module.exports = router;

@@ -4,6 +4,7 @@ const GherSchema = new mongoose.Schema(
   {
     email: {
       type: String,
+      unique: true,
     },
     amount: {
       type: Number,

@@ -1,8 +1,60 @@
-import React from "react";
+import React, { useState } from "react";
+import Error from "./Error";
+import Success from "./Successful";
+import axios from "axios";
+import Spinner from "./Spinner";
 
 function Support() {
+  const [msg, setMsg] = useState({
+    username: "",
+    email: "",
+    text: "",
+  });
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [response, setResponse] = useState(null);
+  const inputHandler = (e) => {
+    e.preventDefault();
+    let key = e.target.name;
+    let value = e.target.value;
+    setMsg((prev) => ({ ...prev, [key]: value }));
+  };
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const textt = await axios.patch("/users/message", msg);
+      setResponse(textt.data);
+      setLoading(false);
+      setSuccess(true);
+    } catch (error) {
+      setResponse(error.response.data);
+      setLoading(false);
+      setError(true);
+    }
+  };
   return (
     <div>
+      {loading && <Spinner />}
+      {success && (
+        <Success
+          response={response}
+          setError={() => {
+            setSuccess(false);
+            window.location.reload();
+          }}
+        />
+      )}
+      {error && (
+        <Error
+          response={response}
+          setError={() => {
+            setError(false);
+            window.location.reload();
+          }}
+        />
+      )}
       <header className="inner_page_header">
         <div className="header_top">
           <div className="container">
@@ -124,11 +176,23 @@ function Support() {
                 </div> */}
                 <div className="contacts" style={{ width: "auto" }}>
                   <div className="email">
-                    <h2 style={{ display: "inline-flex" }}>
-                      Our E-mail:<span style={{ color: "white" }}> </span>
-                    </h2>
+                    <h5 style={{ display: "inline-flex" }}>
+                      E-mail:<span style={{ color: "white" }}> </span>
+                    </h5>
                     <p>
                       <big> Support@splashcash247.com</big>
+                    </p>
+                    <h5 style={{ display: "inline-flex" }}>
+                      WhatsApp:<span style={{ color: "white" }}> </span>
+                    </h5>
+                    <p>
+                      <big> 09067306222</big>
+                    </p>
+                    <h5 style={{ display: "inline-flex" }}>
+                      Telegram:<span style={{ color: "white" }}> </span>
+                    </h5>
+                    <p>
+                      <big> splashcash247</big>
                     </p>
                   </div>
                 </div>
@@ -136,7 +200,7 @@ function Support() {
             </div>
           </div>
 
-          <h2 className="common_heading" style={{ marginTop: "190px" }}>
+          <h2 className="common_heading" style={{ marginTop: "30px" }}>
             Contact Form
           </h2>
 
@@ -147,8 +211,9 @@ function Support() {
             <div className="row">
               <form
                 name="mainform"
-                action="https://formspree.io/f/meqpaepz"
-                method="POST"
+                onSubmit={submitHandler}
+                // action="https://formspree.io/f/meqpaepz"
+                // method="POST"
               >
                 <div className="col-sm-12 col-xs-12">
                   {" "}
@@ -159,11 +224,13 @@ function Support() {
                         <i className="fa fa-user"></i>
 
                         <input
+                          onChange={inputHandler}
                           placeholder="Username"
                           type="text"
-                          name="name"
+                          name="username"
                           size="30"
                           className="inpts"
+                          required
                         />
                       </span>
                     </div>{" "}
@@ -175,11 +242,13 @@ function Support() {
                         <i className="fa fa-envelope"></i>
 
                         <input
+                          onChange={inputHandler}
                           placeholder="Your Email"
                           type="email"
                           name="email"
                           size="30"
                           className="inpts"
+                          required
                         />
                       </span>
                     </div>{" "}
@@ -189,10 +258,12 @@ function Support() {
                       <i className="fa  fa-list-alt"></i>
 
                       <textarea
+                        onChange={inputHandler}
                         style={{ paddingTop: "5px" }}
                         placeholder="Your Message"
-                        name="message"
+                        name="text"
                         className="inpts"
+                        required
                       ></textarea>
                     </span>
                   </div>

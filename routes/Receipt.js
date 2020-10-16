@@ -7,6 +7,8 @@ const Pher = require("../models/pher");
 const Guider = require("../models/guider");
 const User = require("../models/user");
 const Committer = require("../models/committer");
+const verifyRequest = require("../verifyPerrequest");
+const verifyAdmin = require("../verifyAdmin");
 const { compareAsc, addHours } = require("date-fns");
 require("dotenv/config");
 const fs = require("fs");
@@ -54,37 +56,10 @@ const setCommitIsFulfilled = (email, boolean) => {
     return Committer.findOneAndUpdate({ email: email }, { isFufilled: false });
   }
 };
-const createUpdateGher = async (email, amount) => {
-  const existingGher = await Gher.findOne({ email: email });
-  const GherAmt = amount * 1.5;
-  if (existingGher === null) {
-    const moveOldCommitToGherCollection = await new Gher({
-      email: email,
-      amount: GherAmt,
-      isFirst: true,
-    }).save();
-    console.log("old commit used to create Gher Collection");
-  }
-  if (existingGher !== null) {
-    if (existingGher.amount === 0 && existingGher.isPaired === true) {
-      const moveOldCommitToGherCollection = await Gher.findOneAndUpdate(
-        { email: email },
-        { $inc: { amount: GherAmt }, isFirst: false }
-      );
-      console.log("old commit used to update Gher Collection");
-    }
-    if (existingGher.amount != 0 && existingGher.isPaired === false) {
-      const moveOldCommitToGherCollection = await Gher.findOneAndUpdate(
-        { email: email },
-        { $inc: { amount: GherAmt } }
-      );
-      console.log("old commit used to update Gher Collection");
-    }
-  }
-};
 
 router.get(
   "/foruser/:email",
+  verifyRequest,
   celebrate({
     [Segments.PARAMS]: Joi.object().keys({
       email: Joi.string().required(),
@@ -125,6 +100,7 @@ router.get(
 );
 router.patch(
   "/updatePopPath/:id",
+  verifyRequest,
   celebrate({
     [Segments.PARAMS]: Joi.object().keys({
       id: Joi.string().required(),
@@ -153,6 +129,7 @@ router.patch(
 
 router.patch(
   "/confirmpayment/",
+  verifyRequest,
   celebrate({
     [Segments.BODY]: Joi.object().keys({
       gher_email: Joi.string().email().required(),
@@ -475,6 +452,7 @@ router.patch(
 );
 router.patch(
   "/confirmfee/",
+  verifyRequest,
   celebrate({
     [Segments.BODY]: Joi.object().keys({
       gher_email: Joi.string().email().required(),
@@ -558,6 +536,7 @@ router.patch(
 );
 router.patch(
   "/purge",
+  verifyRequest,
   celebrate({
     [Segments.BODY]: Joi.object().keys({
       gher_email: Joi.string().email().required(),
@@ -641,7 +620,7 @@ router.patch(
     }
   }
 );
-router.get("/", async (req, res) => {
+router.get("/", verifyAdmin, async (req, res) => {
   try {
     const foundReceipt = await Receipt.find();
     res.json(foundReceipt);
@@ -650,7 +629,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/automatch-otherCommits", async (req, res) => {
+router.get("/automatch-otherCommits", verifyAdmin, async (req, res) => {
   // INPUTS
   const matchAuto = async () => {
     try {
@@ -1010,7 +989,7 @@ router.get("/automatch-otherCommits", async (req, res) => {
   matchAuto();
   console.log("MatchAuto for other commits Started");
 });
-router.get("/automatch-firstcommit", async (req, res) => {
+router.get("/automatch-firstcommit", verifyAdmin, async (req, res) => {
   // INPUTS
   const matchAuto = async () => {
     try {
@@ -1444,6 +1423,7 @@ router.post(
 
 router.patch(
   "/match-a-user-instant",
+  verifyAdmin,
   celebrate({
     [Segments.BODY]: Joi.object().keys({
       email: Joi.string().email().required(),

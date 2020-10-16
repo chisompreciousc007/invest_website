@@ -141,7 +141,7 @@ function Transactions() {
           response={response}
           setError={() => {
             setError(false);
-            window.location.reload();
+            history.push("/login");
           }}
         />
       )}

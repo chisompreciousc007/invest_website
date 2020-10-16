@@ -40,7 +40,7 @@ function Support() {
       {success && (
         <Success
           response={response}
-          setError={() => {
+          setSuccess={() => {
             setSuccess(false);
             window.location.reload();
           }}
@@ -192,7 +192,7 @@ function Support() {
                       Telegram:<span style={{ color: "white" }}> </span>
                     </h5>
                     <p>
-                      <big> splashcash247</big>
+                      <big> https://t.me/joinchat/ReH8v1QQcJrKnMnvIo51-A</big>
                     </p>
                   </div>
                 </div>

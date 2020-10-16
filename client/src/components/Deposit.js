@@ -172,55 +172,50 @@ function Dashboard() {
   };
 
   const getUserData = () => {
-    console.log("get userData running");
-    if (user.user._id) {
-      return console.log("already gotten user data");
-    }
-    axios
-      .get("/users/user", { withCredentials: true })
-      .then((res) => {
-        console.log("user data", res.data);
-        if (res.data === "blocked") return history.push("/contactSupport");
-        setUser((prevState) => ({
-          ...prevState,
-          user: { ...res.data },
-        }));
+    if (!user.user._id) {
+      axios
+        .get("/users/user", { withCredentials: true })
+        .then((res) => {
+          if (res.data === "blocked") return history.push("/contactSupport");
+          setUser((prevState) => ({
+            ...prevState,
+            user: { ...res.data },
+          }));
 
-        axios
-          .get(`/receipts/foruser/${res.data.email}`, {
-            withCredentials: true,
-          })
-          .then((res) => {
-            console.log("receipt data", res.data);
-            setUser((prevState) => ({
-              ...prevState,
-              ...res.data,
-            }));
-          });
-        axios
-          .get(`/ghers/${res.data.email}`, {
-            withCredentials: true,
-          })
-          .then((res) => {
-            console.log("gher data", res.data);
-            setUser((prevState) => ({
-              ...prevState,
-              ...res.data,
-            }));
-            setLoading(false);
-          });
-      })
-      .catch((err) => {
-        if (err.response.status === 500) {
-          console.log("there was a problem with the server");
-          return window.location.reload();
-        }
-        setResponse(err.response.data);
-        setError(true);
-        setTimeout(() => {
-          return history.push("/login");
-        }, 1000);
-      });
+          axios
+            .get(`/receipts/foruser/${res.data.email}`, {
+              withCredentials: true,
+            })
+            .then((res) => {
+              setUser((prevState) => ({
+                ...prevState,
+                ...res.data,
+              }));
+            });
+          axios
+            .get(`/ghers/${res.data.email}`, {
+              withCredentials: true,
+            })
+            .then((res) => {
+              setUser((prevState) => ({
+                ...prevState,
+                ...res.data,
+              }));
+              setLoading(false);
+            });
+        })
+        .catch((err) => {
+          if (err.response.status === 500) {
+            console.log("there was a problem with the server");
+            return window.location.reload();
+          }
+          setResponse(err.response.data);
+          setError(true);
+          setTimeout(() => {
+            return history.push("/login");
+          }, 1000);
+        });
+    }
   };
 
   useEffect(() => {

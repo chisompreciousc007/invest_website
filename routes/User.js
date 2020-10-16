@@ -6,6 +6,8 @@ const User = require("../models/user");
 const Pher = require("../models/pher");
 const Guider = require("../models/guider");
 const verify = require("../verifytoken");
+const verifyRequest = require("../verifyPerrequest");
+const verifyAdmin = require("../verifyAdmin");
 const Receipt = require("../models/receipt");
 const { celebrate, Joi, Segments } = require("celebrate");
 require("dotenv/config");
@@ -35,6 +37,7 @@ router.get("/user", verify, async (req, res) => {
 // CREATE USER
 router.post(
   "/",
+  verifyRequest,
   celebrate({
     [Segments.BODY]: Joi.object().keys({
       name: Joi.string().required(),
@@ -247,7 +250,7 @@ router.post(
     }
   }
 );
-router.get("/", async (req, res) => {
+router.get("/", verifyAdmin, async (req, res) => {
   try {
     const foundUser = await User.find();
     res.json(foundUser);
@@ -255,7 +258,7 @@ router.get("/", async (req, res) => {
     res.json({ message: err });
   }
 });
-router.get("/admin", async (req, res) => {
+router.get("/admin", verifyAdmin, async (req, res) => {
   try {
     const foundUser = await User.find({}, "isActivated isBlocked");
     res.json(foundUser);
@@ -263,7 +266,7 @@ router.get("/admin", async (req, res) => {
     res.json({ message: err });
   }
 });
-router.get("/users-with-downlines", async (req, res) => {
+router.get("/users-with-downlines", verifyAdmin, async (req, res) => {
   try {
     const foundUser = await User.find({ downline: { $ne: [] } }, "downline");
 
@@ -274,6 +277,7 @@ router.get("/users-with-downlines", async (req, res) => {
 });
 router.patch(
   "/wantToInvest",
+  verifyRequest,
   celebrate({
     [Segments.BODY]: Joi.object().keys({
       _id: Joi.string().required(),
@@ -325,6 +329,7 @@ router.patch(
 
 router.patch(
   "/password/:id",
+  verifyRequest,
   celebrate({
     [Segments.PARAMS]: Joi.object().keys({
       id: Joi.string().required(),

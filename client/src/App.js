@@ -18,17 +18,7 @@ const Admin = asyncComponent(() => import("./components/Admin"));
 
 function App() {
   const [user, setUser] = useState({
-    user: {
-      //   name: "Loading",
-      //   username: "Loading",
-      //   isActivated: false,
-      //   InvestAmt: "Loading",
-      //   updatedAt: "Loading",
-      //   pendingInvestAmt: "Loading",
-      //   pendingCashoutAmt: "Loading",
-      //   isBlocked: false,
-      //   createdAt: "Loading",
-    },
+    user: {},
     payArr: [],
     getArr: [],
     guiderArr: [],

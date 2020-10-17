@@ -34,10 +34,10 @@ router.get("/user", verify, async (req, res) => {
     res.status(400).send(err.message);
   }
 });
+
 // CREATE USER
 router.post(
   "/",
-  verifyRequest,
   celebrate({
     [Segments.BODY]: Joi.object().keys({
       name: Joi.string().required(),
@@ -159,6 +159,7 @@ router.post(
   }
 );
 //LOGIN
+
 router.post(
   "/login",
   celebrate({
@@ -326,7 +327,6 @@ router.patch(
     }
   }
 );
-
 router.patch(
   "/password/:id",
   verifyRequest,
@@ -387,5 +387,4 @@ router.patch(
     }
   }
 );
-
 module.exports = router;

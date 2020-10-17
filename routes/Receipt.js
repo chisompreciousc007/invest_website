@@ -197,37 +197,24 @@ router.patch(
 
       const exist = await Committer.findOne({ email: pher_email });
 
-      // FIRST TIME COMMIT
-      if (exist === null) {
-        console.log("no old commit");
+      // FIRST TIME COMMIT && AMOUNT EQUAL PLEDGE
+      //
+      if (exist === null && amount >= pledge) {
+        console.log("no old commit && commit equals pledge");
         // CREATE NEW COMMIT
         const newCommitter = new Committer({
           email: pher_email,
           amount: amount,
         });
-        const savedCommit = newCommitter.save();
+        const savedCommit = await newCommitter.save();
         console.log("new Commit Created");
-        const savedCommitPromise = await savedCommit;
-        //CHECKS AND SETUP
-        if (savedCommit.amount >= pledge) {
-          console.log("commit equals pledge");
-          const setisFufilledTrue = setCommitIsFulfilled(pher_email, true);
-          const setWantToInvestFalse = setWantToInvest(pher_email, false);
-          const setisFufilledTruePromise = await setisFufilledTrue;
-          const setWantToInvestFalsePromise = await setWantToInvestFalse;
-          console.log(
-            "Commit set isfulfilled:true, wantToInvest:false, ready for recommit"
-          );
-        } else {
-          console.log("commit less than pledge");
-          // const setisFufilledFalse = setCommitIsFulfilled(pher_email, false);
-          // const setWantToInvestTrue = setWantToInvest(pher_email, true);
-          // const setisFufilledFalsePromise = await setisFufilledFalse;
-          // const setWantToInvestTruePromise = await setWantToInvestTrue;
-          console.log(
-            "Commit is retained as isfulfilled:false & wantToInvest:true, not ready for recommit"
-          );
-        }
+        const setisFufilledTrue = setCommitIsFulfilled(pher_email, true);
+        const setWantToInvestFalse = setWantToInvest(pher_email, false);
+        const setisFufilledTruePromise = await setisFufilledTrue;
+        const setWantToInvestFalsePromise = await setWantToInvestFalse;
+        console.log(
+          "Commit set isfulfilled:true, wantToInvest:false, ready for recommit"
+        );
         //ADD TO DOWNLINE
         if (upline !== "new") {
           const updateDownline = await User.findOneAndUpdate(
@@ -243,8 +230,38 @@ router.patch(
           );
           console.log("Added to Downline");
         }
-        // res.status(200).send("Success!");
-      } else {
+      }
+      // FIRST TIME COMMIT && AMOUNT EQUAL PLEDGE
+      //
+      if (exist === null && amount < pledge) {
+        console.log("no old commit && commit less than pledge");
+        // CREATE NEW COMMIT
+        const newCommitter = new Committer({
+          email: pher_email,
+          amount: amount,
+        });
+        const savedCommit = await newCommitter.save();
+        console.log("new Commit Created");
+        console.log(
+          "Commit is retained as isfulfilled:false & wantToInvest:true, not ready for recommit"
+        );
+        //ADD TO DOWNLINE
+        if (upline !== "new") {
+          const updateDownline = await User.findOneAndUpdate(
+            { username: upline },
+            {
+              $push: {
+                downline: {
+                  name: pher_name,
+                  amount: pledge * 0.05,
+                },
+              },
+            }
+          );
+          console.log("Added to Downline");
+        }
+      }
+      if (exist !== null) {
         console.log("old commit exists");
         const checkisFulfil = exist.isFufilled;
 
@@ -343,7 +360,6 @@ router.patch(
         } else {
           console.log("old commit is not fulfilled");
           //INCREMENT TO COMMIT
-          console.log("increment existing commit");
           const incCommit = await Committer.findOneAndUpdate(
             { email: pher_email },
             { $inc: { amount: amount } },
@@ -408,8 +424,6 @@ router.patch(
                   );
                 }
               }
-            } else {
-              console.log("no existing pendingGh ");
             }
             const setisFufilledTrue = setCommitIsFulfilled(pher_email, true);
             const setwantToInvestFalse = setWantToInvest(pher_email, false);

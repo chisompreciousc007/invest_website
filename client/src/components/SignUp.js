@@ -68,9 +68,8 @@ function SignUp({ match }) {
             })
             .catch((err) => {
               // const errmsg = err.response.data;
-              setResponse(err.message);
+              setResponse("Request to verify username failed");
               setError(true);
-              window.scrollTo(0, 0);
             });
         }
         break;
@@ -84,10 +83,8 @@ function SignUp({ match }) {
               if (res.data === false) setEmailStatus("Available");
             })
             .catch((err) => {
-              // const errmsg = err.response.data;
-              setResponse(err.message);
+              setResponse("Request to verify email failed");
               setError(true);
-              window.scrollTo(0, 0);
             });
         }
 
@@ -102,9 +99,8 @@ function SignUp({ match }) {
               if (res.data === false) setPhoneStatus("Available");
             })
             .catch((err) => {
-              setResponse(err.message);
+              setResponse("Request to verify phone number failed");
               setError(true);
-              window.scrollTo(0, 0);
             });
         }
 
@@ -251,7 +247,6 @@ function SignUp({ match }) {
                           <span>
                             <i className="fa fa-user" aria-hidden="true"></i>
                             <input
-                              pattern="[a-zA-Z0-9 ]+"
                               minLength="8"
                               maxLength="50"
                               required
@@ -397,7 +392,6 @@ function SignUp({ match }) {
                           <span>
                             <i className="fa fa-usd" aria-hidden="true"></i>
                             <input
-                              pattern="[a-zA-Z ]+"
                               minLength="8"
                               maxLength="50"
                               required
@@ -473,15 +467,15 @@ function SignUp({ match }) {
                       <div className="col-sm-12 col-xs-12">
                         <div className="form_box">
                           <aside>
-                            <input
+                            {/* <input
                               disabled
                               required
                               type="checkbox"
                               name="agree"
                               value="1"
                               defaultChecked
-                            />{" "}
-                            I agree with{" "}
+                            />{" "} */}
+                            By Signing Up, I agree with{" "}
                             <a href="/rules">Terms and conditions</a>
                           </aside>{" "}
                         </div>{" "}

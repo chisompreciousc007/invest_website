@@ -1,23 +1,26 @@
 const express = require("express");
 const fileUpload = require("express-fileupload");
-const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
-const { errors } = require("celebrate");
+
 require("dotenv/config");
+
 const path = require("path");
 const compression = require("compression");
 const rateLimit = require("express-rate-limit");
+const { errors } = require("celebrate");
 const userRouter = require("./routes/User");
 const uploadRouter = require("./routes/Upload");
+
 const receiptRouter = require("./routes/Receipt");
 const guiderRouter = require("./routes/Guider");
 const pherRouter = require("./routes/Pher");
 const gherRouter = require("./routes/Gher");
 const committerRouter = require("./routes/Committer");
 
+const app = express();
 const port = process.env.PORT || 4000;
 
 mongoose.connect(process.env.MONGODB_URI || process.env.DB_CONNECTION, {

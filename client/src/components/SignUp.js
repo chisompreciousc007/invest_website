@@ -465,19 +465,12 @@ function SignUp({ match }) {
                       </div>
 
                       <div className="col-sm-12 col-xs-12">
-                        <div className="form_box">
-                          <aside>
-                            {/* <input
-                              disabled
-                              required
-                              type="checkbox"
-                              name="agree"
-                              value="1"
-                              defaultChecked
-                            />{" "} */}
-                            By Signing Up, I agree with{" "}
-                            <a href="/rules">Terms and conditions</a>
-                          </aside>{" "}
+                        <div
+                          className="form_box"
+                          style={{ color: "white", width: "max-content" }}
+                        >
+                          By Signing Up, I agree with{" "}
+                          <a href="/rules">Terms and conditions</a>
                         </div>{" "}
                       </div>
 

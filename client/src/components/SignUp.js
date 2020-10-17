@@ -68,8 +68,7 @@ function SignUp({ match }) {
             })
             .catch((err) => {
               // const errmsg = err.response.data;
-              setResponse("Request to verify username failed");
-              setError(true);
+              setEmailStatus("Network Error!Failed to verify username");
             });
         }
         break;
@@ -83,8 +82,7 @@ function SignUp({ match }) {
               if (res.data === false) setEmailStatus("Available");
             })
             .catch((err) => {
-              setResponse("Request to verify email failed");
-              setError(true);
+              setEmailStatus("Network Error!Failed to verify email");
             });
         }
 
@@ -99,8 +97,7 @@ function SignUp({ match }) {
               if (res.data === false) setPhoneStatus("Available");
             })
             .catch((err) => {
-              setResponse("Request to verify phone number failed");
-              setError(true);
+              setEmailStatus("Network Error!Failed to verify phone");
             });
         }
 
@@ -430,7 +427,6 @@ function SignUp({ match }) {
                           <span>
                             <i className="fa fa-usd" aria-hidden="true"></i>
                             <input
-                              pattern="[a-zA-Z ]+"
                               minLength="3"
                               maxLength="15"
                               required

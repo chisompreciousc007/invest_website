@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 const path = require("path");
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads/");
+    cb(null, "./client/public/uploads");
   },
   filename: function (req, file, cb) {
     cb(null, file.fieldname + "-" + uuidv4() + path.extname(file.originalname));
@@ -30,7 +30,6 @@ const autheToken = process.env.TWILIO_AUTHE_TOKEN;
 const client = require("twilio")(accountSid, autheToken);
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const { TelegramClient } = require("messaging-api-telegram");
-const { create } = require("domain");
 const clientTelegram = new TelegramClient({
   accessToken: BOT_TOKEN,
 });
@@ -641,13 +640,13 @@ router.post(
         { new: true }
       );
       console.log("buffer updated");
-      fs.unlink(req.file.path, (err) => {
-        if (err) {
-          console.log(err.message);
-        } else {
-          console.log("image deleted");
-        }
-      });
+      // fs.unlink(req.file.path, (err) => {
+      //   if (err) {
+      //     console.log(err.message);
+      //   } else {
+      //     console.log("image deleted");
+      //   }
+      // });
       res.status(200).send("POP Upload Successful!!");
     } catch (err) {
       console.log(err.message);

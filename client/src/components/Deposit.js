@@ -96,6 +96,7 @@ function Dashboard() {
       //   });
     } catch (error) {
       if (error.response.status === 500) {
+        console.log(error.response.data);
         setResponse("Server Error,Request Failed");
         setError(true);
       } else {

@@ -109,34 +109,6 @@ router.get(
     }
   }
 );
-// router.patch(
-//   "/updatePopPath/:id",
-//   verifyRequest,
-//   celebrate({
-//     [Segments.PARAMS]: Joi.object().keys({
-//       id: Joi.string().required(),
-//     }),
-//     [Segments.BODY]: Joi.object().keys({
-//       popPath: Joi.string().required(),
-//     }),
-//   }),
-//   async (req, res) => {
-//     const { popPath } = req.body;
-//     // UPDATE RECEIPT WITH POP-PATH
-//     try {
-//       const result = await Receipt.findByIdAndUpdate(
-//         req.params.id,
-//         {
-//           popPath: popPath,
-//         },
-//         { new: true, runValidators: true, context: "query" }
-//       );
-//       res.status(200).send("POP Uploaded");
-//     } catch (err) {
-//       res.status(400).send(err.message);
-//     }
-//   }
-// );
 
 router.patch(
   "/confirmpayment/",
@@ -640,17 +612,17 @@ router.post(
         { new: true }
       );
       console.log("buffer updated");
-      // fs.unlink(req.file.path, (err) => {
-      //   if (err) {
-      //     console.log(err.message);
-      //   } else {
-      //     console.log("image deleted");
-      //   }
-      // });
+      fs.unlink(req.file.path, (err) => {
+        if (err) {
+          console.log(err.message);
+        } else {
+          console.log("image deleted");
+        }
+      });
       res.status(200).send("POP Upload Successful!!");
     } catch (err) {
       console.log(err.message);
-      res.json({ message: err.message });
+      res.status(400).send(err.message);
     }
   }
 );

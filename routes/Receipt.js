@@ -423,7 +423,7 @@ router.patch(
           }
         }
       }
-      const deleteReceipt = await Receipt.findOneAndDelete(receiptId);
+      const deleteReceipt = await Receipt.findByIdAndDelete(receiptId);
       console.log("receipt Deleted");
       res.status(200).send("Payment Confirmed!");
     } catch (error) {

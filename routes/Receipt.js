@@ -1,10 +1,22 @@
 const express = require("express");
+var multer = require("multer");
+const { v4: uuidv4 } = require("uuid");
+const path = require("path");
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + "-" + uuidv4() + path.extname(file.originalname));
+  },
+});
+
+var upload = multer({ storage: storage });
 const router = express.Router();
 const Receipt = require("../models/receipt");
 const Gher = require("../models/gher");
 const PendingGher = require("../models/pendingGher");
 const Pher = require("../models/pher");
-const Guider = require("../models/guider");
 const User = require("../models/user");
 const Committer = require("../models/committer");
 const verifyRequest = require("../verifyPerrequest");
@@ -98,34 +110,34 @@ router.get(
     }
   }
 );
-router.patch(
-  "/updatePopPath/:id",
-  verifyRequest,
-  celebrate({
-    [Segments.PARAMS]: Joi.object().keys({
-      id: Joi.string().required(),
-    }),
-    [Segments.BODY]: Joi.object().keys({
-      popPath: Joi.string().required(),
-    }),
-  }),
-  async (req, res) => {
-    const { popPath } = req.body;
-    // UPDATE RECEIPT WITH POP-PATH
-    try {
-      const result = await Receipt.findByIdAndUpdate(
-        req.params.id,
-        {
-          popPath: popPath,
-        },
-        { new: true, runValidators: true, context: "query" }
-      );
-      res.status(200).send("POP Uploaded");
-    } catch (err) {
-      res.status(400).send(err.message);
-    }
-  }
-);
+// router.patch(
+//   "/updatePopPath/:id",
+//   verifyRequest,
+//   celebrate({
+//     [Segments.PARAMS]: Joi.object().keys({
+//       id: Joi.string().required(),
+//     }),
+//     [Segments.BODY]: Joi.object().keys({
+//       popPath: Joi.string().required(),
+//     }),
+//   }),
+//   async (req, res) => {
+//     const { popPath } = req.body;
+//     // UPDATE RECEIPT WITH POP-PATH
+//     try {
+//       const result = await Receipt.findByIdAndUpdate(
+//         req.params.id,
+//         {
+//           popPath: popPath,
+//         },
+//         { new: true, runValidators: true, context: "query" }
+//       );
+//       res.status(200).send("POP Uploaded");
+//     } catch (err) {
+//       res.status(400).send(err.message);
+//     }
+//   }
+// );
 
 router.patch(
   "/confirmpayment/",
@@ -137,7 +149,7 @@ router.patch(
       pher_name: Joi.string().required(),
       _id: Joi.string().required(),
       amount: Joi.number().integer().required(),
-      __v: Joi.number().integer().required(),
+      __v: Joi.number().integer(),
       createdAt: Joi.date().required(),
       gher_accountName: Joi.string().required(),
       gher_accountNo: Joi.string().required(),
@@ -145,11 +157,9 @@ router.patch(
       gher_name: Joi.string().required(),
       gher_phone: Joi.string().required(),
       isActivationFee: Joi.boolean().required(),
-      isConfirmed: Joi.boolean().required(),
-      isPurged: Joi.boolean().required(),
       pher_phone: Joi.string().required(),
-      popPath: Joi.string().allow(null).required(),
-      updatedAt: Joi.date().required(),
+      popImage: Joi.object().required(),
+      updatedAt: Joi.date(),
     }),
   }),
   async (req, res) => {
@@ -442,22 +452,8 @@ router.patch(
           }
         }
       }
-
-      // DELETE RECEIPT
-      const deleteReceipt = await Receipt.findByIdAndDelete(receiptId);
-      console.log("Receipt Deleted");
-      // DELETE POP IMAGE
-      if (popPath !== null) {
-        fs.unlink(`client/public/uploads/${popPath}`, (err) => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("POP was deleted");
-          }
-        });
-      } else {
-        console.log("POP is null");
-      }
+      const deleteReceipt = await Receipt.findOneAndDelete(receiptId);
+      console.log("receipt Deleted");
       res.status(200).send("Payment Confirmed!");
     } catch (error) {
       res.status(400).send(error.message);
@@ -474,7 +470,7 @@ router.patch(
       pher_name: Joi.string().required(),
       _id: Joi.string().required(),
       amount: Joi.number().integer().required(),
-      __v: Joi.number().integer().required(),
+      __v: Joi.number().integer(),
       createdAt: Joi.date().required(),
       gher_accountName: Joi.string().required(),
       gher_accountNo: Joi.string().required(),
@@ -482,11 +478,9 @@ router.patch(
       gher_name: Joi.string().required(),
       gher_phone: Joi.string().required(),
       isActivationFee: Joi.boolean().required(),
-      isConfirmed: Joi.boolean().required(),
-      isPurged: Joi.boolean().required(),
       pher_phone: Joi.string().required(),
-      popPath: Joi.string().allow(null).required(),
-      updatedAt: Joi.date().required(),
+      popImage: Joi.object().required(),
+      updatedAt: Joi.date(),
     }),
   }),
   async (req, res) => {
@@ -498,7 +492,6 @@ router.patch(
         amount,
         _id: receiptId,
         pher_name,
-        popPath,
       } = req.body;
       // SET PHER TO ISACTIVATED
       const activateNewUser = await User.findOneAndUpdate(
@@ -527,21 +520,6 @@ router.patch(
       const deleteFeeReceipt = await Receipt.findByIdAndDelete(receiptId);
       console.log("Fee Receipt Deleted");
 
-      //
-      // DELETE POP IMAGE
-      if (popPath !== null) {
-        fs.unlink(`client/public/uploads/${popPath}`, (err) => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("POP was deleted");
-          }
-        });
-      } else {
-        console.log("POP is null");
-      }
-      //
-      console.log("Fee Confirm Process Completed");
       res.status(200).send("Payment Confirmed");
     } catch (error) {
       res.status(400).send(error.message);
@@ -566,11 +544,9 @@ router.patch(
       gher_name: Joi.string().required(),
       gher_phone: Joi.string().required(),
       isActivationFee: Joi.boolean().required(),
-      isConfirmed: Joi.boolean(),
-      isPurged: Joi.boolean(),
       pher_phone: Joi.string().required(),
-      popPath: Joi.string().allow(null).required(),
-      updatedAt: Joi.date().required(),
+      popImage: Joi.object().required(),
+      updatedAt: Joi.date(),
     }),
   }),
   async (req, res) => {
@@ -640,6 +616,79 @@ router.get("/", verifyAdmin, async (req, res) => {
     res.json(foundReceipt);
   } catch (err) {
     res.json({ message: err });
+  }
+});
+router.post(
+  "/upload-pop/:id",
+  verifyRequest,
+  upload.single("file"),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      var image = fs.readFileSync(req.file.path);
+      var encode_image = image.toString("base64");
+      var finalImage = {
+        contentType: req.file.mimetype,
+        path: req.file.path,
+        data: Buffer.from(encode_image, "base64"),
+      };
+
+      const updateReceipt = await Receipt.findByIdAndUpdate(
+        id,
+        {
+          popImage: finalImage,
+        },
+        { new: true }
+      );
+      console.log("buffer updated");
+      fs.unlink(req.file.path, (err) => {
+        if (err) {
+          console.log(err.message);
+        } else {
+          console.log("image deleted");
+        }
+      });
+      res.status(200).send("POP Upload Successful!!");
+    } catch (err) {
+      console.log(err.message);
+      res.json({ message: err.message });
+    }
+  }
+);
+
+router.post("/new", async (req, res) => {
+  try {
+    const {
+      gher_name,
+      gher_email,
+      gher_accountName,
+      gher_accountNo,
+      gher_bank,
+      gher_phone,
+      pher_name,
+      pher_email,
+      pher_phone,
+      amount,
+      isActivationFee,
+    } = req.body;
+    let obj = {
+      gher_name: gher_name,
+      gher_email: gher_email,
+      gher_accountName: gher_accountName,
+      gher_accountNo: gher_accountNo,
+      gher_bank: gher_bank,
+      gher_phone: gher_phone,
+      pher_name: pher_name,
+      pher_email: pher_email,
+      pher_phone: pher_phone,
+      amount: amount,
+      isActivationFee: isActivationFee,
+    };
+    const makeReceipt = await new Receipt(obj).save();
+    res.send(makeReceipt);
+  } catch (err) {
+    console.log(err.message);
+    res.json({ message: err.message });
   }
 });
 

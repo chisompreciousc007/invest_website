@@ -61,14 +61,13 @@ function SignUp({ match }) {
           axios
             .post("/users/username", { username: user.username })
             .then((res) => {
-              console.log("res from check username", res);
               if (res.data === true)
                 setUsernameStatus("Already Exists, try another!");
               if (res.data === false) setUsernameStatus("Available");
             })
             .catch((err) => {
               // const errmsg = err.response.data;
-              setEmailStatus("Network Error!Failed to verify username");
+              setUsernameStatus("Network Error!Failed to verify username");
             });
         }
         break;
@@ -97,7 +96,7 @@ function SignUp({ match }) {
               if (res.data === false) setPhoneStatus("Available");
             })
             .catch((err) => {
-              setEmailStatus("Network Error!Failed to verify phone");
+              setPhoneStatus("Network Error!Failed to verify phone");
             });
         }
 

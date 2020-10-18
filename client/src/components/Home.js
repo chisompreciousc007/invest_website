@@ -86,7 +86,6 @@ function Home() {
           </div>
         </div>
       </header>
-
       <section id="header-image2" className="index_banner">
         <div className="index_banner_inner">
           <div className="container">
@@ -138,7 +137,6 @@ function Home() {
           </div>
         </div>
       </section>
-
       <section className="index_about" id="index_about_div">
         <div className="container">
           <div
@@ -307,7 +305,6 @@ function Home() {
           </div>
         </div>
       </section>
-
       <footer>
         <div className="footer_top">
           <div className="container">

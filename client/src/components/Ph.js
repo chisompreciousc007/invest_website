@@ -59,7 +59,7 @@ function PhComponent({
           marginLeft: "-15px",
         }}
       >
-        {pop == null ? (
+        {pop === null ? (
           <div className="col-md-4 col-sm-6 col-12">
             <form>
               <div
@@ -72,12 +72,14 @@ function PhComponent({
                 <div className="input-group mb-3">
                   <div className="custom-file">
                     <input
-                      accept="image/x-png,image/gif,image/jpeg"
+                      accept="image/*,"
                       onClick={() => IdSet()}
                       type="file"
                       className="custom-file-input"
                       id="inputGroupFile02"
                       onChange={fileSelect}
+                      encType="multipart/form-data"
+                      name="file"
                     />
                     {/* <label className="custom-file-label" htmlFor="inputGroupFile02" >{fileLabel}</label> */}
                   </div>

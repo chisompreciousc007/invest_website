@@ -59,27 +59,41 @@ function Dashboard() {
     formData.append("file", file);
     console.log("formdata: ", formData);
     try {
-      const res = await axios.post("/uploads", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      // const res = await axios.post("/uploads", formData, {
+      //   headers: {
+      //     "Content-Type": "multipart/form-data",
+      //   },
+      // });
+      const res = await axios.post(
+        `/receipts/upload-pop/${currentReceipt._id}`,
+        formData
+        // {
+        //   headers: {
+        //     "Content-Type": "multipart/form-data",
+        //   },
+        // }
+      );
+      setLoading(false);
+      setResponse(res.data);
+      setSuccess(true);
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
 
-      const { filePath } = res.data;
-      const obj = {
-        popPath: filePath,
-      };
-      console.log("image saved!");
-      axios
-        .patch(`/receipts/updatePopPath/${currentReceipt._id}`, obj)
-        .then((res) => {
-          setLoading(false);
-          setResponse(res.data);
-          setSuccess(true);
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
-        });
+      // const { filePath } = res.data;
+      // const obj = {
+      //   popPath: filePath,
+      // };
+      // axios
+      //   .patch(`/receipts/updatePopPath/${currentReceipt._id}`, obj)
+      //   .then((res) => {
+      //     setLoading(false);
+      //     setResponse(res.data);
+      //     setSuccess(true);
+      //     setTimeout(() => {
+      //       window.location.reload();
+      //     }, 1000);
+      //   });
     } catch (error) {
       if (error.response.status === 500) {
         setResponse("Server Error,Request Failed");
@@ -261,7 +275,7 @@ function Dashboard() {
               accountNumber={activationFee.gher_accountNo}
               bank={activationFee.gher_bank}
               phone={activationFee.gher_phone}
-              pop={activationFee.popPath}
+              pop={activationFee.popImage.data}
               amount={1000}
               time={format(
                 addHours(new Date(activationFee.createdAt), 8),
@@ -295,7 +309,7 @@ function Dashboard() {
                 bank={el.gher_bank}
                 phone={el.gher_phone}
                 amount={el.amount}
-                pop={el.popPath}
+                pop={el.popImage.data}
                 time={format(
                   addHours(new Date(el.createdAt), 8),
                   "MMM-dd' 'hh:mm aaaa"
@@ -324,7 +338,7 @@ function Dashboard() {
                 )}
                 confirm={confirmFeeHandler}
                 purge={purgeHandler}
-                pop={el.popPath}
+                pop={el.popImage.data}
                 IdSet={() => setCurrentReceipt(el)}
               />
             ))}
@@ -342,7 +356,7 @@ function Dashboard() {
                 )}
                 confirm={confirmPaymentHandler}
                 purge={purgeHandler}
-                pop={el.popPath}
+                pop={el.popImage.data}
                 IdSet={() => setCurrentReceipt(el)}
               />
             ))}

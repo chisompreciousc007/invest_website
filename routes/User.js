@@ -291,7 +291,6 @@ router.patch(
     try {
       // INPUTS
       const { _id: id, email, investAmt, pledge } = req.body;
-      console.log(investAmt);
       if (pledge > investAmt) {
         return res.status(400).send(`Recommit must be greater than ${pledge}`);
       }

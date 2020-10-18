@@ -12,10 +12,21 @@ const ReceiptSchema = new mongoose.Schema(
     pher_email: { type: String },
     pher_phone: { type: String },
     amount: { type: Number },
-    isConfirmed: { type: Boolean, default: false },
     isActivationFee: { type: Boolean, default: false },
-    isPurged: { type: Boolean, default: false },
-    popPath: { type: String, default: null },
+    popImage: {
+      contentType: {
+        type: String,
+        default: null,
+      },
+      path: {
+        type: String,
+        default: null,
+      },
+      data: {
+        type: Buffer,
+        default: null,
+      },
+    },
   },
   { timestamps: true }
 );

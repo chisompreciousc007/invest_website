@@ -8,11 +8,18 @@ function PhComponent({
   confirm,
   purge,
   pop,
-  IdSet, title
+  IdSet,
+  title,
 }) {
   const [button, setbutton] = useState(false);
   const [button2, setbutton2] = useState(false);
   const working = () => IdSet();
+  function arrayBufferToBase64(buffer) {
+    var binary = "";
+    var bytes = [].slice.call(new Uint8Array(buffer));
+    bytes.forEach((b) => (binary += String.fromCharCode(b)));
+    return window.btoa(binary);
+  }
   return (
     <div
       style={{
@@ -117,15 +124,15 @@ function PhComponent({
         </div>
       )}
 
-      {!pop ? (
+      {pop === undefined || pop === null ? (
         <p>No POP available</p>
       ) : (
         <div className="row">
           <div className="col-md-4 col-sm-6 col-xs-12  ml-2">
             {" "}
             <img
-              src={`${window.location.origin }/uploads/${pop}`}
-              style={{ height: "400px", width: "100%",paddingBottom: "8px" }}
+              src={`data:image/*;base64,${arrayBufferToBase64(pop.data)}`}
+              style={{ height: "400px", width: "100%", paddingBottom: "8px" }}
               alt="POP"
             />
           </div>{" "}

@@ -1,19 +1,15 @@
 const express = require("express");
-const fileUpload = require("express-fileupload");
+// const fileUpload = require("express-fileupload");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
-
 require("dotenv/config");
-
 const path = require("path");
 const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 const { errors } = require("celebrate");
 const userRouter = require("./routes/User");
-const uploadRouter = require("./routes/Upload");
-
 const receiptRouter = require("./routes/Receipt");
 const guiderRouter = require("./routes/Guider");
 const pherRouter = require("./routes/Pher");
@@ -48,14 +44,16 @@ const apiLimiter = rateLimit({
 // };
 
 app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+// app.use(express.urlencoded({ limit: "50mb" }));
 app.use(cookieParser());
-app.use(fileUpload());
+// app.use(fileUpload());
 
 app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
-    extended: false,
+    extended: true,
+    limit: "50mb",
   })
 );
 app.use(
@@ -69,7 +67,6 @@ app.use(errors());
 // app.use("/users", apiLimiter);
 // app.use("/uploads", apiLimiter);
 app.use("/users", userRouter);
-app.use("/uploads", uploadRouter);
 app.use("/receipts", receiptRouter);
 app.use("/phers", pherRouter);
 app.use("/ghers", gherRouter);

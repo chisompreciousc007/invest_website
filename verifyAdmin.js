@@ -21,12 +21,10 @@ module.exports = function (req, res, next) {
     return "";
   };
   const token = getCookie("token");
-  console.log();
 
   if (!token) return res.status(400).send("ACCESS DENIED");
   try {
     const verified = jwt.verify(token, process.env.SECRET);
-    console.log(verified);
     if (verified._id === "5f7ec49437499e0db0cf1592") {
       return next();
     }

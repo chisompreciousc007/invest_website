@@ -55,8 +55,7 @@ function Transactions() {
         return window.location.reload();
       }
       console.log(err.response);
-      setResponse(err.response.data);
-      setError(true);
+      history.push("/login");
     }
   };
   useEffect(() => {

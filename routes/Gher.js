@@ -1,9 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const Gher = require("../models/gher");
+const OutstandingGher = require("../models/outstandingGher");
+const OneDayGher = require("../models/1DGher");
+const FourDayGher = require("../models/4DGher");
+const SevenDayGher = require("../models/7DGher");
 const PendingGher = require("../models/pendingGher");
 const User = require("../models/user");
 const { celebrate, Joi, Segments } = require("celebrate");
+const verifyAdmin = require("../verifyAdmin");
 
 router.post(
   "/:id",
@@ -62,7 +67,7 @@ router.delete(
   }
 );
 
-router.get("/", async (req, res) => {
+router.get("/all-details", async (req, res) => {
   try {
     const foundGher = await Gher.find();
     res.json(foundGher);
@@ -70,15 +75,47 @@ router.get("/", async (req, res) => {
     res.json({ message: err });
   }
 });
-router.get("/admin", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const foundGher = await Gher.find({ isPaired: false }, "email amount");
+    const foundGher = await Gher.find({}, "email amount");
     res.json(foundGher);
   } catch (err) {
     res.json({ message: err });
   }
 });
-router.get("/pending", async (req, res) => {
+router.get("/1D", verifyAdmin, async (req, res) => {
+  try {
+    const foundGher = await OneDayGher.find({}, "email amount");
+    res.json(foundGher);
+  } catch (err) {
+    res.json({ message: err });
+  }
+});
+router.get("/4D", verifyAdmin, async (req, res) => {
+  try {
+    const foundGher = await FourDayGher.find({}, "email amount");
+    res.json(foundGher);
+  } catch (err) {
+    res.json({ message: err });
+  }
+});
+router.get("/7D", verifyAdmin, async (req, res) => {
+  try {
+    const foundGher = await SevenDayGher.find({}, "email amount");
+    res.json(foundGher);
+  } catch (err) {
+    res.json({ message: err });
+  }
+});
+router.get("/outstanding", verifyAdmin, async (req, res) => {
+  try {
+    const foundGher = await OutstandingGher.find({}, "email amount");
+    res.json(foundGher);
+  } catch (err) {
+    res.json({ message: err });
+  }
+});
+router.get("/pending", verifyAdmin, async (req, res) => {
   try {
     const foundPendingGher = await PendingGher.find({}, "email amount");
     res.json(foundPendingGher);
@@ -88,10 +125,28 @@ router.get("/pending", async (req, res) => {
 });
 router.get("/:email", async (req, res) => {
   try {
-    const foundGher = await Gher.findOne({ email: req.params.email }, "amount");
-    if (foundGher == null) return res.status(200).send({ ghStatus: {} });
-    if (foundGher.amount == 0) return res.status(200).send({ ghStatus: {} });
-    res.status(200).json({ ghStatus: foundGher });
+    const oneDayGher = await OneDayGher.findOne(
+      { email: req.params.email },
+      "amount"
+    );
+    const fourDayGher = await FourDayGher.findOne(
+      { email: req.params.email },
+      "amount"
+    );
+    const sevenDayGher = await SevenDayGher.findOne(
+      { email: req.params.email },
+      "amount"
+    );
+    const verify = (v) => {
+      if (v === null) return 0;
+      return v.amount;
+    };
+    const totalAmt =
+      verify(oneDayGher) + verify(fourDayGher) + verify(sevenDayGher);
+    if (totalAmt == 0) return res.status(200).send({ ghStatus: {} });
+    res
+      .status(200)
+      .json({ ghStatus: { email: req.params.email, amount: totalAmt } });
   } catch (err) {
     res.status(400).send(err.message);
   }

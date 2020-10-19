@@ -14,11 +14,15 @@ function Transactions() {
   const [reading, setReading] = useState(true);
   const [loading, setloading] = useState(false);
   const [response, setResponse] = useState(null);
-  const [ghers, setGhers] = useState([]);
+  const [outstandingghers, setOutstandingGhers] = useState([]);
+  const [fourDayghers, setFourDayGhers] = useState([]);
+  const [oneDayghers, setOneDayGhers] = useState([]);
+  const [sevenDayghers, setSevenDayGhers] = useState([]);
   const [phers, setPhers] = useState([]);
   const [pendingGhers, setPendingGhers] = useState([]);
   const [users, setUsers] = useState([]);
-  const [ghEmail, setghEmail] = useState({ email: "" });
+  const [receipts, setReceipts] = useState([]);
+  const [ghData, setGhData] = useState({ email: "", amount: null });
 
   const getUserData = async () => {
     try {
@@ -27,18 +31,37 @@ function Transactions() {
         // setLoading(false);
         return console.log("already gotten user data");
       }
-      const usersData = await axios.get("/users/admin", {
+      const usersData = await axios.get("/users/", {
         withCredentials: true,
       });
       console.log("user data", usersData.data);
       if (usersData.data === "blocked") return history.push("/contactSupport");
       setUsers((prevState) => [...prevState, ...usersData.data]);
-      const ghersData = await axios.get(`/ghers/admin`, {
+
+      const receiptsData = await axios.get(`/receipts`, {
         withCredentials: true,
       });
-      console.log("gher data", ghersData.data);
-      setGhers((prevState) => [...prevState, ...ghersData.data]);
-      const phersData = await axios.get(`/phers/admin`, {
+      console.log("receipts data", receiptsData.data);
+      setReceipts((prevState) => [...prevState, ...receiptsData.data]);
+      const oneDayghersData = await axios.get(`/ghers/1D`, {
+        withCredentials: true,
+      });
+      console.log("1daygher data", oneDayghersData.data);
+      setOneDayGhers((prevState) => [...prevState, ...oneDayghersData.data]);
+      const fourDayghersData = await axios.get(`/ghers/4D`, {
+        withCredentials: true,
+      });
+      console.log("4daygher data", fourDayghersData.data);
+      setFourDayGhers((prevState) => [...prevState, ...fourDayghersData.data]);
+      const sevenDayghersData = await axios.get(`/ghers/7D`, {
+        withCredentials: true,
+      });
+      console.log("7daygher data", sevenDayghersData.data);
+      setSevenDayGhers((prevState) => [
+        ...prevState,
+        ...sevenDayghersData.data,
+      ]);
+      const phersData = await axios.get(`/phers`, {
         withCredentials: true,
       });
       console.log("pher data", phersData.data);
@@ -48,6 +71,14 @@ function Transactions() {
       });
       console.log("pendingGher data", pendingGhersData.data);
       setPendingGhers((prevState) => [...prevState, ...pendingGhersData.data]);
+      const outstandingGhersData = await axios.get(`/ghers/outstanding`, {
+        withCredentials: true,
+      });
+      console.log("outGher data", outstandingGhersData.data);
+      setOutstandingGhers((prevState) => [
+        ...prevState,
+        ...outstandingGhersData.data,
+      ]);
       setReading(false);
     } catch (err) {
       if (err.response.status === 500) {
@@ -61,16 +92,16 @@ function Transactions() {
   useEffect(() => {
     getUserData();
   }, []);
-  const firstcommitHandler = async () => {
+  const OneDayGhHandler = async () => {
     try {
       setloading(true);
-      const firstcommit = await axios.get(`/receipts/automatch-firstcommit`, {
+      const res = await axios.get(`/receipts/automatch-1DayGher`, {
         withCredentials: true,
       });
       setloading(false);
-      setResponse(firstcommit.data);
+      setResponse(res.data);
       setSuccess(true);
-      console.log("firstcommit response", firstcommit.data);
+      console.log("1daygher response", res.data);
     } catch (err) {
       setloading(false);
       if (err.response.status === 500) {
@@ -82,16 +113,59 @@ function Transactions() {
       setError(true);
     }
   };
-  const NonFirstcommitHandler = async () => {
+  const FourDayGhHandler = async () => {
     try {
       setloading(true);
-      const NonFirstCommit = await axios.get(
-        `/receipts/automatch-otherCommits`
-      );
+      const res = await axios.get(`/receipts/automatch-4DayGher`, {
+        withCredentials: true,
+      });
       setloading(false);
-      setResponse(NonFirstCommit.data);
+      setResponse(res.data);
       setSuccess(true);
-      console.log("Nonfirstcommit response", NonFirstCommit.data);
+      console.log("1daygher response", res.data);
+    } catch (err) {
+      setloading(false);
+      if (err.response.status === 500) {
+        console.log("there was a problem with the server");
+        return window.location.reload();
+      }
+      console.log(err.response);
+      setResponse(err.response.data);
+      setError(true);
+    }
+  };
+  const SevenDayGhHandler = async () => {
+    try {
+      setloading(true);
+      const res = await axios.get(`/receipts/automatch-7DayGher`, {
+        withCredentials: true,
+      });
+      setloading(false);
+      setResponse(res.data);
+      setSuccess(true);
+      console.log("1daygher response", res.data);
+    } catch (err) {
+      setloading(false);
+      if (err.response.status === 500) {
+        console.log("there was a problem with the server");
+        return window.location.reload();
+      }
+      console.log(err.response);
+      setResponse(err.response.data);
+      setError(true);
+    }
+  };
+
+  const OutstandingGhHandler = async () => {
+    try {
+      setloading(true);
+      const res = await axios.get(`/receipts/automatch-outGher`, {
+        withCredentials: true,
+      });
+      setloading(false);
+      setResponse(res.data);
+      setSuccess(true);
+      console.log("outgher response", res.data);
     } catch (err) {
       setloading(false);
       if (err.response.status === 500) {
@@ -107,14 +181,11 @@ function Transactions() {
     e.preventDefault();
     try {
       setloading(true);
-      const matchUser = await axios.patch(
-        `/receipts/match-a-user-instant`,
-        ghEmail
-      );
+      const res = await axios.patch(`/receipts/match-a-user-instant`, ghData);
       setloading(false);
-      setResponse(matchUser.data);
+      setResponse(res.data);
       setSuccess(true);
-      console.log("matchUser response", matchUser.data);
+      console.log("matchUser response", res.data);
     } catch (err) {
       setloading(false);
       if (err.response.status === 500) {
@@ -130,7 +201,7 @@ function Transactions() {
     e.preventDefault();
     let key = e.target.name;
     let value = e.target.value;
-    setghEmail((prev) => ({ ...prev, [key]: value }));
+    setGhData((prev) => ({ ...prev, [key]: value }));
   };
   if (reading) return <Spinner />;
   return (
@@ -212,18 +283,18 @@ function Transactions() {
 
                 <div className="col-sm-6 col-xs-6">
                   <div className="summary_box">
-                    <h3>GH</h3>
+                    <h3>7DayGH</h3>
                     <h6>
                       No :
                       <b id="total_balance">
-                        {ghers.length ? ghers.length : 0}
+                        {sevenDayghers.length ? sevenDayghers.length : 0}
                       </b>
                     </h6>
                     <h6>
                       Amount :
                       <b id="total_balance">
-                        {ghers.length
-                          ? ghers
+                        {sevenDayghers.length
+                          ? sevenDayghers
                               .map((el) => el.amount)
                               .reduce((a, b) => a + b, 0)
                           : 0}
@@ -283,53 +354,163 @@ function Transactions() {
                   </div>
                 </div>
               </div>
+              <div
+                className="row"
+                style={{
+                  width: "80%",
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                }}
+              >
+                <div className="col-sm-6 col-xs-6">
+                  <div className="summary_box">
+                    <h3>oneDayGh</h3>
+                    <h6>
+                      No :
+                      <b id="total_balance">
+                        {oneDayghers.length ? oneDayghers.length : 0}
+                      </b>
+                    </h6>
+                    <h6>
+                      Amount :
+                      <b id="total_balance">
+                        {oneDayghers.length
+                          ? oneDayghers
+                              .map((el) => el.amount)
+                              .reduce((a, b) => a + b, 0)
+                          : 0}
+                      </b>
+                    </h6>
+                  </div>
+                </div>
+                <div className="col-sm-6 col-xs-6">
+                  <div className="summary_box">
+                    <h3>4dayGH</h3>
+                    <h6>
+                      No :
+                      <b id="total_balance">
+                        {fourDayghers.length ? fourDayghers.length : 0}
+                      </b>
+                    </h6>
+                    <h6>
+                      Amount :
+                      <b id="total_balance">
+                        {fourDayghers.length
+                          ? fourDayghers
+                              .map((el) => el.amount)
+                              .reduce((a, b) => a + b, 0)
+                          : 0}
+                      </b>
+                    </h6>
+                  </div>
+                </div>
+              </div>
+              <div
+                className="row"
+                style={{
+                  width: "80%",
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                }}
+              >
+                <div className="col-sm-6 col-xs-6">
+                  <div className="summary_box">
+                    <h3>outstandingGh</h3>
+                    <h6>
+                      No :
+                      <b id="total_balance">
+                        {outstandingghers.length ? outstandingghers.length : 0}
+                      </b>
+                    </h6>
+                    <h6>
+                      Amount :
+                      <b id="total_balance">
+                        {outstandingghers.length
+                          ? outstandingghers
+                              .map((el) => el.amount)
+                              .reduce((a, b) => a + b, 0)
+                          : 0}
+                      </b>
+                    </h6>
+                  </div>
+                </div>
+                <div className="col-sm-6 col-xs-6">
+                  <div className="summary_box">
+                    <h3>Receipts</h3>
+                    <h6>
+                      No :
+                      <b id="total_balance">
+                        {receipts.length ? receipts.length : 0}
+                      </b>
+                    </h6>
+                    <h6>
+                      Amount :
+                      <b id="total_balance">
+                        {receipts.length
+                          ? receipts
+                              .map((el) => el.amount)
+                              .reduce((a, b) => a + b, 0)
+                          : 0}
+                      </b>
+                    </h6>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div className="row">
-            <div className="col-xs-4">
+            <div className="col-xs-3">
               <div className="hashpower_left">
-                <button className="btn btn-white" onClick={firstcommitHandler}>
-                  MergefirstTime
+                <button className="btn btn-white" onClick={OneDayGhHandler}>
+                  Merge1dayGh
                 </button>
               </div>
             </div>
-            <div className="col-xs-1"></div>
-            <div className="col-xs-4">
+            <div className="col-xs-3">
+              <div className="hashpower_right">
+                <button className="btn btn-primary" onClick={FourDayGhHandler}>
+                  Merge4DayGh
+                </button>
+              </div>
+            </div>
+            <div className="col-xs-3">
+              <div className="hashpower_right">
+                <button className="btn btn-primary" onClick={SevenDayGhHandler}>
+                  Merge7DayGh
+                </button>
+              </div>
+            </div>
+            <div className="col-xs-3">
               <div className="hashpower_right">
                 <button
                   className="btn btn-primary"
-                  onClick={NonFirstcommitHandler}
+                  onClick={OutstandingGhHandler}
                 >
-                  MergeOtherTime
+                  MergeOutstandingGh
                 </button>
               </div>
             </div>
           </div>
           <br />
           <form name="mainform">
-            {/* <div className="col-sm-6 col-xs-12">
-              <div className="form_box form_box_login">
-                <span>
-                  <input
-                    placeholder="Payer"
-                    value=""
-                    type="text"
-                    name="username"
-                    className="inpts"
-                    size="30"
-                  />
-                </span>
-              </div>
-            </div> */}
-
             <div className="col-sm-8 col-xs-12">
               {" "}
               <div className="form_box form_box_login">
                 <span>
                   <input
                     placeholder="User Email for GH"
-                    type="text"
+                    type="email"
                     name="email"
+                    className="inpts"
+                    size="30"
+                    required
+                    onChange={inputHandler}
+                  />
+
+                  <input
+                    placeholder="Amount for GH"
+                    type="number"
+                    name="amount"
                     className="inpts"
                     size="30"
                     required
@@ -351,79 +532,9 @@ function Transactions() {
             style={{ marginTop: " 20px", marginBottom: "20px" }}
           >
             <div className="row">
-              <div className="col-md-10 col-sm-12">
-                {/* <table
-                  cellSpacing="1"
-                  cellPadding="2"
-                  border="0"
-                  width="100%"
-                  className="tab"
-                >
-                  <tbody>
-                    <tr>
-                      <td className="inheader">
-                        <b>PH</b>
-                      </td>
-                      <td className="inheader" width="200">
-                        <b>Name</b>
-                      </td>
-                      <td className="inheader" width="170">
-                        <b>Amount</b>
-                      </td>
-                    </tr>
-                    {investHistory.map((el, index) => (
-                      <tr key={index}>
-                        <td className="inheader">
-                          <b>{index + 1}</b>
-                        </td>
-                        <td className="inheader" width="200">
-                          <b>{el.name}</b>
-                        </td>
-                        <td className="inheader" width="170">
-                          <b>{el.amount}</b>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table> */}
-              </div>
+              <div className="col-md-10 col-sm-12"></div>
               <br />
-              <div className="col-md-10 col-sm-12">
-                {/* <table
-                  cellSpacing="1"
-                  cellPadding="2"
-                  border="0"
-                  width="100%"
-                  className="tab"
-                >
-                  <tbody>
-                    <tr>
-                      <td className="inheader">
-                        <b>GH</b>
-                      </td>
-                      <td className="inheader" width="200">
-                        <b>Name</b>
-                      </td>
-                      <td className="inheader" width="170">
-                        <b>Amount</b>
-                      </td>
-                    </tr>
-                    {cashoutHistory.map((el, index) => (
-                      <tr key={index}>
-                        <td className="inheader">
-                          <b>{index + 1}</b>
-                        </td>
-                        <td className="inheader" width="200">
-                          <b>{el.name}</b>
-                        </td>
-                        <td className="inheader" width="170">
-                          <b>{el.amount}</b>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table> */}
-              </div>
+              <div className="col-md-10 col-sm-12"></div>
             </div>
             <br />
             <br />

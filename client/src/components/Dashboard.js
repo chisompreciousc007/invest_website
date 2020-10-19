@@ -52,17 +52,6 @@ function Dashboard() {
                 ...res.data,
               }));
             });
-          axios
-            .get(`/ghers/${res.data.email}`, {
-              withCredentials: true,
-            })
-            .then((res) => {
-              setUser((prevState) => ({
-                ...prevState,
-                ...res.data,
-              }));
-              // setLoading(false);
-            });
         })
         .catch((err) => {
           if (err.response.status === 500) {

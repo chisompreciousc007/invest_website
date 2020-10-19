@@ -5,6 +5,10 @@ const router = express.Router();
 const User = require("../models/user");
 const Pher = require("../models/pher");
 const Guider = require("../models/guider");
+const OutstandingGher = require("../models/outstandingGher");
+const OneDayGher = require("../models/1DGher");
+const FourDayGher = require("../models/4DGher");
+const SevenDayGher = require("../models/7DGher");
 const verify = require("../verifytoken");
 const verifyRequest = require("../verifyPerrequest");
 const verifyAdmin = require("../verifyAdmin");
@@ -251,7 +255,7 @@ router.post(
     }
   }
 );
-router.get("/", verifyAdmin, async (req, res) => {
+router.get("/all-details", verifyAdmin, async (req, res) => {
   try {
     const foundUser = await User.find();
     res.json(foundUser);
@@ -259,7 +263,7 @@ router.get("/", verifyAdmin, async (req, res) => {
     res.json({ message: err });
   }
 });
-router.get("/admin", verifyAdmin, async (req, res) => {
+router.get("/", verifyAdmin, async (req, res) => {
   try {
     const foundUser = await User.find({}, "isActivated isBlocked");
     res.json(foundUser);
@@ -292,34 +296,44 @@ router.patch(
       // INPUTS
       const { _id: id, email, investAmt, pledge } = req.body;
       if (pledge > investAmt) {
-        return res.status(400).send(`Recommit must be greater than ${pledge}`);
+        return res
+          .status(400)
+          .send(`Investment must be equal or greater than ${pledge}`);
       }
-      const updatedUser = await User.findByIdAndUpdate(
-        id,
-        {
-          pledge: investAmt,
-          wantToInvest: true,
-          recommit: true,
-        },
-        { new: true, runValidators: true, context: "query" }
-      );
-      const checkDB = await Pher.countDocuments({ email: email });
-      if (!checkDB) {
-        const createPher = await new Pher({
-          email: email,
-          amount: investAmt,
-        }).save();
-        res.status(200).send("Commit Request Successful");
-      } else {
-        const updatePher = await Pher.findOneAndUpdate(
-          {
-            email: email,
-          },
-          { amount: investAmt, isPaired: false }
-        );
-        console.log("Updated Pher Amt for User");
-        res.status(200).json(updatePher);
+      // CHECK IF THERE IS PENDING TRANSACTION
+      const checkForPher = await Pher.findOne({
+        email: email,
+      });
+      const checkOneDayGher = await OneDayGher.findOne({
+        email: email,
+      });
+      const checkFourDayGher = await FourDayGher.findOne({ email: email });
+      const checkSevenDayGher = await SevenDayGher.findOne({ email: email });
+      const checkOutstandingGher = await OutstandingGher.findOne({
+        email: email,
+      });
+      if (
+        checkForPher !== null ||
+        checkOneDayGher !== null ||
+        checkFourDayGher !== null ||
+        checkSevenDayGher !== null ||
+        checkOutstandingGher !== null
+      ) {
+        return res
+          .status(400)
+          .send(
+            `You have a pending transaction(GH/PH) so you cannot invest yet`
+          );
       }
+
+      const updatedUser = await User.findByIdAndUpdate(id, {
+        pledge: investAmt,
+      });
+      const createPher = await new Pher({
+        email: email,
+        amount: investAmt,
+      }).save();
+      res.status(200).send("Commit Request Successful");
     } catch (error) {
       console.log("error from submit amount");
       res.status(400).send(error.message);

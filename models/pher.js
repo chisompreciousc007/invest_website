@@ -9,10 +9,6 @@ const PherSchema = new mongoose.Schema(
     amount: {
       type: Number,
     },
-    isPaired: {
-      type: Boolean,
-      default: false,
-    },
   },
   { timestamps: true }
 );

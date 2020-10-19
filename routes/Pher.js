@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const Pher = require("../models/pher");
-const PendingGher = require("../models/pendingGher");
 const User = require("../models/user");
 const { celebrate, Joi, Segments } = require("celebrate");
+const verifyAdmin = require("../verifyAdmin");
 
 router.post(
   "/:id",
@@ -62,7 +62,7 @@ router.delete(
   }
 );
 
-router.get("/", async (req, res) => {
+router.get("/all-detail", async (req, res) => {
   try {
     const foundPher = await Pher.find();
     res.json(foundPher);
@@ -70,9 +70,9 @@ router.get("/", async (req, res) => {
     res.json({ message: err });
   }
 });
-router.get("/admin", async (req, res) => {
+router.get("/", verifyAdmin, async (req, res) => {
   try {
-    const foundPher = await Pher.find({ isPaired: false }, "email amount");
+    const foundPher = await Pher.find({}, "email amount");
     res.json(foundPher);
   } catch (err) {
     res.json({ message: err });

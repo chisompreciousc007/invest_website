@@ -1,6 +1,6 @@
 import React from "react";
 
-function SelectAmount({ submitAmount, SelectAmount, recommit }) {
+function SelectAmount({ submitAmount, SelectAmount }) {
   return (
     <div className="form-group">
       <select
@@ -35,8 +35,13 @@ function SelectAmount({ submitAmount, SelectAmount, recommit }) {
         className="btn btn-primary"
         onClick={submitAmount}
       >
-        {recommit ? "Recommit" : "Commit"}
+        Invest
       </button>
+      <p>
+        <small style={{ color: "white" }}>
+          Invest only when you have no pending transactions(PH/GH)
+        </small>
+      </p>
     </div>
   );
 }

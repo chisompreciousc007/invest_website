@@ -23,8 +23,8 @@ function Dashboard() {
   const [selectAmount, setSelectAmount] = useState(5000);
   const { user, setUser } = useContext(UserContext);
   const [response, setResponse] = useState(null);
-  const { _id, email, isActivated, wantToInvest, recommit, pledge } = user.user;
-  const { payArr, getArr, guiderArr, activationFee } = user;
+  const { _id, email, isActivated, wantToInvest, pledge } = user.user;
+  const { payArr, getArr, guiderArr, activationFee, phStatus, ghStatus } = user;
   const isEmpty = (obj) => {
     for (var i in obj) {
       return false;
@@ -206,16 +206,6 @@ function Dashboard() {
                 ...prevState,
                 ...res.data,
               }));
-            });
-          axios
-            .get(`/ghers/${res.data.email}`, {
-              withCredentials: true,
-            })
-            .then((res) => {
-              setUser((prevState) => ({
-                ...prevState,
-                ...res.data,
-              }));
               setLoading(false);
             });
         })
@@ -284,19 +274,22 @@ function Dashboard() {
               )}
             />
           )}
-          {isActivated && !isEmpty(user.ghStatus) && (
+          {isActivated && !isEmpty(ghStatus) && (
             <h4 style={{ color: "goldenrod" }}>
-              Your are now eligible for GH of NGN{user.ghStatus.amount}, You
-              will be matched shortly.
+              Your are now eligible for GH of NGN{ghStatus.amount}, You will be
+              matched shortly.
             </h4>
           )}
-          {isActivated && !wantToInvest && (
-            <SelectAmount
-              submitAmount={submitAmountHandler}
-              SelectAmount={selectAmountHandler}
-              recommit={recommit}
-            />
-          )}
+          {isActivated &&
+            phStatus === null &&
+            isEmpty(ghStatus) &&
+            payArr.length === 0 &&
+            getArr.length === 0 && (
+              <SelectAmount
+                submitAmount={submitAmountHandler}
+                SelectAmount={selectAmountHandler}
+              />
+            )}
           {isActivated &&
             payArr.length && //    ITERATE THROUGH LIST
             payArr.map((el) => (
@@ -318,7 +311,7 @@ function Dashboard() {
                 IdSet={() => setCurrentReceipt(el)}
               />
             ))}
-          {isActivated && wantToInvest && !payArr.length && (
+          {isActivated && phStatus !== null && (
             //    ITERATE THROUGH LIST
             <h4 style={{ color: "goldenrod" }}>
               You will be Matched within the next few hours for your PH

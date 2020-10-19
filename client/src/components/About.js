@@ -104,7 +104,10 @@ function About() {
       <div className="bottom_body inner_page_body">
         <section className="index_about">
           <div className="container">
-            <div className="index_about_inner" style={{background:"#0e010100"}}>
+            <div
+              className="index_about_inner"
+              style={{ background: "#0e010100" }}
+            >
               <div className="row">
                 <div className="col-sm-12">
                   <h2 className="common_heading">Welcome to Splashcash247</h2>
@@ -306,15 +309,7 @@ function About() {
                       />
                     </div>
                   </div>
-                  <div className="item">
-                    <div className="secure_inner">
-                      <img
-                        src="images/secure_icon_3.png"
-                        alt="secure_icon"
-                        className="img-responsive"
-                      />
-                    </div>
-                  </div>
+
                   <div className="item">
                     <div className="secure_inner">
                       <img

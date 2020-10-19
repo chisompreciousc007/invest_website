@@ -44,7 +44,7 @@ function Footer() {
                         </div>
                       </div>
                     </div>
-                    <div className="owl-item" style={{ width: "276px" }}>
+                    {/* <div className="owl-item" style={{ width: "276px" }}>
                       <div className="item">
                         <div className="secure_inner">
                           <img
@@ -54,7 +54,7 @@ function Footer() {
                           />
                         </div>
                       </div>
-                    </div>
+                    </div> */}
                     <div className="owl-item" style={{ width: "276px" }}>
                       <div className="item">
                         <div className="secure_inner">

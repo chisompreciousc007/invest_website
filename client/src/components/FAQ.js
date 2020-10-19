@@ -280,15 +280,7 @@ function Faq() {
                     />
                   </div>
                 </div>
-                <div className="item">
-                  <div className="secure_inner">
-                    <img
-                      src="images/secure_icon_3.png"
-                      alt="secure_icon"
-                      className="img-responsive"
-                    />
-                  </div>
-                </div>
+
                 <div className="item">
                   <div className="secure_inner">
                     <img

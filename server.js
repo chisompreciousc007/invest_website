@@ -43,9 +43,7 @@ const apiLimiter = rateLimit({
 
 app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 app.use(express.json({ limit: "50mb" }));
-// app.use(express.urlencoded({ limit: "50mb" }));
 app.use(cookieParser());
-// app.use(fileUpload());
 
 app.use(bodyParser.json());
 app.use(
@@ -61,9 +59,11 @@ app.use(
   })
 );
 app.use(errors());
-// app.use("/receipts", apiLimiter);
-// app.use("/users", apiLimiter);
-// app.use("/uploads", apiLimiter);
+app.use("/receipts", apiLimiter);
+app.use("/users", apiLimiter);
+app.use("/phers", apiLimiter);
+app.use("/ghers", apiLimiter);
+app.use("/guiders", apiLimiter);
 app.use("/users", userRouter);
 app.use("/receipts", receiptRouter);
 app.use("/phers", pherRouter);

@@ -11,7 +11,6 @@ import { addHours, format } from "date-fns";
 
 function Dashboard() {
   const history = useHistory();
-  // const [loading, setLoading] = useState(true);
   const { user, setUser } = useContext(UserContext);
   const [error, setError] = useState(false);
   const [response, setResponse] = useState(null);

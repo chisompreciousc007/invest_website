@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const Gher = require("../models/gher");
 const OutstandingGher = require("../models/outstandingGher");
 const OneDayGher = require("../models/1DGher");
 const FourDayGher = require("../models/4DGher");
@@ -8,14 +7,6 @@ const SevenDayGher = require("../models/7DGher");
 const PendingGher = require("../models/pendingGher");
 const verifyAdmin = require("../verifyAdmin");
 
-router.get("/", async (req, res) => {
-  try {
-    const foundGher = await Gher.find({}, "email amount");
-    res.json(foundGher);
-  } catch (err) {
-    res.json({ message: err });
-  }
-});
 router.get("/1D", verifyAdmin, async (req, res) => {
   try {
     const foundGher = await OneDayGher.find({}, "email amount");

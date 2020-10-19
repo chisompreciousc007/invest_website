@@ -13,7 +13,6 @@ const receiptRouter = require("./routes/Receipt");
 const guiderRouter = require("./routes/Guider");
 const pherRouter = require("./routes/Pher");
 const gherRouter = require("./routes/Gher");
-const committerRouter = require("./routes/Committer");
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -70,7 +69,6 @@ app.use("/receipts", receiptRouter);
 app.use("/phers", pherRouter);
 app.use("/ghers", gherRouter);
 app.use("/guiders", guiderRouter);
-app.use("/committers", committerRouter);
 app.use("/public", express.static("public"));
 
 if ((process.env.NODE_ENV || "").trim() === "production") {

@@ -27,21 +27,29 @@ const { compareAsc, addHours } = require("date-fns");
 require("dotenv/config");
 const fs = require("fs");
 const { celebrate, Joi, Segments } = require("celebrate");
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const autheToken = process.env.TWILIO_AUTHE_TOKEN;
-const client = require("twilio")(accountSid, autheToken);
+const smsToken = process.env.BULK_SMS_TOKEN;
+// const accountSid = process.env.TWILIO_ACCOUNT_SID;
+// const autheToken = process.env.TWILIO_AUTHE_TOKEN;
+// const client = require("twilio")(accountSid, autheToken);
+const axios = require("axios");
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const { TelegramClient } = require("messaging-api-telegram");
 const clientTelegram = new TelegramClient({
   accessToken: BOT_TOKEN,
 });
 
-const sendSMS = (name, number) =>
-  client.messages.create({
-    body: `Hello ${name}, You have been matched on SplashCash247, Kindly Check your Dashboard.`,
-    from: "+12059646173",
-    to: number,
-  });
+// const sendSMS1 = (name, number) =>
+//   client.messages.create({
+//     body: `Hello ${name}, You have been matched on SplashCash247, Kindly Check your Dashboard.`,
+//     from: "+12059646173",
+//     to: number,
+//   });
+const sendSMS = (name, number) => {
+  axios.post(
+    `https://www.bulksmsnigeria.com/api/v1/sms/create?api_token=${smsToken}from=SplashCash&to=${number}&body=Hello ${name}, You have been matched on SplashCash247, Kindly Check your Dashboard.`
+  );
+};
+// sendSMS("dorathy", "08036734191");
 
 const postTelegram = (phername, ghername, amount) =>
   clientTelegram.sendMessage(
@@ -590,9 +598,7 @@ router.get("/automatch-1DayGher", verifyAdmin, async (req, res) => {
       const makeReceipt = await new Receipt(obj).save();
       console.log("receipt created");
       // SEND TEXT AND TELEGRAM
-      // let phonee = pher_phone;
-      // const textnumber = `+234${phonee.substr(1)}`;
-      // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
+      const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
       const waitForTeegram = await postTelegram(
         makeReceipt.pher_name,
         makeReceipt.gher_name,
@@ -705,9 +711,7 @@ router.get("/automatch-4DayGher", verifyAdmin, async (req, res) => {
       const makeReceipt = await new Receipt(obj).save();
       console.log("receipt created");
       // SEND TEXT AND TELEGRAM
-      // let phonee = pher_phone;
-      // const textnumber = `+234${phonee.substr(1)}`;
-      // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
+      const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
       const waitForTeegram = await postTelegram(
         makeReceipt.pher_name,
         makeReceipt.gher_name,
@@ -822,9 +826,7 @@ router.get("/automatch-7DayGher", verifyAdmin, async (req, res) => {
       const makeReceipt = await new Receipt(obj).save();
       console.log("receipt created");
       // SEND TEXT AND TELEGRAM
-      // let phonee = pher_phone;
-      // const textnumber = `+234${phonee.substr(1)}`;
-      // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
+      const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
       const waitForTeegram = await postTelegram(
         makeReceipt.pher_name,
         makeReceipt.gher_name,
@@ -930,9 +932,7 @@ router.get("/automatch-outGher", verifyAdmin, async (req, res) => {
       const makeReceipt = await new Receipt(obj).save();
       console.log("receipt created");
       // SEND TEXT AND TELEGRAM
-      // let phonee = pher_phone;
-      // const textnumber = `+234${phonee.substr(1)}`;
-      // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
+      const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
       const waitForTeegram = await postTelegram(
         makeReceipt.pher_name,
         makeReceipt.gher_name,
@@ -1032,9 +1032,7 @@ router.get(
         const makeReceipt = await new Receipt(obj).save();
         console.log("receipt saved");
         // SEND TEXT AND TELEGRAM
-        // let phonee = pher_phone;
-        // const textnumber = `+234${phonee.substr(1)}`;
-        // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
+        const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
         const waitForTeegram = await postTelegram(
           makeReceipt.pher_name,
           makeReceipt.gher_name,

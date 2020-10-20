@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 require("dotenv/config");
 const path = require("path");
+const enforce = require("express-sslify");
 const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 const { errors } = require("celebrate");
@@ -50,6 +51,11 @@ app.use(
   bodyParser.urlencoded({
     extended: true,
     limit: "50mb",
+  })
+);
+app.use(
+  enforce.HTTPS({
+    trustProtoHeader: true,
   })
 );
 app.use(

@@ -536,9 +536,9 @@ router.get("/automatch-1DayGher", verifyAdmin, async (req, res) => {
   const matchAuto = async () => {
     try {
       const gherSorted = await OneDayGher.find({
-        // createdAt: {
-        //   $lte: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000),
-        // },
+        createdAt: {
+          $lte: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000),
+        },
       })
         .sort({
           updatedAt: 1,
@@ -590,7 +590,7 @@ router.get("/automatch-1DayGher", verifyAdmin, async (req, res) => {
       const makeReceipt = await new Receipt(obj).save();
       console.log("receipt created");
       // SEND TEXT AND TELEGRAM
-      // let phonee = "08036734191";
+      // let phonee = pher_phone;
       // const textnumber = `+234${phonee.substr(1)}`;
       // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
       const waitForTeegram = await postTelegram(
@@ -651,9 +651,9 @@ router.get("/automatch-4DayGher", verifyAdmin, async (req, res) => {
   const matchAuto = async () => {
     try {
       const gherSorted = await FourDayGher.find({
-        // createdtedAt: {
-        //   $lte: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000),
-        // },
+        createdtedAt: {
+          $lte: new Date(new Date().getTime() - 4 * 24 * 60 * 60 * 1000),
+        },
       })
         .sort({
           updatedAt: 1,
@@ -705,7 +705,7 @@ router.get("/automatch-4DayGher", verifyAdmin, async (req, res) => {
       const makeReceipt = await new Receipt(obj).save();
       console.log("receipt created");
       // SEND TEXT AND TELEGRAM
-      // let phonee = "08036734191";
+      // let phonee = pher_phone;
       // const textnumber = `+234${phonee.substr(1)}`;
       // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
       const waitForTeegram = await postTelegram(
@@ -768,9 +768,9 @@ router.get("/automatch-7DayGher", verifyAdmin, async (req, res) => {
   const matchAuto = async () => {
     try {
       const gherSorted = await SevenDayGher.find({
-        // createdAt: {
-        //   $lte: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000),
-        // },
+        createdAt: {
+          $lte: new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000),
+        },
       })
         .sort({
           updatedAt: 1,
@@ -822,7 +822,7 @@ router.get("/automatch-7DayGher", verifyAdmin, async (req, res) => {
       const makeReceipt = await new Receipt(obj).save();
       console.log("receipt created");
       // SEND TEXT AND TELEGRAM
-      // let phonee = "08036734191";
+      // let phonee = pher_phone;
       // const textnumber = `+234${phonee.substr(1)}`;
       // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
       const waitForTeegram = await postTelegram(
@@ -930,7 +930,7 @@ router.get("/automatch-outGher", verifyAdmin, async (req, res) => {
       const makeReceipt = await new Receipt(obj).save();
       console.log("receipt created");
       // SEND TEXT AND TELEGRAM
-      // let phonee = "08036734191";
+      // let phonee = pher_phone;
       // const textnumber = `+234${phonee.substr(1)}`;
       // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
       const waitForTeegram = await postTelegram(
@@ -1032,7 +1032,7 @@ router.get(
         const makeReceipt = await new Receipt(obj).save();
         console.log("receipt saved");
         // SEND TEXT AND TELEGRAM
-        // let phonee = "08036734191";
+        // let phonee = pher_phone;
         // const textnumber = `+234${phonee.substr(1)}`;
         // const waitSMS = await sendSMS(makeReceipt.pher_name, textnumber);
         const waitForTeegram = await postTelegram(

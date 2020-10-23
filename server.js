@@ -53,11 +53,11 @@ app.use(
     limit: "50mb",
   })
 );
-app.use(
-  enforce.HTTPS({
-    trustProtoHeader: true,
-  })
-);
+// app.use(
+//   enforce.HTTPS({
+//     trustProtoHeader: true,
+//   })
+// );
 app.use(
   compression({
     level: 6,
@@ -87,7 +87,10 @@ if ((process.env.NODE_ENV || "").trim() === "production") {
     res.setHeader("X-XSS-Protection", "1;mode=block");
     res.setHeader("X-Frame-Options", "SAMEORIGIN");
     res.setHeader("X-Content-Type-Options", "nosniff");
-    res.setHeader("Content-Security-Policy", "script-src 'self'");
+    res.setHeader(
+      "Content-Security-Policy",
+      "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'"
+    );
     res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
   });
 }

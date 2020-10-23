@@ -80,6 +80,14 @@ app.use("/public", express.static("public"));
 if ((process.env.NODE_ENV || "").trim() === "production") {
   app.use(express.static("client/build"));
   app.get("*", (req, res) => {
+    res.setHeader(
+      "Strict-Transport-Security",
+      "max-age=31536000; includeSubDomains; preload"
+    );
+    res.setHeader("X-XSS-Protection", "1;mode=block");
+    res.setHeader("X-Frame-Options", "SAMEORIGIN");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Content-Security-Policy", "script-src 'self'");
     res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
   });
 }

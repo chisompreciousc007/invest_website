@@ -361,9 +361,20 @@ router.patch(
         { new: true, runValidators: true, context: "query" }
       );
       console.log("Guider's History Updated");
+      // POST ON TELEGRAM
+      const activationpostTelegram = clientTelegram.sendMessage(
+        "@splash_cash247",
+        `${pher_name} have been Successfully activated, Proceed to splash your cash so that you can be splashed.`,
+        {
+          disableWebPagePreview: true,
+          disableNotification: true,
+        }
+      );
       // DELETE RECEIPT
-      const deleteFeeReceipt = await Receipt.findByIdAndDelete(receiptId);
-      console.log("Fee Receipt Deleted");
+      const deleteFeeReceipt = Receipt.findByIdAndDelete(receiptId);
+      const postTelegramPromise = await activationpostTelegram;
+      const deleteFeeReceiptPromise = await deleteFeeReceipt;
+      console.log("Fee Receipt Deleted and posted on telegram");
 
       res.status(200).send("Payment Confirmed");
     } catch (error) {
@@ -496,6 +507,15 @@ router.post(
         }
       });
       res.status(200).send("POP Upload Successful!!");
+      // POST ON TELEGRAM
+      const activationpostTelegram = await clientTelegram.sendMessage(
+        "@splash_cash247",
+        `${updateReceipt.pher_name} have paid and successfully uploaded a POP , Please wait to be confirmed.`,
+        {
+          disableWebPagePreview: true,
+          disableNotification: true,
+        }
+      );
     } catch (err) {
       console.log(err.message);
       res.status(400).send(err.message);

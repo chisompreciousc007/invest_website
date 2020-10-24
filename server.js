@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
-// const cors = require("cors");
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 require("dotenv/config");
@@ -34,7 +34,7 @@ try {
 }
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  max: 50,
 });
 
 let setCache = function (req, res, next) {
@@ -75,19 +75,19 @@ let setCache = function (req, res, next) {
   next();
 };
 
-app.use(setCache);
+// app.use(setCache);
 // const corsOptions = {
 //   origin: true,
 //   credentials: true,
 //   maxAge: 3600,
 // };
 
-// app.use(
-//   cors({
-//     credentials: true,
-//      origin: "http://localhost:3000"
-//   })
-// );
+app.use(
+  cors({
+    credentials: true,
+    origin: "http://localhost:3000",
+  })
+);
 app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 

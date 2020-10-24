@@ -45,13 +45,13 @@ let setCache = function (req, res, next) {
     "Strict-Transport-Security",
     "max-age=31536000; includeSubDomains; preload"
   );
-  // res.setHeader("X-XSS-Protection", "1;mode=block");
-  // res.setHeader("X-Frame-Options", "SAMEORIGIN");
-  // res.setHeader("X-Content-Type-Options", "nosniff");
-  // res.setHeader(
-  //   "Content-Security-Policy",
-  //   "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'"
-  // );
+  res.setHeader("X-XSS-Protection", "1;mode=block");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'"
+  );
   // you only want to cache for GET requests
   // if (req.method == "GET") {
 
@@ -75,7 +75,7 @@ let setCache = function (req, res, next) {
   next();
 };
 
-app.use(setCache);
+// app.use(setCache);
 // const corsOptions = {
 //   origin: true,
 //   credentials: true,

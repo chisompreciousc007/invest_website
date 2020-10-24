@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 require("dotenv/config");
 const path = require("path");
-const enforce = require("express-sslify");
+// const enforce = require("express-sslify");
 const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 const { errors } = require("celebrate");
@@ -36,6 +36,46 @@ const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100,
 });
+
+let setCache = function (req, res, next) {
+  // here you can define period in second, this one is 5 minutes
+  const period = 60 * 60 * 24;
+
+  // you only want to cache for GET requests
+  if (req.method == "GET") {
+    res.set("Cache-control", `public, max-age=${period}`);
+    res.setHeader(
+      "Strict-Transport-Security",
+      "max-age=31536000; includeSubDomains; preload"
+    );
+    res.setHeader("X-XSS-Protection", "1;mode=block");
+    res.setHeader("X-Frame-Options", "SAMEORIGIN");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader(
+      "Content-Security-Policy",
+      "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'"
+    );
+  } else {
+    // for the other requests set strict no caching parameters
+    res.set("Cache-control", `no-store`);
+    res.setHeader(
+      "Strict-Transport-Security",
+      "max-age=31536000; includeSubDomains; preload"
+    );
+    res.setHeader("X-XSS-Protection", "1;mode=block");
+    res.setHeader("X-Frame-Options", "SAMEORIGIN");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader(
+      "Content-Security-Policy",
+      "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'"
+    );
+  }
+
+  // remember to call next() to pass on the request
+  next();
+};
+
+app.use(setCache);
 // const corsOptions = {
 //   origin: true,
 //   credentials: true,
@@ -80,17 +120,6 @@ app.use("/public", express.static("public"));
 if ((process.env.NODE_ENV || "").trim() === "production") {
   app.use(express.static("client/build"));
   app.get("*", (req, res) => {
-    res.setHeader(
-      "Strict-Transport-Security",
-      "max-age=31536000; includeSubDomains; preload"
-    );
-    res.setHeader("X-XSS-Protection", "1;mode=block");
-    res.setHeader("X-Frame-Options", "SAMEORIGIN");
-    res.setHeader("X-Content-Type-Options", "nosniff");
-    res.setHeader(
-      "Content-Security-Policy",
-      "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'"
-    );
     res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
   });
 }

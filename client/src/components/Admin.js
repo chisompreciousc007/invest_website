@@ -23,6 +23,12 @@ function Transactions() {
   const [users, setUsers] = useState([]);
   const [receipts, setReceipts] = useState([]);
   const [ghData, setGhData] = useState({ email: "", amount: null });
+  const [matchTelegramData, setMatchTelegramData] = useState({
+    gher_name: null,
+    pher_name: null,
+    amount: null,
+    new_user: null,
+  });
 
   const getUserData = async () => {
     try {
@@ -181,7 +187,7 @@ function Transactions() {
     e.preventDefault();
     try {
       setloading(true);
-      const res = await axios.patch(`/receipts/match-a-user-instant`, ghData);
+      const res = await axios.post(`/receipts/match-a-user-instant`, ghData);
       setloading(false);
       setResponse(res.data);
       setSuccess(true);
@@ -197,11 +203,74 @@ function Transactions() {
       setError(true);
     }
   };
+  const postMatchHandler = async (e) => {
+    e.preventDefault();
+    try {
+      setloading(true);
+      const res = await axios.post(`/users/post-a-match`, matchTelegramData);
+      setloading(false);
+      setResponse(res.data);
+      setSuccess(true);
+    } catch (err) {
+      setloading(false);
+      if (err.response.status === 500) {
+        console.log("there was a problem with the server");
+        return window.location.reload();
+      }
+      setResponse(err.response.data);
+      setError(true);
+    }
+  };
+  const postNewUserHandler = async (e) => {
+    e.preventDefault();
+    try {
+      setloading(true);
+      const res = await axios.post(`/users/post-new-user`, matchTelegramData);
+      setloading(false);
+      setResponse(res.data);
+      setSuccess(true);
+    } catch (err) {
+      setloading(false);
+      if (err.response.status === 500) {
+        console.log("there was a problem with the server");
+        return window.location.reload();
+      }
+      setResponse(err.response.data);
+      setError(true);
+    }
+  };
+  const postActivatedUserHandler = async (e) => {
+    e.preventDefault();
+    try {
+      setloading(true);
+      const res = await axios.post(
+        `/users/post-activated-user`,
+        matchTelegramData
+      );
+      setloading(false);
+      setResponse(res.data);
+      setSuccess(true);
+    } catch (err) {
+      setloading(false);
+      if (err.response.status === 500) {
+        console.log("there was a problem with the server");
+        return window.location.reload();
+      }
+      setResponse(err.response.data);
+      setError(true);
+    }
+  };
   const inputHandler = (e) => {
     e.preventDefault();
     let key = e.target.name;
     let value = e.target.value;
     setGhData((prev) => ({ ...prev, [key]: value }));
+  };
+  const inputHandler2 = (e) => {
+    e.preventDefault();
+    let key = e.target.name;
+    let value = e.target.value;
+    setMatchTelegramData((prev) => ({ ...prev, [key]: value }));
   };
   if (reading) return <Spinner />;
   return (
@@ -522,6 +591,97 @@ function Transactions() {
                   type="submit"
                   value="Match User"
                   onClick={matchUserHandler}
+                />
+              </div>
+            </div>
+          </form>
+          <form name="mainform2">
+            <div className="col-sm-8 col-xs-12">
+              {" "}
+              <div className="form_box form_box_login">
+                <span>
+                  <input
+                    placeholder="name for Payer"
+                    type="email"
+                    name="pher_name"
+                    className="inpts"
+                    size="30"
+                    required
+                    onChange={inputHandler2}
+                  />
+                  <input
+                    placeholder="name for receiver"
+                    type="email"
+                    name="gher_name"
+                    className="inpts"
+                    size="30"
+                    required
+                    onChange={inputHandler2}
+                  />
+
+                  <input
+                    placeholder="Amount"
+                    type="number"
+                    name="amount"
+                    className="inpts"
+                    size="30"
+                    required
+                    onChange={inputHandler2}
+                  />
+                </span>
+                <input
+                  className="btn btn-primary"
+                  type="submit"
+                  value="Matched(Telegram)"
+                  onClick={postMatchHandler}
+                />
+              </div>
+            </div>
+          </form>
+          <form name="mainform3">
+            <div className="col-sm-8 col-xs-12">
+              {" "}
+              <div className="form_box form_box_login">
+                <span>
+                  <input
+                    placeholder="Name of new User"
+                    type="email"
+                    name="new_user"
+                    className="inpts"
+                    size="30"
+                    required
+                    onChange={inputHandler2}
+                  />
+                </span>
+                <input
+                  className="btn btn-primary"
+                  type="submit"
+                  value="user have registered(Telegram)"
+                  onClick={postNewUserHandler}
+                />
+              </div>
+            </div>
+          </form>
+          <form name="mainform4">
+            <div className="col-sm-8 col-xs-12">
+              {" "}
+              <div className="form_box form_box_login">
+                <span>
+                  <input
+                    placeholder="Name of Activated User"
+                    type="email"
+                    name="new_user"
+                    className="inpts"
+                    size="30"
+                    required
+                    onChange={inputHandler2}
+                  />
+                </span>
+                <input
+                  className="btn btn-primary"
+                  type="submit"
+                  value="user Activated(Telegram)"
+                  onClick={postActivatedUserHandler}
                 />
               </div>
             </div>

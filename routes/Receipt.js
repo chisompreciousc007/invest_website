@@ -51,15 +51,26 @@ const sendSMS = (name, number) => {
 };
 // sendSMS("dorathy", "08036734191");
 
-const postTelegram = (phername, ghername, amount) =>
+const postTelegram = (phername, ghername, amount) => {
   clientTelegram.sendMessage(
     "@splash_cash247",
-    `${phername} have been matched to pay ${ghername} an amount of NGN${amount}.`,
+    `${phername} have been matched to pay ${ghername} an amount of NGN${amount}.Kindly make a payment soon and upload a POP for confirmation `,
     {
       disableWebPagePreview: true,
       disableNotification: true,
     }
   );
+};
+const postTelegram2 = (phername, ghername, amount) => {
+  clientTelegram.sendMessage(
+    "@splash_cash247",
+    `${ghername} have been matched to receive an amount of NGN${amount}. Always check on your dashboard for confirmation`,
+    {
+      disableWebPagePreview: true,
+      disableNotification: true,
+    }
+  );
+};
 
 router.get(
   "/foruser/:email",
@@ -619,7 +630,7 @@ router.get("/automatch-1DayGher", verifyAdmin, async (req, res) => {
       console.log("receipt created");
       // SEND TEXT AND TELEGRAM
       const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
-      const waitForTeegram = await postTelegram(
+      const waitForTeegram = postTelegram(
         makeReceipt.pher_name,
         makeReceipt.gher_name,
         makeReceipt.amount

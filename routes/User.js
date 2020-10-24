@@ -29,6 +29,24 @@ const createAccountLimiter = rateLimit({
     "Too many accounts created from this IP, please try again after an hour",
 });
 
+const postTelegram = (phername, ghername, amount) => {
+  clientTelegram.sendMessage(
+    "@splash_cash247",
+    `${phername} have been matched to pay ${ghername} an amount of NGN${amount}.Kindly make a payment soon and upload a POP for confirmation `,
+    {
+      disableWebPagePreview: true,
+      disableNotification: true,
+    }
+  );
+  clientTelegram.sendMessage(
+    "@splash_cash247",
+    `${ghername} have been matched to receive an amount of NGN${amount}. Kindly check on your dashboard for confirmation`,
+    {
+      disableWebPagePreview: true,
+      disableNotification: true,
+    }
+  );
+};
 // VERIFY USER AND RETURN USER DATA
 router.get("/user", verify, async (req, res) => {
   try {
@@ -400,4 +418,80 @@ router.patch(
     }
   }
 );
+
+router.post(
+  "/post-a-match",
+  celebrate({
+    [Segments.BODY]: Joi.object().keys({
+      gher_name: Joi.string().required().allow(null),
+      pher_name: Joi.string().required().allow(null),
+      amount: Joi.number().integer().required().allow(null),
+      new_user: Joi.string().required().allow(null),
+    }),
+  }),
+  async (req, res) => {
+    try {
+      const { gher_name, pher_name, amount, new_user } = req.body;
+      const postTelegram1 = postTelegram(pher_name, gher_name, amount);
+      res.status(200).send("Posted On Telegram");
+    } catch (error) {
+      res.json({ message: err });
+    }
+  }
+);
+router.post(
+  "/post-new-user",
+  celebrate({
+    [Segments.BODY]: Joi.object().keys({
+      gher_name: Joi.string().required().allow(null),
+      pher_name: Joi.string().required().allow(null),
+      amount: Joi.number().integer().required().allow(null),
+      new_user: Joi.string().required().allow(null),
+    }),
+  }),
+  async (req, res) => {
+    try {
+      const { new_user } = req.body;
+      const postTelegram = await clientTelegram.sendMessage(
+        "@splash_cash247",
+        `${new_user} have been Successfully registered, Please proceed to pay activation fee to your guider.`,
+        {
+          disableWebPagePreview: true,
+          disableNotification: true,
+        }
+      );
+      res.status(200).send("Posted On Telegram");
+    } catch (error) {
+      res.json({ message: err });
+    }
+  }
+);
+router.post(
+  "/post-activated-user",
+  celebrate({
+    [Segments.BODY]: Joi.object().keys({
+      gher_name: Joi.string().required().allow(null),
+      pher_name: Joi.string().required().allow(null),
+      amount: Joi.number().integer().required().allow(null),
+      new_user: Joi.string().required().allow(null),
+    }),
+  }),
+  async (req, res) => {
+    try {
+      const { new_user } = req.body;
+      const postTelegram = await clientTelegram.sendMessage(
+        "@splash_cash247",
+        `${new_user} have been Successfully activated, Proceed to splash your cash so that you can be splashed.`,
+        {
+          disableWebPagePreview: true,
+          disableNotification: true,
+        }
+      );
+      res.status(200).send("Posted On Telegram");
+    } catch (error) {
+      res.json({ message: err });
+    }
+  }
+);
+
 module.exports = router;

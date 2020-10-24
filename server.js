@@ -40,7 +40,7 @@ const apiLimiter = rateLimit({
 let setCache = function (req, res, next) {
   // here you can define period in second, this one is 5 minutes
   // const period = 60 * 60 * 24;
-  res.set("Cache-control", `private,max-age=31536000, no-cache`);
+  res.set("Cache-control", `public,max-age=31536000, no-cache`);
   res.setHeader(
     "Strict-Transport-Security",
     "max-age=31536000; includeSubDomains; preload"
@@ -75,7 +75,7 @@ let setCache = function (req, res, next) {
   next();
 };
 
-// app.use(setCache);
+app.use(setCache);
 // const corsOptions = {
 //   origin: true,
 //   credentials: true,
@@ -85,7 +85,7 @@ let setCache = function (req, res, next) {
 // app.use(
 //   cors({
 //     credentials: true,
-//     //  origin: "http://localhost:3000"
+//      origin: "http://localhost:3000"
 //   })
 // );
 app.use(express.json({ limit: "50mb" }));

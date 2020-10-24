@@ -38,8 +38,6 @@ const apiLimiter = rateLimit({
 });
 
 let setCache = function (req, res, next) {
-  // here you can define period in second, this one is 5 minutes
-  // const period = 60 * 60 * 24;
   res.set("Cache-control", `public,max-age=31536000, no-cache`);
   res.setHeader(
     "Strict-Transport-Security",

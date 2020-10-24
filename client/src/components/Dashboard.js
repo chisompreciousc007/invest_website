@@ -53,15 +53,11 @@ function Dashboard() {
             });
         })
         .catch((err) => {
-          if (err.response.status === 500) {
-            console.log("there was a problem with the server");
-            return window.location.reload();
-          }
           setResponse(err.response.data);
           setError(true);
-          setTimeout(() => {
-            return history.push("/login");
-          }, 1000);
+          // setTimeout(() => {
+          //   return history.push("/login");
+          // }, 1000);
         });
     }
   };

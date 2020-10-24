@@ -60,11 +60,9 @@ const postTelegram = (phername, ghername, amount) => {
       disableNotification: true,
     }
   );
-};
-const postTelegram2 = (phername, ghername, amount) => {
   clientTelegram.sendMessage(
     "@splash_cash247",
-    `${ghername} have been matched to receive an amount of NGN${amount}. Always check on your dashboard for confirmation`,
+    `${ghername} have been matched to receive an amount of NGN${amount}. Kindly check on your dashboard for confirmation`,
     {
       disableWebPagePreview: true,
       disableNotification: true,

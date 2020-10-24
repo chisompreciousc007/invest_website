@@ -252,10 +252,6 @@ function Transactions() {
       setSuccess(true);
     } catch (err) {
       setloading(false);
-      if (err.response.status === 500) {
-        console.log("there was a problem with the server");
-        return window.location.reload();
-      }
       setResponse(err.response.data);
       setError(true);
     }

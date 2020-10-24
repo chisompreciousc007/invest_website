@@ -53,6 +53,7 @@ function Dashboard() {
             });
         })
         .catch((err) => {
+          console.log(err);
           setResponse(err.response.data);
           setError(true);
           // setTimeout(() => {

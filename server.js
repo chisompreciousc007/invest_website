@@ -39,37 +39,37 @@ const apiLimiter = rateLimit({
 
 let setCache = function (req, res, next) {
   // here you can define period in second, this one is 5 minutes
-  const period = 60 * 60 * 24;
-
+  // const period = 60 * 60 * 24;
+  res.set("Cache-control", `private,max-age=31536000, no-cache`);
+  res.setHeader(
+    "Strict-Transport-Security",
+    "max-age=31536000; includeSubDomains; preload"
+  );
+  res.setHeader("X-XSS-Protection", "1;mode=block");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'"
+  );
   // you only want to cache for GET requests
-  if (req.method == "GET") {
-    res.set("Cache-control", `public, max-age=${period}`);
-    res.setHeader(
-      "Strict-Transport-Security",
-      "max-age=31536000; includeSubDomains; preload"
-    );
-    res.setHeader("X-XSS-Protection", "1;mode=block");
-    res.setHeader("X-Frame-Options", "SAMEORIGIN");
-    res.setHeader("X-Content-Type-Options", "nosniff");
-    res.setHeader(
-      "Content-Security-Policy",
-      "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'"
-    );
-  } else {
-    // for the other requests set strict no caching parameters
-    res.set("Cache-control", `no-store`);
-    res.setHeader(
-      "Strict-Transport-Security",
-      "max-age=31536000; includeSubDomains; preload"
-    );
-    res.setHeader("X-XSS-Protection", "1;mode=block");
-    res.setHeader("X-Frame-Options", "SAMEORIGIN");
-    res.setHeader("X-Content-Type-Options", "nosniff");
-    res.setHeader(
-      "Content-Security-Policy",
-      "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'"
-    );
-  }
+  // if (req.method == "GET") {
+
+  // } else {
+
+  //   res.set("Cache-control", `no-store`);
+  //   res.setHeader(
+  //     "Strict-Transport-Security",
+  //     "max-age=31536000; includeSubDomains; preload"
+  //   );
+  //   res.setHeader("X-XSS-Protection", "1;mode=block");
+  //   res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  //   res.setHeader("X-Content-Type-Options", "nosniff");
+  //   res.setHeader(
+  //     "Content-Security-Policy",
+  //     "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'"
+  //   );
+  // }
 
   // remember to call next() to pass on the request
   next();

@@ -114,18 +114,26 @@ if ((process.env.NODE_ENV || "").trim() === "production") {
   app.use(express.static("client/build"), {
     extensions: ["html"],
     setHeaders(res, path) {
-      if (path.match(/(\.html|\/sw\.js)$/)) {
+      if (path.include(".html")) {
         setNoCache(res);
         return;
       }
 
-      if (path.match(/\.(js|css|png|jpg|jpeg|gif|ico|json)$/)) {
+      if (
+        path.include(".js") ||
+        path.include(".css") ||
+        path.include(".png") ||
+        path.include(".jpg") ||
+        path.include(".jpeg") ||
+        path.include(".gif") ||
+        path.include(".ico") ||
+        path.include(".json")
+      ) {
         setLongTermCache(res);
       }
     },
   });
   app.get("*", (req, res) => {
-    res.setHeader("Cache-control", `public,max-age=31536000`);
     res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
   });
 }

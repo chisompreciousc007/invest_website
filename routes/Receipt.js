@@ -48,7 +48,6 @@ const sendSMS = (name, number) => {
     `https://www.bulksmsnigeria.com/api/v1/sms/create?api_token=${smsToken}from=SplashCash&to=${number}&body=Hello ${name}, You have been matched on SplashCash247, Kindly Check your Dashboard.`
   );
 };
-sendSMS("dorathy", "08036734191");
 
 const postTelegram = (phername, ghername, amount) => {
   clientTelegram.sendMessage(

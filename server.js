@@ -36,7 +36,22 @@ const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 50,
 });
+//
+//
+function setNoCache(res) {
+  const date = new Date();
+  date.setFullYear(date.getFullYear() - 1);
+  res.setHeader("Expires", date.toUTCString());
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Cache-Control", "public, no-cache");
+}
 
+function setLongTermCache(res) {
+  const date = new Date();
+  date.setFullYear(date.getFullYear() + 1);
+  res.setHeader("Expires", date.toUTCString());
+  res.setHeader("Cache-Control", "public, max-age=31536000");
+}
 let setCache = function (req, res, next) {
   res.setHeader(
     "Strict-Transport-Security",
@@ -96,7 +111,19 @@ app.use("/guiders", guiderRouter);
 app.use("/public", express.static("public"));
 
 if ((process.env.NODE_ENV || "").trim() === "production") {
-  app.use(express.static("client/build"));
+  app.use(express.static("client/build"), {
+    extensions: ["html"],
+    setHeaders(res, path) {
+      if (path.match(/(\.html|\/sw\.js)$/)) {
+        setNoCache(res);
+        return;
+      }
+
+      if (path.match(/\.(js|css|png|jpg|jpeg|gif|ico|json)$/)) {
+        setLongTermCache(res);
+      }
+    },
+  });
   app.get("*", (req, res) => {
     res.setHeader("Cache-control", `public,max-age=31536000`);
     res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));

@@ -36,22 +36,6 @@ const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 50,
 });
-//
-//
-function setNoCache(res) {
-  const date = new Date();
-  date.setFullYear(date.getFullYear() - 1);
-  res.setHeader("Expires", date.toUTCString());
-  res.setHeader("Pragma", "no-cache");
-  res.setHeader("Cache-Control", "public, no-cache");
-}
-
-function setLongTermCache(res) {
-  const date = new Date();
-  date.setFullYear(date.getFullYear() + 1);
-  res.setHeader("Expires", date.toUTCString());
-  res.setHeader("Cache-Control", "public, max-age=31536000");
-}
 let setCache = function (req, res, next) {
   res.setHeader(
     "Strict-Transport-Security",
@@ -59,7 +43,7 @@ let setCache = function (req, res, next) {
   );
   res.setHeader("X-XSS-Protection", "1;mode=block");
   res.setHeader("X-Frame-Options", "SAMEORIGIN");
-  res.setHeader("X-Content-Type-Options", "nosniff");
+  // res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader(
     "Content-Security-Policy",
     "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'"

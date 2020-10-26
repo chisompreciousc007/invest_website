@@ -221,6 +221,28 @@ function Transactions() {
       setError(true);
     }
   };
+
+  const postConfirmationHandler = async (e) => {
+    e.preventDefault();
+    try {
+      setloading(true);
+      const res = await axios.post(
+        `/users/post-a-confirmation`,
+        matchTelegramData
+      );
+      setloading(false);
+      setResponse(res.data);
+      setSuccess(true);
+    } catch (err) {
+      setloading(false);
+      if (err.response.status === 500) {
+        console.log("there was a problem with the server");
+        return window.location.reload();
+      }
+      setResponse(err.response.data);
+      setError(true);
+    }
+  };
   const postNewUserHandler = async (e) => {
     e.preventDefault();
     try {
@@ -630,6 +652,12 @@ function Transactions() {
                   type="submit"
                   value="Matched(Telegram)"
                   onClick={postMatchHandler}
+                />{" "}
+                <input
+                  className="btn btn-primary"
+                  type="submit"
+                  value="ConfirmPayment(Telegram)"
+                  onClick={postConfirmationHandler}
                 />
               </div>
             </div>

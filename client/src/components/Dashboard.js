@@ -29,11 +29,10 @@ function Dashboard() {
     investHistory,
   } = user.user;
   const { getArr, payArr } = user;
-
   const getUserData = () => {
     if (!user.user._id) {
       axios
-        .get("/users/user", { withCredentials: true })
+        .get("/users/user")
         .then((res) => {
           if (res.data === "blocked") return history.push("/contactSupport");
           setUser((prevState) => ({
@@ -41,19 +40,14 @@ function Dashboard() {
             user: { ...res.data },
           }));
 
-          axios
-            .get(`/receipts/foruser/${res.data.email}`, {
-              withCredentials: true,
-            })
-            .then((res) => {
-              setUser((prevState) => ({
-                ...prevState,
-                ...res.data,
-              }));
-            });
+          axios.get(`/receipts/foruser/${res.data.email}`).then((res) => {
+            setUser((prevState) => ({
+              ...prevState,
+              ...res.data,
+            }));
+          });
         })
         .catch((err) => {
-          console.log(err);
           setResponse(err.response.data);
           setError(true);
           // setTimeout(() => {

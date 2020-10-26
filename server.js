@@ -38,7 +38,6 @@ const apiLimiter = rateLimit({
 });
 
 let setCache = function (req, res, next) {
-  res.set("Cache-control", `public,max-age=31536000, no-cache`);
   res.setHeader(
     "Strict-Transport-Security",
     "max-age=31536000; includeSubDomains; preload"
@@ -50,30 +49,9 @@ let setCache = function (req, res, next) {
     "Content-Security-Policy",
     "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'"
   );
-  // you only want to cache for GET requests
-  // if (req.method == "GET") {
-
-  // } else {
-
-  //   res.set("Cache-control", `no-store`);
-  //   res.setHeader(
-  //     "Strict-Transport-Security",
-  //     "max-age=31536000; includeSubDomains; preload"
-  //   );
-  //   res.setHeader("X-XSS-Protection", "1;mode=block");
-  //   res.setHeader("X-Frame-Options", "SAMEORIGIN");
-  //   res.setHeader("X-Content-Type-Options", "nosniff");
-  //   res.setHeader(
-  //     "Content-Security-Policy",
-  //     "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'"
-  //   );
-  // }
-
-  // remember to call next() to pass on the request
   next();
 };
 
-// app.use(setCache);
 // const corsOptions = {
 //   origin: true,
 //   credentials: true,
@@ -96,17 +74,14 @@ app.use(
     limit: "50mb",
   })
 );
-// app.use(
-//   enforce.HTTPS({
-//     trustProtoHeader: true,
-//   })
-// );
+
 app.use(
   compression({
     level: 6,
     threshold: 0,
   })
 );
+app.use(setCache);
 app.use(errors());
 app.use("/receipts", apiLimiter);
 app.use("/users", apiLimiter);
@@ -123,6 +98,7 @@ app.use("/public", express.static("public"));
 if ((process.env.NODE_ENV || "").trim() === "production") {
   app.use(express.static("client/build"));
   app.get("*", (req, res) => {
+    res.setHeader("Cache-control", `public,max-age=31536000`);
     res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
   });
 }
@@ -130,3 +106,9 @@ if ((process.env.NODE_ENV || "").trim() === "production") {
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 });
+
+// app.use(
+//   enforce.HTTPS({
+//     trustProtoHeader: true,
+//   })
+// );

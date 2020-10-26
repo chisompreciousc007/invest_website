@@ -2,25 +2,10 @@ const jwt = require("jsonwebtoken");
 const User = require("./models/user");
 
 module.exports = function (req, res, next) {
-  // const token = req.header("auth-token");
-  if (req.headers.cookie === undefined) {
+  if (req.cookies.token === undefined) {
     return res.status(400).send("Log in Before Accessing this page");
   }
-  const getCookie = (cname) => {
-    var name = cname + "=";
-    var ca = req.headers.cookie.split(";");
-    for (var i = 0; i < ca.length; i++) {
-      var c = ca[i];
-      while (c.charAt(0) == " ") {
-        c = c.substring(1);
-      }
-      if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length);
-      }
-    }
-    return "";
-  };
-  const token = getCookie("token");
+  const token = req.cookies.token;
 
   if (!token) return res.status(400).send("ACCESS DENIED");
   try {

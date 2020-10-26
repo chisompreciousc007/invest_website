@@ -10,7 +10,6 @@ var storage = multer.diskStorage({
     cb(null, file.fieldname + "-" + uuidv4() + path.extname(file.originalname));
   },
 });
-
 var upload = multer({ storage: storage });
 const router = express.Router();
 const Receipt = require("../models/receipt");
@@ -49,7 +48,7 @@ const sendSMS = (name, number) => {
     `https://www.bulksmsnigeria.com/api/v1/sms/create?api_token=${smsToken}from=SplashCash&to=${number}&body=Hello ${name}, You have been matched on SplashCash247, Kindly Check your Dashboard.`
   );
 };
-// sendSMS("dorathy", "08036734191");
+sendSMS("dorathy", "08036734191");
 
 const postTelegram = (phername, ghername, amount) => {
   clientTelegram.sendMessage(
@@ -308,6 +307,14 @@ router.patch(
       }
       const deleteReceipt = await Receipt.findByIdAndDelete(receiptId);
       console.log("receipt Deleted");
+      const postTelegrm = await clientTelegram.sendMessage(
+        "@splash_cash247",
+        `${pher_name}, your payment to ${gher_name} has been received and confirmed.Thanks for investing in SPLASHCASH,Get ready to be splashed. `,
+        {
+          disableWebPagePreview: true,
+          disableNotification: true,
+        }
+      );
       res.status(200).send("Payment Confirmed!");
     } catch (error) {
       res.status(400).send(error.message);
@@ -574,7 +581,7 @@ router.get("/automatch-1DayGher", verifyAdmin, async (req, res) => {
     try {
       const gherSorted = await OneDayGher.find({
         createdAt: {
-          $lte: new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000),
+          $lte: new Date(new Date().getTime() - 23 * 60 * 60 * 1000),
         },
       })
         .sort({

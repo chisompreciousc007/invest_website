@@ -204,12 +204,16 @@ router.post(
         return res.status(400).send("Incorrect username or password");
       //CREATE AND ASSIGN A TOKEN
       const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
-        expiresIn: "24h",
+        expiresIn: "168h",
       });
+      var now = new Date();
+      now.setTime(now.getTime() + 168 * 3600 * 1000);
+      res.setHeader(
+        "Set-Cookie",
+        `token=${token};path=/;httpOnly;expires=${now.toUTCString()}`
+      );
 
-      // res.setHeader("set-cookie", [`jwtToken=${token}`]);
-
-      res.status(200).send(token);
+      res.status(200).send("Logged In");
     } catch (error) {
       res.status(400).send(error.message);
     }
@@ -433,6 +437,33 @@ router.post(
     try {
       const { gher_name, pher_name, amount, new_user } = req.body;
       const postTelegram1 = postTelegram(pher_name, gher_name, amount);
+      res.status(200).send("Posted On Telegram");
+    } catch (error) {
+      res.json({ message: err });
+    }
+  }
+);
+router.post(
+  "/post-a-confirmation",
+  celebrate({
+    [Segments.BODY]: Joi.object().keys({
+      gher_name: Joi.string().required().allow(null),
+      pher_name: Joi.string().required().allow(null),
+      amount: Joi.number().integer().required().allow(null),
+      new_user: Joi.string().required().allow(null),
+    }),
+  }),
+  async (req, res) => {
+    try {
+      const { gher_name, pher_name } = req.body;
+      const postTelegrm = await clientTelegram.sendMessage(
+        "@splash_cash247",
+        `${pher_name}, your payment to ${gher_name} has been received and confirmed.Thanks for investing in SPLASHCASH,Get ready to be splashed. `,
+        {
+          disableWebPagePreview: true,
+          disableNotification: true,
+        }
+      );
       res.status(200).send("Posted On Telegram");
     } catch (error) {
       res.json({ message: err });

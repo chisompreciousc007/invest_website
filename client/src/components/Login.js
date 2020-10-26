@@ -41,11 +41,9 @@ function Login() {
       localStorage.checkbox = isChecked;
     }
     axios
-      .post("/users/login", loginData, {
-        withCredentials: true,
-      })
+      .post("/users/login", loginData)
       .then((res) => {
-        document.cookie = `token=${res.data}`;
+        // document.cookie = `token=${res.data}`;
         history.push("/dashboard");
       })
       .catch((err) => {

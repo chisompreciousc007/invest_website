@@ -46,7 +46,7 @@ let setCache = function (req, res, next) {
   // res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader(
     "Content-Security-Policy",
-    "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'"
+    "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none'; img-src 'self' data:"
   );
   next();
 };

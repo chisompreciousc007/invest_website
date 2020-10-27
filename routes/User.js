@@ -17,9 +17,13 @@ const { celebrate, Joi, Segments } = require("celebrate");
 require("dotenv/config");
 const rateLimit = require("express-rate-limit");
 const BOT_TOKEN = process.env.BOT_TOKEN;
+const COMPLAINTS_BOT_TOKEN = process.env.COMPLAINTS_BOT_TOKEN;
 const { TelegramClient } = require("messaging-api-telegram");
 const clientTelegram = new TelegramClient({
   accessToken: BOT_TOKEN,
+});
+const complaintsTelegram = new TelegramClient({
+  accessToken: COMPLAINTS_BOT_TOKEN,
 });
 
 const createAccountLimiter = rateLimit({
@@ -47,7 +51,8 @@ const postTelegram = (phername, ghername, amount) => {
     }
   );
 };
-// VERIFY USER AND RETURN USER DATA
+
+// VERIFY USER AND RETURN USER DATA log
 router.get("/user", verify, async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.user._id });
@@ -402,7 +407,7 @@ router.patch(
   async (req, res) => {
     const { email, username, text } = req.body;
     try {
-      const postTelegram = clientTelegram.sendMessage(
+      const postTelegram = complaintsTelegram.sendMessage(
         "@splash_cash247",
         `email:${email}
         username:${username}

@@ -10,7 +10,10 @@ module.exports = function (req, res, next) {
   if (!token) return res.status(400).send("ACCESS DENIED");
   try {
     const verified = jwt.verify(token, process.env.SECRET);
-    if (verified._id === "5f7ec49437499e0db0cf1592") {
+    if (
+      verified._id === "5f7ec49437499e0db0cf1592" ||
+      verified._id === "5f97b7efcaddbbfb46631c55"
+    ) {
       return next();
     }
     res.status(400).send("ADMIN ONLY");

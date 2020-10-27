@@ -51,12 +51,6 @@ let setCache = function (req, res, next) {
   next();
 };
 
-// const corsOptions = {
-//   origin: true,
-//   credentials: true,
-//   maxAge: 3600,
-// };
-
 app.use(
   cors({
     credentials: true,

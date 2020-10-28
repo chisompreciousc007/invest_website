@@ -133,19 +133,22 @@ router.post(
       const savedUser = await newUser.save();
 
       // UPDATE REFERRALS
-      const checkReferee = await User.findOne({ username: upline });
-      if (upline !== "new" && checkReferee !== null) {
-        const editReferee = await User.findOneAndUpdate(
-          { username: upline },
-          {
-            $push: {
-              downline: {
-                name: name,
+
+      if (upline !== "new") {
+        const checkReferee = await User.findOne({ username: upline });
+        if (checkReferee !== null) {
+          const editReferee = await User.findOneAndUpdate(
+            { username: upline },
+            {
+              $push: {
+                downline: {
+                  name: name,
+                },
               },
             },
-          },
-          { new: true, runValidators: true, context: "query" }
-        );
+            { new: true, runValidators: true, context: "query" }
+          );
+        }
       }
 
       // CREATE RECEIPT FOR ACTIVATION FEE
@@ -188,7 +191,7 @@ router.post(
       );
       const postTelegramPromise = await postTelegram;
       const editGuiderPromise = await editGuider;
-      res.json(savedUser);
+      res.status(200).send(savedUser);
     } catch (err) {
       res.status(400).send(err.message);
     }
@@ -297,7 +300,7 @@ router.post(
 router.get("/all-details", verifyAdmin, async (req, res) => {
   try {
     const foundUser = await User.find();
-    res.json(foundUser);
+    res.status(200).send(foundUser);
   } catch (err) {
     res.status(400).send(err.message);
   }
@@ -305,7 +308,7 @@ router.get("/all-details", verifyAdmin, async (req, res) => {
 router.get("/", verifyAdmin, async (req, res) => {
   try {
     const foundUser = await User.find({}, "isActivated isBlocked");
-    res.json(foundUser);
+    res.status(200).send(foundUser);
   } catch (err) {
     res.status(400).send(err.message);
   }
@@ -314,7 +317,7 @@ router.get("/users-with-downlines", verifyAdmin, async (req, res) => {
   try {
     const foundUser = await User.find({ downline: { $ne: [] } }, "downline");
 
-    res.json(foundUser);
+    res.status(200).send(foundUser);
   } catch (err) {
     res.status(400).send(err.message);
   }
@@ -409,7 +412,7 @@ router.patch(
         if (err) {
           res.status(400).send(err.message);
         } else {
-          res.json(result);
+          res.status(200).send(result);
         }
       }
     );

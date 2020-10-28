@@ -277,11 +277,10 @@ router.patch(
         }
       }
       if (upline !== "new") {
-        const isThere = await User.find({
+        const isThere = await User.findOne({
           username: upline,
-          "downline.name": pher_name,
         });
-        if (isThere.length === 0) {
+        if (isThere !== null) {
           const updateDownline = await User.findOneAndUpdate(
             { username: upline },
             {
@@ -293,18 +292,6 @@ router.patch(
               },
             }
           );
-          // test
-          // const updateDownline = await User.findOneAndUpdate(
-          //   { username: upline,"downline.name": pher_name, },
-          //   {
-          //     $set: {
-          //       downline: {
-          //         name: pher_name,
-          //         amount: pledge * 0.05,
-          //       },
-          //     },
-          //   }
-          // );
         }
       }
       const deleteReceipt = await Receipt.findByIdAndDelete(receiptId);
@@ -322,34 +309,6 @@ router.patch(
     }
   }
 );
-
-// router.patch("/setdownline", async (req, res) => {
-//   try {
-//     const { upline, pher_name } = req.body;
-//     if (upline !== "new") {
-//       const isThere = await User.find({
-//         username: upline,
-//         "downline.name": pher_name,
-//       });
-//       const updateDownline = await User.findOneAndUpdate(
-//         { username: upline, "downline.name": pher_name },
-//         {
-//           $set: {
-//             "downline.name": {
-//               name: pher_name,
-//               amount: 10000,
-//             },
-//           },
-//         }
-//       );
-//       res.send(updateDownline);
-//       // if (isThere.length === 0) {
-//       // }
-//     }
-//   } catch (err) {
-//     res.json({ message: err });
-//   }
-// });
 
 router.patch(
   "/confirmfee/",
@@ -506,9 +465,9 @@ router.patch(
 router.get("/", verifyAdmin, async (req, res) => {
   try {
     const foundReceipt = await Receipt.find({}, "gher_email pher_email amount");
-    res.json(foundReceipt);
+    res.status(200).send(foundReceipt);
   } catch (err) {
-    res.json({ message: err });
+    res.status(400).send(err.message);
   }
 });
 router.post(
@@ -587,7 +546,7 @@ router.post("/new", async (req, res) => {
     const makeReceipt = await new Receipt(obj).save();
     res.send(makeReceipt);
   } catch (err) {
-    res.json({ message: err.message });
+    res.status(400).send(err.message);
   }
 });
 

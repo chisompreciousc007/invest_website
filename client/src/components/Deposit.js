@@ -23,7 +23,7 @@ function Dashboard() {
   const [selectAmount, setSelectAmount] = useState(5000);
   const { user, setUser } = useContext(UserContext);
   const [response, setResponse] = useState(null);
-  const { _id, email, isActivated, wantToInvest, pledge } = user.user;
+  const { _id, email, isActivated, pledge } = user.user;
   const { payArr, getArr, guiderArr, activationFee, phStatus, ghStatus } = user;
   const isEmpty = (obj) => {
     for (var i in obj) {

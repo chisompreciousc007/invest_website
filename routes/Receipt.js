@@ -375,7 +375,7 @@ router.patch(
           disableNotification: true,
         }
       );
-      // DELETE RECEIPTTTTTT
+      // DELETE RECEIPT
       const deleteFeeReceipt = Receipt.findByIdAndDelete(receiptId);
       const postTelegramPromise = await activationpostTelegram;
       const deleteFeeReceiptPromise = await deleteFeeReceipt;

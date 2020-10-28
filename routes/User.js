@@ -59,7 +59,14 @@ const postTelegram = (phername, ghername, amount) => {
     }
   );
 };
-
+// investTelegram.sendMessage(
+//   telegramHandle,
+//   `user have pledge 5000.Waiting to be merged.`,
+//   {
+//     disableWebPagePreview: true,
+//     disableNotification: true,
+//   }
+// );
 // VERIFY USER AND RETURN USER DATA log
 router.get("/user", verify, async (req, res) => {
   try {
@@ -104,7 +111,8 @@ router.post(
       const len = foundGuiders.length;
       const randomNumber = Math.floor(Math.random() * Math.floor(len));
       const selectGuider = foundGuiders[randomNumber];
-      const guiderEmail = selectGuider.email;
+      const guiderEm = selectGuider.email;
+      const guiderEmail = guiderEm.toLowerCase();
       // HASH PASSWORD
       const salt = bcrypt.genSaltSync(10);
       const hashedPassword = await bcrypt.hash(password, salt);
@@ -125,9 +133,8 @@ router.post(
       const savedUser = await newUser.save();
 
       // UPDATE REFERRALS
-
-      if (upline !== "new") {
-        const checkReferee = await User.findOne({ username: upline });
+      const checkReferee = await User.findOne({ username: upline });
+      if (upline !== "new" && checkReferee !== null) {
         const editReferee = await User.findOneAndUpdate(
           { username: upline },
           {
@@ -183,7 +190,7 @@ router.post(
       const editGuiderPromise = await editGuider;
       res.json(savedUser);
     } catch (err) {
-      res.json({ message: err.message });
+      res.status(400).send(err.message);
     }
   }
 );
@@ -237,13 +244,14 @@ router.post(
   }),
   async (req, res) => {
     try {
+      const lowercaseUsername = req.body.username.toLowerCase();
       // check if username is taken
-      const user = await User.findOne({ username: req.body.username });
+      const user = await User.findOne({ username: lowercaseUsername });
 
       if (user) return res.send(true);
       if (!user) return res.send(false);
     } catch (error) {
-      res.json({ message: err });
+      res.status(400).send(error.message);
     }
   }
 );
@@ -262,7 +270,7 @@ router.post(
       if (user) return res.send(true);
       return res.send(false);
     } catch (error) {
-      res.json({ message: error });
+      res.status(400).send(error.message);
     }
   }
 );
@@ -275,13 +283,14 @@ router.post(
   }),
   async (req, res) => {
     try {
+      const lowercaseEmail = req.body.email.toLowerCase();
       // check if email is taken
-      const user = await User.findOne({ email: req.body.email });
+      const user = await User.findOne({ email: lowercaseEmail });
 
       if (user) return res.send(true);
       if (!user) return res.send(false);
     } catch (error) {
-      res.json({ message: error });
+      res.status(400).send(error.message);
     }
   }
 );
@@ -290,7 +299,7 @@ router.get("/all-details", verifyAdmin, async (req, res) => {
     const foundUser = await User.find();
     res.json(foundUser);
   } catch (err) {
-    res.json({ message: err });
+    res.status(400).send(err.message);
   }
 });
 router.get("/", verifyAdmin, async (req, res) => {
@@ -298,7 +307,7 @@ router.get("/", verifyAdmin, async (req, res) => {
     const foundUser = await User.find({}, "isActivated isBlocked");
     res.json(foundUser);
   } catch (err) {
-    res.json({ message: err });
+    res.status(400).send(err.message);
   }
 });
 router.get("/users-with-downlines", verifyAdmin, async (req, res) => {
@@ -307,7 +316,7 @@ router.get("/users-with-downlines", verifyAdmin, async (req, res) => {
 
     res.json(foundUser);
   } catch (err) {
-    res.json({ message: err });
+    res.status(400).send(err.message);
   }
 });
 router.patch(
@@ -317,6 +326,7 @@ router.patch(
     [Segments.BODY]: Joi.object().keys({
       _id: Joi.string().required(),
       email: Joi.string().email().required(),
+      username: Joi.string().required(),
       investAmt: Joi.number().integer().min(4999).max(200001).required(),
       pledge: Joi.number().integer().required(),
     }),
@@ -324,7 +334,7 @@ router.patch(
   async (req, res) => {
     try {
       // INPUTS
-      const { _id: id, email, investAmt, pledge } = req.body;
+      const { _id: id, email, investAmt, pledge, username } = req.body;
       if (pledge > investAmt) {
         return res
           .status(400)
@@ -364,8 +374,8 @@ router.patch(
         amount: investAmt,
       }).save();
       const postTelegram = await investTelegram.sendMessage(
-        "@backendsplashcash",
-        `${email} have pledge ${investAmt}.`,
+        telegramHandle,
+        `${username} have pledge NGN${investAmt},Waiting to be merged.`,
         {
           disableWebPagePreview: true,
           disableNotification: true,
@@ -397,7 +407,7 @@ router.patch(
       { new: true, runValidators: true, context: "query" },
       function (err, result) {
         if (err) {
-          res.json(err);
+          res.status(400).send(err.message);
         } else {
           res.json(result);
         }
@@ -418,7 +428,7 @@ router.patch(
     const { email, username, text } = req.body;
     try {
       const postTelegram = complaintsTelegram.sendMessage(
-        telegramHandle,
+        "@splash_cash247",
         `email:${email}
         username:${username}
         message: ${text}.`,
@@ -455,7 +465,7 @@ router.post(
       const postTelegram1 = postTelegram(pher_name, gher_name, amount);
       res.status(200).send("Posted On Telegram");
     } catch (error) {
-      res.json({ message: err });
+      res.status(400).send(error.message);
     }
   }
 );
@@ -483,7 +493,7 @@ router.post(
       );
       res.status(200).send("Posted On Telegram");
     } catch (error) {
-      res.json({ message: err });
+      res.status(400).send(error.message);
     }
   }
 );
@@ -511,7 +521,7 @@ router.post(
       );
       res.status(200).send("Posted On Telegram");
     } catch (error) {
-      res.json({ message: err });
+      res.status(400).send(error.message);
     }
   }
 );
@@ -539,9 +549,21 @@ router.post(
       );
       res.status(200).send("Posted On Telegram");
     } catch (error) {
-      res.json({ message: err });
+      res.status(400).send(error.message);
     }
   }
 );
+
+//HASH PASSWORD AND CHANGE IN DATABASE MANUALLY
+//
+// router.post("/hash", async (req, res) => {
+//   try {
+//     const salt = bcrypt.genSaltSync(10);
+//     const hashedPassword = await bcrypt.hash(req.body.password, salt);
+//     res.status(200).send(hashedPassword);
+//   } catch (err) {
+//     res.status(400).send(err.message);
+//   }
+// });
 
 module.exports = router;

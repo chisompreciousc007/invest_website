@@ -273,7 +273,6 @@ router.patch(
             const deletePendingGher = await PendingGher.findOneAndDelete({
               email: pher_email,
             });
-          } else {
           }
         }
       }
@@ -294,7 +293,18 @@ router.patch(
               },
             }
           );
-        } else {
+          // test
+          // const updateDownline = await User.findOneAndUpdate(
+          //   { username: upline,"downline.name": pher_name, },
+          //   {
+          //     $set: {
+          //       downline: {
+          //         name: pher_name,
+          //         amount: pledge * 0.05,
+          //       },
+          //     },
+          //   }
+          // );
         }
       }
       const deleteReceipt = await Receipt.findByIdAndDelete(receiptId);
@@ -312,6 +322,35 @@ router.patch(
     }
   }
 );
+
+// router.patch("/setdownline", async (req, res) => {
+//   try {
+//     const { upline, pher_name } = req.body;
+//     if (upline !== "new") {
+//       const isThere = await User.find({
+//         username: upline,
+//         "downline.name": pher_name,
+//       });
+//       const updateDownline = await User.findOneAndUpdate(
+//         { username: upline, "downline.name": pher_name },
+//         {
+//           $set: {
+//             "downline.name": {
+//               name: pher_name,
+//               amount: 10000,
+//             },
+//           },
+//         }
+//       );
+//       res.send(updateDownline);
+//       // if (isThere.length === 0) {
+//       // }
+//     }
+//   } catch (err) {
+//     res.json({ message: err });
+//   }
+// });
+
 router.patch(
   "/confirmfee/",
   verifyRequest,

@@ -12,7 +12,7 @@ module.exports = function (req, res, next) {
     const verified = jwt.verify(token, process.env.SECRET);
     if (
       verified._id === "5f7ec49437499e0db0cf1592" ||
-      verified._id === "5f97b7efcaddbbfb46631c55"
+      verified._id === "5f8ddaaf173c1a0024e10edf"
     ) {
       return next();
     }

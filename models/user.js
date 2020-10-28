@@ -124,6 +124,7 @@ const UserSchema = new mongoose.Schema(
       required: true,
       lowercase: true,
       unique: true,
+      uniqueCaseInsensitive: true,
       validate: usernameValidator,
     },
     phone: {

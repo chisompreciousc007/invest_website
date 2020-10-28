@@ -200,8 +200,9 @@ router.post(
   }),
   async (req, res) => {
     try {
+      const lowercaseUsername = req.body.username.toLowerCase();
       // check if user is registered
-      const user = await User.findOne({ username: req.body.username });
+      const user = await User.findOne({ username: lowercaseUsername });
 
       if (!user) return res.status(400).send("Incorrect Username or password");
       // hash password

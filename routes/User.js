@@ -16,16 +16,24 @@ const Receipt = require("../models/receipt");
 const { celebrate, Joi, Segments } = require("celebrate");
 require("dotenv/config");
 const rateLimit = require("express-rate-limit");
-const BOT_TOKEN = process.env.BOT_TOKEN;
+const POST_BOT_TOKEN = process.env.POST_BOT_TOKEN;
+const telegramHandle = process.env.TELEGRAM_HANDLE;
+const INVEST_BOT_TOKEN = process.env.INVEST_BOT_TOKEN;
+const REG_BOT_TOKEN = process.env.REG_BOT_TOKEN;
 const COMPLAINTS_BOT_TOKEN = process.env.COMPLAINTS_BOT_TOKEN;
 const { TelegramClient } = require("messaging-api-telegram");
-const clientTelegram = new TelegramClient({
-  accessToken: BOT_TOKEN,
-});
 const complaintsTelegram = new TelegramClient({
   accessToken: COMPLAINTS_BOT_TOKEN,
 });
-
+const regTelegram = new TelegramClient({
+  accessToken: REG_BOT_TOKEN,
+});
+const postingTelegram = new TelegramClient({
+  accessToken: POST_BOT_TOKEN,
+});
+const investTelegram = new TelegramClient({
+  accessToken: INVEST_BOT_TOKEN,
+});
 const createAccountLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour window
   max: 5, // start blocking after 5 requests
@@ -34,16 +42,16 @@ const createAccountLimiter = rateLimit({
 });
 
 const postTelegram = (phername, ghername, amount) => {
-  clientTelegram.sendMessage(
-    "@splash_cash247",
+  postingTelegram.sendMessage(
+    telegramHandle,
     `${phername} have been matched to pay ${ghername} an amount of NGN${amount}.Kindly make a payment soon and upload a POP for confirmation `,
     {
       disableWebPagePreview: true,
       disableNotification: true,
     }
   );
-  clientTelegram.sendMessage(
-    "@splash_cash247",
+  postingTelegram.sendMessage(
+    telegramHandle,
     `${ghername} have been matched to receive an amount of NGN${amount}. Kindly check on your dashboard for confirmation`,
     {
       disableWebPagePreview: true,
@@ -93,16 +101,12 @@ router.post(
         bank,
       } = req.body;
       const foundGuiders = await Guider.find({});
-      const randomNumber = Math.floor(
-        Math.random() * Math.floor(foundGuiders.length)
-      );
+      const len = foundGuiders.length;
+      const randomNumber = Math.floor(Math.random() * Math.floor(len));
       const selectGuider = foundGuiders[randomNumber];
       const guiderEmail = selectGuider.email;
-      console.log(
-        `selected random guider ${guiderEmail} out of ${foundGuiders.length} `
-      );
       // HASH PASSWORD
-      const salt = await bcrypt.genSaltSync(10);
+      const salt = bcrypt.genSaltSync(10);
       const hashedPassword = await bcrypt.hash(password, salt);
 
       // SAVE USER ON DB
@@ -135,7 +139,6 @@ router.post(
           },
           { new: true, runValidators: true, context: "query" }
         );
-        console.log("Referal Updated");
       }
 
       // CREATE RECEIPT FOR ACTIVATION FEE
@@ -154,10 +157,9 @@ router.post(
         isActivationFee: true,
       });
       const savedReceipt = await newReceipt.save();
-      console.log("Fee Receipt Generated");
 
-      const postTelegram = clientTelegram.sendMessage(
-        "@splash_cash247",
+      const postTelegram = regTelegram.sendMessage(
+        telegramHandle,
         `${savedReceipt.pher_name} have been Successfully registered, Please proceed to pay activation fee to your guider.`,
         {
           disableWebPagePreview: true,
@@ -201,18 +203,18 @@ router.post(
       // check if user is registered
       const user = await User.findOne({ username: req.body.username });
 
-      if (!user) return res.status(400).send("Incorrect username or password");
-
+      if (!user) return res.status(400).send("Incorrect Username or password");
       // hash password
       const validPass = await bcrypt.compare(req.body.password, user.password);
       if (!validPass)
-        return res.status(400).send("Incorrect username or password");
+        return res.status(400).send("Incorrect username or Password");
       //CREATE AND ASSIGN A TOKEN
       const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
         expiresIn: "168h",
       });
       var now = new Date();
-      now.setTime(now.getTime() + 168 * 3600 * 1000);
+      now.setTime(now.getTime() + 167 * 3600 * 1000);
+
       res.setHeader(
         "Set-Cookie",
         `token=${token};path=/;httpOnly;expires=${now.toUTCString()}`
@@ -360,9 +362,16 @@ router.patch(
         email: email,
         amount: investAmt,
       }).save();
+      const postTelegram = await investTelegram.sendMessage(
+        "@backendsplashcash",
+        `${email} have pledge ${investAmt}.`,
+        {
+          disableWebPagePreview: true,
+          disableNotification: true,
+        }
+      );
       res.status(200).send("Commit Request Successful");
     } catch (error) {
-      console.log("error from submit amount");
       res.status(400).send(error.message);
     }
   }
@@ -408,7 +417,7 @@ router.patch(
     const { email, username, text } = req.body;
     try {
       const postTelegram = complaintsTelegram.sendMessage(
-        "@splash_cash247",
+        telegramHandle,
         `email:${email}
         username:${username}
         message: ${text}.`,
@@ -430,6 +439,7 @@ router.patch(
 
 router.post(
   "/post-a-match",
+  verifyAdmin,
   celebrate({
     [Segments.BODY]: Joi.object().keys({
       gher_name: Joi.string().required().allow(null),
@@ -450,6 +460,7 @@ router.post(
 );
 router.post(
   "/post-a-confirmation",
+  verifyAdmin,
   celebrate({
     [Segments.BODY]: Joi.object().keys({
       gher_name: Joi.string().required().allow(null),
@@ -461,8 +472,8 @@ router.post(
   async (req, res) => {
     try {
       const { gher_name, pher_name } = req.body;
-      const postTelegrm = await clientTelegram.sendMessage(
-        "@splash_cash247",
+      const postTelegrm = await postingTelegram.sendMessage(
+        telegramHandle,
         `${pher_name}, your payment to ${gher_name} has been received and confirmed.Thanks for investing in SPLASHCASH,Get ready to be splashed. `,
         {
           disableWebPagePreview: true,
@@ -477,6 +488,7 @@ router.post(
 );
 router.post(
   "/post-new-user",
+  verifyAdmin,
   celebrate({
     [Segments.BODY]: Joi.object().keys({
       gher_name: Joi.string().required().allow(null),
@@ -488,8 +500,8 @@ router.post(
   async (req, res) => {
     try {
       const { new_user } = req.body;
-      const postTelegram = await clientTelegram.sendMessage(
-        "@splash_cash247",
+      const postTelegram = await postingTelegram.sendMessage(
+        telegramHandle,
         `${new_user} have been Successfully registered, Please proceed to pay activation fee to your guider.`,
         {
           disableWebPagePreview: true,
@@ -504,6 +516,7 @@ router.post(
 );
 router.post(
   "/post-activated-user",
+  verifyAdmin,
   celebrate({
     [Segments.BODY]: Joi.object().keys({
       gher_name: Joi.string().required().allow(null),
@@ -515,8 +528,8 @@ router.post(
   async (req, res) => {
     try {
       const { new_user } = req.body;
-      const postTelegram = await clientTelegram.sendMessage(
-        "@splash_cash247",
+      const postTelegram = await postingTelegram.sendMessage(
+        telegramHandle,
         `${new_user} have been Successfully activated, Proceed to splash your cash so that you can be splashed.`,
         {
           disableWebPagePreview: true,

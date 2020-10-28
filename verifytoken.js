@@ -6,13 +6,11 @@ module.exports = function (req, res, next) {
     return res.status(400).send("Log in Before Accessing this page");
   }
   const token = req.cookies.token;
-
   if (!token) return res.status(400).send("ACCESS DENIED");
   try {
     const verified = jwt.verify(token, process.env.SECRET);
     User.findById(verified, "isBlocked", (err, result) => {
       if (err) {
-        console.log("error from verify token");
         return res.status(400).send("Session expired,Kindly login again");
       } else {
         const verifyBlock = result.isBlocked;
@@ -20,7 +18,6 @@ module.exports = function (req, res, next) {
           req.user = verified;
           next();
         } else {
-          console.log("user Blocked");
           return res.status(200).send("blocked");
         }
       }

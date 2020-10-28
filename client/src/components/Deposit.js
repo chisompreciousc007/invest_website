@@ -57,21 +57,11 @@ function Dashboard() {
 
     const formData = new FormData();
     formData.append("file", file);
-    console.log("formdata: ", formData);
+
     try {
-      // const res = await axios.post("/uploads", formData, {
-      //   headers: {
-      //     "Content-Type": "multipart/form-data",
-      //   },
-      // });
       const res = await axios.post(
         `/receipts/upload-pop/${currentReceipt._id}`,
         formData
-        // {
-        //   headers: {
-        //     "Content-Type": "multipart/form-data",
-        //   },
-        // }
       );
       setLoading(false);
       setResponse(res.data);
@@ -96,7 +86,6 @@ function Dashboard() {
       //   });
     } catch (error) {
       if (error.response.status === 500) {
-        console.log(error.response.data);
         setResponse("Server Error,Request Failed");
         setError(true);
       } else {
@@ -211,7 +200,6 @@ function Dashboard() {
         })
         .catch((err) => {
           // if (err.response.status === 500) {
-          //   console.log("there was a problem with the server");
           //   return window.location.reload();
           // }
           setResponse(err.response.data);

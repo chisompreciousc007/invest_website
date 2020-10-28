@@ -5,6 +5,7 @@ const FourDayGherSchema = new mongoose.Schema(
     email: {
       type: String,
       unique: true,
+      lowercase: true,
     },
     amount: {
       type: Number,

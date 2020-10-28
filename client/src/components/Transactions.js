@@ -20,7 +20,6 @@ function Transactions() {
       axios
         .get("/users/user", { withCredentials: true })
         .then((res) => {
-          console.log("user data", res.data);
           if (res.data === "blocked") return history.push("/contactSupport");
           setUser((prevState) => ({
             ...prevState,
@@ -32,7 +31,6 @@ function Transactions() {
               withCredentials: true,
             })
             .then((res) => {
-              console.log("receipt data", res.data);
               setUser((prevState) => ({
                 ...prevState,
                 ...res.data,
@@ -41,7 +39,6 @@ function Transactions() {
         })
         .catch((err) => {
           // if (err.response.status === 500) {
-          //   console.log("there was a problem with the server");
           //   return window.location.reload();
           // }
           setResponse(err.response.data);

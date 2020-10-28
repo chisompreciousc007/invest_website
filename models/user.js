@@ -145,6 +145,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       lowercase: true,
       required: true,
+      trim: true,
       validate: accountNameValidator,
     },
     accountNo: {
@@ -156,6 +157,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       lowercase: true,
       required: true,
+      trim: true,
       validate: bankValidator,
     },
     password: {

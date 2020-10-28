@@ -4,6 +4,7 @@ const OutstandingGherSchema = new mongoose.Schema(
   {
     email: {
       type: String,
+      lowercase: true,
     },
     amount: {
       type: Number,

@@ -473,6 +473,32 @@ router.post(
   }
 );
 router.post(
+  "/post-pledge",
+  verifyAdmin,
+  celebrate({
+    [Segments.BODY]: Joi.object().keys({
+      email: Joi.string().required(),
+      amount: Joi.number().integer().required(),
+    }),
+  }),
+  async (req, res) => {
+    try {
+      const { email: username, amount } = req.body;
+      const postTelegram = await postingTelegram.sendMessage(
+        telegramHandle,
+        `${username} have pledge NGN${amount},Waiting to be merged.`,
+        {
+          disableWebPagePreview: true,
+          disableNotification: true,
+        }
+      );
+      res.status(200).send("Posted On Telegram");
+    } catch (error) {
+      res.status(400).send(error.message);
+    }
+  }
+);
+router.post(
   "/post-a-confirmation",
   verifyAdmin,
   celebrate({

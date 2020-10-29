@@ -203,6 +203,26 @@ function Transactions() {
       setError(true);
     }
   };
+  const pledgeHandler = async (e) => {
+    e.preventDefault();
+    try {
+      setloading(true);
+      const res = await axios.post(`/users/post-pledge`, ghData);
+      setloading(false);
+      setResponse(res.data);
+      setSuccess(true);
+      console.log("matchUser response", res.data);
+    } catch (err) {
+      setloading(false);
+      if (err.response.status === 500) {
+        console.log("there was a problem with the server");
+        return window.location.reload();
+      }
+      console.log(err);
+      setResponse(err.response.data);
+      setError(true);
+    }
+  };
   const postMatchHandler = async (e) => {
     e.preventDefault();
     try {
@@ -706,6 +726,40 @@ function Transactions() {
                   type="submit"
                   value="user Activated(Telegram)"
                   onClick={postActivatedUserHandler}
+                />
+              </div>
+            </div>
+          </form>
+          <form name="mainform">
+            <div className="col-sm-8 col-xs-12">
+              {" "}
+              <div className="form_box form_box_login">
+                <span>
+                  <input
+                    placeholder="Username for pledge"
+                    type="text"
+                    name="email"
+                    className="inpts"
+                    size="30"
+                    required
+                    onChange={inputHandler}
+                  />
+
+                  <input
+                    placeholder="Amount for pledge"
+                    type="number"
+                    name="amount"
+                    className="inpts"
+                    size="30"
+                    required
+                    onChange={inputHandler}
+                  />
+                </span>
+                <input
+                  className="btn btn-primary"
+                  type="submit"
+                  value="post Pledge(Telegram)"
+                  onClick={pledgeHandler}
                 />
               </div>
             </div>

@@ -39,6 +39,26 @@ function SignUp({ match }) {
   const submitHandler = (e) => {
     e.preventDefault();
     setLoading(true);
+    if (
+      user.username.match(/scam/gi) !== null ||
+      user.username.match(/fuck/gi) !== null ||
+      user.username.match(/fake/gi) !== null ||
+      user.name.match(/scam/gi) !== null ||
+      user.name.match(/fuck/gi) !== null ||
+      user.name.match(/fake/gi) !== null ||
+      user.email.match(/scam/gi) !== null ||
+      user.email.match(/fuck/gi) !== null ||
+      user.email.match(/fake/gi) !== null ||
+      user.accountName.match(/scam/gi) !== null ||
+      user.accountName.match(/fuck/gi) !== null ||
+      user.accountName.match(/fake/gi) !== null ||
+      user.bank.match(/scam/gi) !== null ||
+      user.bank.match(/fuck/gi) !== null ||
+      user.bank.match(/fake/gi) !== null
+    ) {
+      setResponse("Blacklisted words detected, Please check your inputs");
+      return setError(true);
+    }
     axios
       .post("/users", user)
       .then((res) => {

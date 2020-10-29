@@ -211,7 +211,6 @@ function Transactions() {
       setloading(false);
       setResponse(res.data);
       setSuccess(true);
-      console.log("matchUser response", res.data);
     } catch (err) {
       setloading(false);
       if (err.response.status === 500) {

@@ -182,7 +182,7 @@ function Transactions() {
                           <b>{el.name}</b>
                         </td>
                         <td className="inheader" width="200">
-                          <b>{el.amount * 0.05}</b>
+                          <b>{el.amount}</b>
                         </td>
                       </tr>
                     ))}

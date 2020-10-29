@@ -50,6 +50,10 @@ const popTelegram = new TelegramClient({
 const confirmPayTelegram = new TelegramClient({
   accessToken: CONFIRMPAY_BOT_TOKEN,
 });
+//  TEXT FOR CUSTOMERS
+// axios.post(
+//   `https://www.bulksmsnigeria.com/api/v1/sms/create?api_token=${smsToken}from=SplashCash&to=${08039487533}&body=Hello nwadike lynda, Please Check tht your username and password was entered correctly.You have been successfully registered`
+// );
 const sendSMS = (name, number) => {
   axios.post(
     `https://www.bulksmsnigeria.com/api/v1/sms/create?api_token=${smsToken}from=SplashCash&to=${number}&body=Hello ${name}, You have been matched on SplashCash247, Kindly Check your Dashboard.`
@@ -287,7 +291,7 @@ router.patch(
               $push: {
                 downline: {
                   name: pher_name,
-                  amount: pledge * 0.05,
+                  amount: amount * 0.05,
                 },
               },
             }

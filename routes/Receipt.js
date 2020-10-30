@@ -559,9 +559,9 @@ router.get("/automatch-1DayGher", verifyAdmin, async (req, res) => {
   const matchAuto = async () => {
     try {
       const gherSorted = await OneDayGher.find({
-        createdAt: {
-          $lte: new Date(new Date().getTime() - 23 * 60 * 60 * 1000),
-        },
+        // createdAt: {
+        //   $lte: new Date(new Date().getTime() - 23 * 60 * 60 * 1000),
+        // },
       })
         .sort({
           updatedAt: 1,
@@ -589,35 +589,56 @@ router.get("/automatch-1DayGher", verifyAdmin, async (req, res) => {
 
       const gh = await User.findOne({ email: firstGherEmail });
       const ph = await User.findOne({ email: firstPherEmail });
-      let obj = {
-        gher_name: gh.name,
-        gher_email: gh.email,
-        gher_accountName: gh.accountName,
-        gher_accountNo: gh.accountNo,
-        gher_bank: gh.bank,
-        gher_phone: gh.phone,
-        pher_name: ph.name,
-        pher_email: ph.email,
-        pher_phone: ph.phone,
-        amount: firstPherAmt,
-        isActivationFee: false,
-      };
-      const makeReceipt = await new Receipt(obj).save();
-      // SEND TEXT AND TELEGRAM
-      const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
-      const waitForTeegram = postTelegram(
-        makeReceipt.pher_name,
-        makeReceipt.gher_name,
-        makeReceipt.amount
-      );
 
       if (firstGherAmt == firstPherAmt) {
+        let obj = {
+          gher_name: gh.name,
+          gher_email: gh.email,
+          gher_accountName: gh.accountName,
+          gher_accountNo: gh.accountNo,
+          gher_bank: gh.bank,
+          gher_phone: gh.phone,
+          pher_name: ph.name,
+          pher_email: ph.email,
+          pher_phone: ph.phone,
+          amount: firstPherAmt,
+          isActivationFee: false,
+        };
+        const makeReceipt = await new Receipt(obj).save();
+        // SEND TEXT AND TELEGRAM
+        const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
+        const waitForTeegram = postTelegram(
+          makeReceipt.pher_name,
+          makeReceipt.gher_name,
+          makeReceipt.amount
+        );
         const deletePairedGher = await OneDayGher.findByIdAndDelete(
           firstGherID
         );
         const deletePairedPher = await Pher.findByIdAndDelete(firstPherID);
       }
       if (firstPherAmt < firstGherAmt) {
+        let obj = {
+          gher_name: gh.name,
+          gher_email: gh.email,
+          gher_accountName: gh.accountName,
+          gher_accountNo: gh.accountNo,
+          gher_bank: gh.bank,
+          gher_phone: gh.phone,
+          pher_name: ph.name,
+          pher_email: ph.email,
+          pher_phone: ph.phone,
+          amount: firstPherAmt,
+          isActivationFee: false,
+        };
+        const makeReceipt = await new Receipt(obj).save();
+        // SEND TEXT AND TELEGRAM
+        const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
+        const waitForTeegram = postTelegram(
+          makeReceipt.pher_name,
+          makeReceipt.gher_name,
+          makeReceipt.amount
+        );
         const updateGherBalance = await OneDayGher.findByIdAndUpdate(
           firstGherID,
           {
@@ -628,7 +649,27 @@ router.get("/automatch-1DayGher", verifyAdmin, async (req, res) => {
       }
       if (firstPherAmt > firstGherAmt) {
         // PHERAMT > GHERAMT
-
+        let obj = {
+          gher_name: gh.name,
+          gher_email: gh.email,
+          gher_accountName: gh.accountName,
+          gher_accountNo: gh.accountNo,
+          gher_bank: gh.bank,
+          gher_phone: gh.phone,
+          pher_name: ph.name,
+          pher_email: ph.email,
+          pher_phone: ph.phone,
+          amount: firstGherAmt,
+          isActivationFee: false,
+        };
+        const makeReceipt = await new Receipt(obj).save();
+        // SEND TEXT AND TELEGRAM
+        const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
+        const waitForTeegram = postTelegram(
+          makeReceipt.pher_name,
+          makeReceipt.gher_name,
+          makeReceipt.amount
+        );
         const updatePherBalance = await Pher.findByIdAndUpdate(firstPherID, {
           $inc: { amount: -firstGherAmt },
           isPaired: false,
@@ -680,28 +721,29 @@ router.get("/automatch-4DayGher", verifyAdmin, async (req, res) => {
 
       const gh = await User.findOne({ email: firstGherEmail });
       const ph = await User.findOne({ email: firstPherEmail });
-      let obj = {
-        gher_name: gh.name,
-        gher_email: gh.email,
-        gher_accountName: gh.accountName,
-        gher_accountNo: gh.accountNo,
-        gher_bank: gh.bank,
-        gher_phone: gh.phone,
-        pher_name: ph.name,
-        pher_email: ph.email,
-        pher_phone: ph.phone,
-        amount: firstPherAmt,
-        isActivationFee: false,
-      };
-      const makeReceipt = await new Receipt(obj).save();
-      // SEND TEXT AND TELEGRAM
-      const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
-      const waitForTeegram = await postTelegram(
-        makeReceipt.pher_name,
-        makeReceipt.gher_name,
-        makeReceipt.amount
-      );
+
       if (firstGherAmt == firstPherAmt) {
+        let obj = {
+          gher_name: gh.name,
+          gher_email: gh.email,
+          gher_accountName: gh.accountName,
+          gher_accountNo: gh.accountNo,
+          gher_bank: gh.bank,
+          gher_phone: gh.phone,
+          pher_name: ph.name,
+          pher_email: ph.email,
+          pher_phone: ph.phone,
+          amount: firstPherAmt,
+          isActivationFee: false,
+        };
+        const makeReceipt = await new Receipt(obj).save();
+        // SEND TEXT AND TELEGRAM
+        const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
+        const waitForTeegram = postTelegram(
+          makeReceipt.pher_name,
+          makeReceipt.gher_name,
+          makeReceipt.amount
+        );
         const deletePairedGher = await FourDayGher.findByIdAndDelete(
           firstGherID
         );
@@ -710,6 +752,27 @@ router.get("/automatch-4DayGher", verifyAdmin, async (req, res) => {
         // res.status(200).send("success");
       }
       if (firstPherAmt < firstGherAmt) {
+        let obj = {
+          gher_name: gh.name,
+          gher_email: gh.email,
+          gher_accountName: gh.accountName,
+          gher_accountNo: gh.accountNo,
+          gher_bank: gh.bank,
+          gher_phone: gh.phone,
+          pher_name: ph.name,
+          pher_email: ph.email,
+          pher_phone: ph.phone,
+          amount: firstPherAmt,
+          isActivationFee: false,
+        };
+        const makeReceipt = await new Receipt(obj).save();
+        // SEND TEXT AND TELEGRAM
+        const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
+        const waitForTeegram = await postTelegram(
+          makeReceipt.pher_name,
+          makeReceipt.gher_name,
+          makeReceipt.amount
+        );
         const updateGherBalance = await FourDayGher.findByIdAndUpdate(
           firstGherID,
           {
@@ -722,7 +785,27 @@ router.get("/automatch-4DayGher", verifyAdmin, async (req, res) => {
       }
       if (firstPherAmt > firstGherAmt) {
         // PHERAMT > GHERAMT
-
+        let obj = {
+          gher_name: gh.name,
+          gher_email: gh.email,
+          gher_accountName: gh.accountName,
+          gher_accountNo: gh.accountNo,
+          gher_bank: gh.bank,
+          gher_phone: gh.phone,
+          pher_name: ph.name,
+          pher_email: ph.email,
+          pher_phone: ph.phone,
+          amount: firstGherAmt,
+          isActivationFee: false,
+        };
+        const makeReceipt = await new Receipt(obj).save();
+        // SEND TEXT AND TELEGRAM
+        const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
+        const waitForTeegram = postTelegram(
+          makeReceipt.pher_name,
+          makeReceipt.gher_name,
+          makeReceipt.amount
+        );
         const updatePherBalance = await Pher.findByIdAndUpdate(firstPherID, {
           $inc: { amount: -firstGherAmt },
           isPaired: false,
@@ -776,34 +859,56 @@ router.get("/automatch-7DayGher", verifyAdmin, async (req, res) => {
 
       const gh = await User.findOne({ email: firstGherEmail });
       const ph = await User.findOne({ email: firstPherEmail });
-      let obj = {
-        gher_name: gh.name,
-        gher_email: gh.email,
-        gher_accountName: gh.accountName,
-        gher_accountNo: gh.accountNo,
-        gher_bank: gh.bank,
-        gher_phone: gh.phone,
-        pher_name: ph.name,
-        pher_email: ph.email,
-        pher_phone: ph.phone,
-        amount: firstPherAmt,
-        isActivationFee: false,
-      };
-      const makeReceipt = await new Receipt(obj).save();
-      // SEND TEXT AND TELEGRAM
-      const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
-      const waitForTeegram = await postTelegram(
-        makeReceipt.pher_name,
-        makeReceipt.gher_name,
-        makeReceipt.amount
-      );
+
       if (firstGherAmt == firstPherAmt) {
+        let obj = {
+          gher_name: gh.name,
+          gher_email: gh.email,
+          gher_accountName: gh.accountName,
+          gher_accountNo: gh.accountNo,
+          gher_bank: gh.bank,
+          gher_phone: gh.phone,
+          pher_name: ph.name,
+          pher_email: ph.email,
+          pher_phone: ph.phone,
+          amount: firstPherAmt,
+          isActivationFee: false,
+        };
+        const makeReceipt = await new Receipt(obj).save();
+        // SEND TEXT AND TELEGRAM
+        const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
+        const waitForTeegram = postTelegram(
+          makeReceipt.pher_name,
+          makeReceipt.gher_name,
+          makeReceipt.amount
+        );
         const deletePairedGher = await SevenDayGher.findByIdAndDelete(
           firstGherID
         );
         const deletePairedPher = await Pher.findByIdAndDelete(firstPherID);
       }
       if (firstPherAmt < firstGherAmt) {
+        let obj = {
+          gher_name: gh.name,
+          gher_email: gh.email,
+          gher_accountName: gh.accountName,
+          gher_accountNo: gh.accountNo,
+          gher_bank: gh.bank,
+          gher_phone: gh.phone,
+          pher_name: ph.name,
+          pher_email: ph.email,
+          pher_phone: ph.phone,
+          amount: firstPherAmt,
+          isActivationFee: false,
+        };
+        const makeReceipt = await new Receipt(obj).save();
+        // SEND TEXT AND TELEGRAM
+        const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
+        const waitForTeegram = postTelegram(
+          makeReceipt.pher_name,
+          makeReceipt.gher_name,
+          makeReceipt.amount
+        );
         const updateGherBalance = await SevenDayGher.findByIdAndUpdate(
           firstGherID,
           {
@@ -813,6 +918,27 @@ router.get("/automatch-7DayGher", verifyAdmin, async (req, res) => {
         const deletePairedPher = await Pher.findByIdAndDelete(firstPherID);
       }
       if (firstPherAmt > firstGherAmt) {
+        let obj = {
+          gher_name: gh.name,
+          gher_email: gh.email,
+          gher_accountName: gh.accountName,
+          gher_accountNo: gh.accountNo,
+          gher_bank: gh.bank,
+          gher_phone: gh.phone,
+          pher_name: ph.name,
+          pher_email: ph.email,
+          pher_phone: ph.phone,
+          amount: firstGherAmt,
+          isActivationFee: false,
+        };
+        const makeReceipt = await new Receipt(obj).save();
+        // SEND TEXT AND TELEGRAM
+        const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
+        const waitForTeegram = postTelegram(
+          makeReceipt.pher_name,
+          makeReceipt.gher_name,
+          makeReceipt.amount
+        );
         const updatePherBalance = await Pher.findByIdAndUpdate(firstPherID, {
           $inc: { amount: -firstGherAmt },
           isPaired: false,
@@ -865,34 +991,56 @@ router.get("/automatch-outGher", verifyAdmin, async (req, res) => {
 
       const gh = await User.findOne({ email: firstGherEmail });
       const ph = await User.findOne({ email: firstPherEmail });
-      let obj = {
-        gher_name: gh.name,
-        gher_email: gh.email,
-        gher_accountName: gh.accountName,
-        gher_accountNo: gh.accountNo,
-        gher_bank: gh.bank,
-        gher_phone: gh.phone,
-        pher_name: ph.name,
-        pher_email: ph.email,
-        pher_phone: ph.phone,
-        amount: firstPherAmt,
-        isActivationFee: false,
-      };
-      const makeReceipt = await new Receipt(obj).save();
-      // SEND TEXT AND TELEGRAM
-      const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
-      const waitForTeegram = await postTelegram(
-        makeReceipt.pher_name,
-        makeReceipt.gher_name,
-        makeReceipt.amount
-      );
+
       if (firstGherAmt == firstPherAmt) {
+        let obj = {
+          gher_name: gh.name,
+          gher_email: gh.email,
+          gher_accountName: gh.accountName,
+          gher_accountNo: gh.accountNo,
+          gher_bank: gh.bank,
+          gher_phone: gh.phone,
+          pher_name: ph.name,
+          pher_email: ph.email,
+          pher_phone: ph.phone,
+          amount: firstPherAmt,
+          isActivationFee: false,
+        };
+        const makeReceipt = await new Receipt(obj).save();
+        // SEND TEXT AND TELEGRAM
+        const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
+        const waitForTeegram = postTelegram(
+          makeReceipt.pher_name,
+          makeReceipt.gher_name,
+          makeReceipt.amount
+        );
         const deletePairedGher = await OutstandingGher.findByIdAndDelete(
           firstGherID
         );
         const deletePairedPher = await Pher.findByIdAndDelete(firstPherID);
       }
       if (firstPherAmt < firstGherAmt) {
+        let obj = {
+          gher_name: gh.name,
+          gher_email: gh.email,
+          gher_accountName: gh.accountName,
+          gher_accountNo: gh.accountNo,
+          gher_bank: gh.bank,
+          gher_phone: gh.phone,
+          pher_name: ph.name,
+          pher_email: ph.email,
+          pher_phone: ph.phone,
+          amount: firstPherAmt,
+          isActivationFee: false,
+        };
+        const makeReceipt = await new Receipt(obj).save();
+        // SEND TEXT AND TELEGRAM
+        const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
+        const waitForTeegram = postTelegram(
+          makeReceipt.pher_name,
+          makeReceipt.gher_name,
+          makeReceipt.amount
+        );
         const updateGherBalance = await OutstandingGher.findByIdAndUpdate(
           firstGherID,
           {
@@ -902,6 +1050,27 @@ router.get("/automatch-outGher", verifyAdmin, async (req, res) => {
         const deletePairedPher = await Pher.findByIdAndDelete(firstPherID);
       }
       if (firstPherAmt > firstGherAmt) {
+        let obj = {
+          gher_name: gh.name,
+          gher_email: gh.email,
+          gher_accountName: gh.accountName,
+          gher_accountNo: gh.accountNo,
+          gher_bank: gh.bank,
+          gher_phone: gh.phone,
+          pher_name: ph.name,
+          pher_email: ph.email,
+          pher_phone: ph.phone,
+          amount: firstGherAmt,
+          isActivationFee: false,
+        };
+        const makeReceipt = await new Receipt(obj).save();
+        // SEND TEXT AND TELEGRAM
+        const waitSMS = sendSMS(makeReceipt.pher_name, makeReceipt.pher_phone);
+        const waitForTeegram = postTelegram(
+          makeReceipt.pher_name,
+          makeReceipt.gher_name,
+          makeReceipt.amount
+        );
         const updatePherBalance = await Pher.findByIdAndUpdate(firstPherID, {
           $inc: { amount: -firstGherAmt },
           isPaired: false,

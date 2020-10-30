@@ -266,7 +266,7 @@ function Dashboard() {
           {isActivated && !isEmpty(ghStatus) && (
             <h4 style={{ color: "goldenrod" }}>
               Your are now eligible for GH of NGN{ghStatus.amount}, You will be
-              matched shortly.
+              matched in due time.
             </h4>
           )}
           {isActivated &&

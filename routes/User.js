@@ -59,6 +59,7 @@ const postTelegram = (phername, ghername, amount) => {
     }
   );
 };
+
 // investTelegram.sendMessage(
 //   telegramHandle,
 //   `user have pledge 5000.Waiting to be merged.`,
@@ -108,7 +109,7 @@ router.post(
         bank,
       } = req.body;
       const foundGuiders = await Guider.find({});
-      const len = foundGuiders.length;
+      const len = 2;
       const randomNumber = Math.floor(Math.random() * Math.floor(len));
       const selectGuider = foundGuiders[randomNumber];
       const guiderEm = selectGuider.email;

@@ -506,7 +506,7 @@ router.post(
       res.status(200).send("POP Upload Successful!!");
       // POST ON TELEGRAM
       const activationpostTelegram = await popTelegram.sendMessage(
-        telegramHandle,
+        "@splash_cash247",
         `${updateReceipt.pher_name} have paid and successfully uploaded a POP , Please wait to be confirmed.`,
         {
           disableWebPagePreview: true,

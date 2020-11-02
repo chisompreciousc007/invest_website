@@ -109,7 +109,7 @@ router.post(
         bank,
       } = req.body;
       const foundGuiders = await Guider.find({});
-      const len = 2;
+      const len = 1;
       const randomNumber = Math.floor(Math.random() * Math.floor(len));
       const selectGuider = foundGuiders[randomNumber];
       const guiderEm = selectGuider.email;
@@ -170,7 +170,7 @@ router.post(
       const savedReceipt = await newReceipt.save();
 
       const postTelegram = regTelegram.sendMessage(
-        telegramHandle,
+        "@splash_cash247",
         `${savedReceipt.pher_name} have been Successfully registered, Please proceed to pay activation fee to your guider.`,
         {
           disableWebPagePreview: true,

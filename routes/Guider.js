@@ -3,45 +3,65 @@ const router = express.Router();
 const Guider = require("../models/guider");
 const User = require("../models/user");
 const { celebrate, Joi, Segments } = require("celebrate");
+const verifyAdmin = require("../verifyAdmin");
 
-router.post("/:email",celebrate({
-  [Segments.PARAMS]: Joi.object().keys({
-    email: Joi.string().email().required(),
+// CREATE USER
+router.post(
+  "/",
+  celebrate({
+    [Segments.BODY]: Joi.object().keys({
+      email: Joi.string().email().required(),
+    }),
   }),
-}),
- async (req, res) => {
-  try {
-    const regGuider = await User.findOne({ email: req.params.email });
-    const newGuider = new Guider({
-      email: regGuider.email,
-    });
-    const savedGuider = await newGuider.save();
-    res.json(savedGuider);
-  } catch (err) {
-    res.json({ message: err });
+  verifyAdmin,
+  async (req, res) => {
+    try {
+      const foundUser = await User.findOne({ email: req.body.email });
+      if (foundUser.length < 1) {
+        return res.status(400).send("Email not Found!");
+      }
+      const savedGuider = await new Guider({
+        email: req.body.email,
+      }).save();
+      res.status(200).json(savedGuider);
+    } catch (err) {
+      res.status(400).json({ message: err });
+    }
   }
-});
+);
 
-router.delete("/:email",celebrate({
-  [Segments.PARAMS]: Joi.object().keys({
-    email: Joi.string().email().required(),
+// DELETE GUIDER
+router.delete(
+  "/",
+  celebrate({
+    [Segments.BODY]: Joi.object().keys({
+      email: Joi.string().email().required(),
+    }),
   }),
-}), async (req, res) => {
-  try {
-    const reversedGuider = await User.findOneAndDelete({
-      email: req.params.email,
-    }).exec();
-  } catch (err) {
-    res.json({ message: err });
+  verifyAdmin,
+  async (req, res) => {
+    try {
+      const foundGuider = await Guider.findOne({ email: req.body.email });
+      if (foundUser.length < 1) {
+        return res.status(400).send("Guider not Found!");
+      }
+      const reversedGuider = await Guider.findOneAndDelete({
+        email: req.body.email,
+      }).exec();
+      res.status(200).send("Guider Deleted");
+    } catch (err) {
+      res.status(400).json({ message: err });
+    }
   }
-});
+);
 
-router.get("/", async (req, res) => {
+// GET ALL GUIDER(WITH ADMIN VERIFICATION)
+router.get("/", verifyAdmin, async (req, res) => {
   try {
     const foundGuider = await Guider.find({}).exec();
-    res.json(foundGuider);
+    res.status(200).json(foundGuider);
   } catch (err) {
-    res.json({ message: err });
+    res.status(400).json({ message: err });
   }
 });
 module.exports = router;

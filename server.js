@@ -2,7 +2,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const bodyParser = require("body-parser");
 require("dotenv/config");
 const path = require("path");
 // const enforce = require("express-sslify");
@@ -60,13 +59,20 @@ app.use(
 app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 
-app.use(bodyParser.json());
+// app.use(bodyParser.json());
+app.use(express.json()); //Used to parse JSON bodies
 app.use(
-  bodyParser.urlencoded({
+  express.urlencoded({
     extended: true,
     limit: "50mb",
   })
-);
+); //Parse URL-encoded bodies
+// app.use(
+// bodyParser.urlencoded({
+//   extended: true,
+//   limit: "50mb",
+// })
+// );
 
 app.use(
   compression({

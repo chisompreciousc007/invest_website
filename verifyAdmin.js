@@ -10,10 +10,7 @@ module.exports = function (req, res, next) {
   if (!token) return res.status(400).send("ACCESS DENIED");
   try {
     const verified = jwt.verify(token, process.env.SECRET);
-    if (
-      verified._id === "5f7ec49437499e0db0cf1592" ||
-      verified._id === "5f8ddaaf173c1a0024e10edf"
-    ) {
+    if (verified._id === process.env.ADMIN_MONGODB_ID) {
       return next();
     }
     res.status(400).send("ADMIN ONLY");

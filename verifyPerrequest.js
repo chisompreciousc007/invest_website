@@ -12,14 +12,12 @@ module.exports = function (req, res, next) {
     const verified = jwt.verify(token, process.env.SECRET);
     User.findById(verified, "isBlocked", (err, result) => {
       if (err) {
-        console.log("error from verify token per request");
         return res.status(400).send("Session expired,Kindly login again");
       } else {
         const verifyBlock = result.isBlocked;
         if (!verifyBlock) {
           next();
         } else {
-          console.log("user Blocked");
           return res.status(400).send("blocked");
         }
       }

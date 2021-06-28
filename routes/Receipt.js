@@ -42,6 +42,7 @@ const sendSMS = (name, number) => {
   );
 };
 
+// FUNCTION THAT POSTS MATCH NOTIFICATION TO TELEGRAM GROUP
 const postTelegram = (phername, ghername, amount) => {
   PostToTelegram.sendMessage(
     telegramHandle,
@@ -61,6 +62,7 @@ const postTelegram = (phername, ghername, amount) => {
   );
 };
 
+// FIND ALL RECEIPTs FOR A USER
 router.get(
   "/foruser/:email",
   verifyRequest,
@@ -136,6 +138,7 @@ router.get(
   }
 );
 
+// CONFIRM PAYMENT RECEIPT
 router.patch(
   "/confirmpayment/",
   verifyRequest,
@@ -296,6 +299,7 @@ router.patch(
   }
 );
 
+// CONFIRM GUIDER FEE PAYMENT
 router.patch(
   "/confirmfee/",
   verifyRequest,
@@ -353,7 +357,7 @@ router.patch(
       // POST ON TELEGRAM
       const activationpostTelegram = PostToTelegram.sendMessage(
         telegramHandle,
-        `${pher_name} have been Successfully activated, Proceed to splash your cash so that you can be splashed.`,
+        `${pher_name} have been Successfully activated.`,
         {
           disableWebPagePreview: true,
           disableNotification: true,
@@ -370,6 +374,8 @@ router.patch(
     }
   }
 );
+
+// PURGE DEFAULTING USER FROM RECEIPT
 router.patch(
   "/purge",
   verifyRequest,
@@ -448,6 +454,8 @@ router.patch(
     }
   }
 );
+
+// GET ALL RECEIPTS(WITH ADMIN VERIFICATION)
 router.get("/", verifyAdmin, async (req, res) => {
   try {
     const foundReceipt = await Receipt.find({}, "gher_email pher_email amount");
@@ -456,6 +464,8 @@ router.get("/", verifyAdmin, async (req, res) => {
     res.status(400).send(err.message);
   }
 });
+
+// UPLOAD PHOTO OF PAYMENT
 router.post(
   "/upload-pop/:id",
   verifyRequest,
@@ -488,7 +498,7 @@ router.post(
       res.status(200).send("POP Upload Successful!!");
       // POST ON TELEGRAM
       const activationpostTelegram = await PostToTelegram.sendMessage(
-        "@splash_cash247",
+        telegramHandle,
         `${updateReceipt.pher_name} have paid and successfully uploaded a POP , Please wait to be confirmed.`,
         {
           disableWebPagePreview: true,
@@ -501,6 +511,7 @@ router.post(
   }
 );
 
+// CREATE RECEIPT
 router.post("/new", async (req, res) => {
   try {
     const {
@@ -536,14 +547,15 @@ router.post("/new", async (req, res) => {
   }
 });
 
+// AUTOMATCH ONE DAY GHERS
 router.get("/automatch-1DayGher", verifyAdmin, async (req, res) => {
   // INPUTS
   const matchAuto = async () => {
     try {
       const gherSorted = await OneDayGher.find({
-        // createdAt: {
-        //   $lte: new Date(new Date().getTime() - 23 * 60 * 60 * 1000),
-        // },
+        createdAt: {
+          $lte: new Date(new Date().getTime() - 23 * 60 * 60 * 1000),
+        },
       })
         .sort({
           updatedAt: 1,
@@ -668,6 +680,8 @@ router.get("/automatch-1DayGher", verifyAdmin, async (req, res) => {
   };
   matchAuto();
 });
+
+// AUTOMATCH FOUR DAY GHERS
 router.get("/automatch-4DayGher", verifyAdmin, async (req, res) => {
   // INPUTS
   const matchAuto = async () => {
@@ -806,6 +820,8 @@ router.get("/automatch-4DayGher", verifyAdmin, async (req, res) => {
   };
   matchAuto();
 });
+
+// AUTOMATCH SEVEN DAY GHERS
 router.get("/automatch-7DayGher", verifyAdmin, async (req, res) => {
   // INPUTS
   const matchAuto = async () => {
@@ -938,6 +954,7 @@ router.get("/automatch-7DayGher", verifyAdmin, async (req, res) => {
   matchAuto();
 });
 
+// AUTOMATCH OUTSTANDING GHERS
 router.get("/automatch-outGher", verifyAdmin, async (req, res) => {
   // INPUTS
   const matchAuto = async () => {
@@ -1070,6 +1087,7 @@ router.get("/automatch-outGher", verifyAdmin, async (req, res) => {
   matchAuto();
 });
 
+// MANUAL MATCH GHER
 router.get(
   "/match-user",
   verifyAdmin,

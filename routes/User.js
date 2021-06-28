@@ -17,11 +17,7 @@ const { celebrate, Joi, Segments } = require("celebrate");
 require("dotenv/config");
 const rateLimit = require("express-rate-limit");
 const telegramHandle = process.env.TELEGRAM_HANDLE;
-const COMPLAINTS_BOT_TOKEN = process.env.COMPLAINTS_BOT_TOKEN;
 const { TelegramClient } = require("messaging-api-telegram");
-const complaintsTelegram = new TelegramClient({
-  accessToken: COMPLAINTS_BOT_TOKEN,
-});
 const PostToTelegram = new TelegramClient({
   accessToken: process.env.TELEGRAM_BOT_TOKEN,
 });
@@ -31,7 +27,7 @@ const createAccountLimiter = rateLimit({
   message:
     "Too many accounts created from this IP, please try again after an hour",
 });
-
+// FUNCTION THAT POSTS MATCH NOTIFICATION TO TELEGRAM GROUP
 const postTelegram = (phername, ghername, amount) => {
   PostToTelegram.sendMessage(
     telegramHandle,
@@ -51,14 +47,6 @@ const postTelegram = (phername, ghername, amount) => {
   );
 };
 
-// investTelegram.sendMessage(
-//   telegramHandle,
-//   `user have pledge 5000.Waiting to be merged.`,
-//   {
-//     disableWebPagePreview: true,
-//     disableNotification: true,
-//   }
-// );
 // VERIFY USER AND RETURN USER DATA log
 router.get("/user", verify, async (req, res) => {
   try {
@@ -68,8 +56,8 @@ router.get("/user", verify, async (req, res) => {
     res.status(400).send(err.message);
   }
 });
-// GET ALL USERS
-router.get("/", async (req, res) => {
+// GET ALL USERS(WITHOUT ADMIN VERIFICATION, FOR DEVELOPMENT ONLY)
+router.get("/devOnly", async (req, res) => {
   try {
     const foundUsers = await User.find({}).exec();
     res.json(foundUsers);
@@ -132,7 +120,6 @@ router.post(
         bank: bank,
       });
       const savedUser = await newUser.save();
-
       // UPDATE REFERRALS
 
       if (upline !== "new") {
@@ -170,7 +157,7 @@ router.post(
       const savedReceipt = await newReceipt.save();
 
       const postTelegram = PostToTelegram.sendMessage(
-        "@splash_cash247",
+        telegramHandle,
         `${savedReceipt.pher_name} have been Successfully registered, Please proceed to pay activation fee to your guider.`,
         {
           disableWebPagePreview: true,
@@ -198,8 +185,8 @@ router.post(
     }
   }
 );
-//LOGIN
 
+//LOGIN
 router.post(
   "/login",
   celebrate({
@@ -238,7 +225,7 @@ router.post(
     }
   }
 );
-
+// CHECK IF USERNAME IS TAKEN
 router.post(
   "/username",
   celebrate({
@@ -259,6 +246,8 @@ router.post(
     }
   }
 );
+
+// CHECK IF PHONE IS TAKEN
 router.post(
   "/phone",
   celebrate({
@@ -268,7 +257,6 @@ router.post(
   }),
   async (req, res) => {
     try {
-      // check if username is taken
       const user = await User.findOne({ phone: req.body.phone });
 
       if (user) return res.send(true);
@@ -278,6 +266,8 @@ router.post(
     }
   }
 );
+
+// CHECK IF EMAIL IS TAKEN
 router.post(
   "/email",
   celebrate({
@@ -298,7 +288,9 @@ router.post(
     }
   }
 );
-router.get("/all-details", verifyAdmin, async (req, res) => {
+
+// GET ALL USERS(WITH ADMIN VERIFICATION)
+router.get("/", verifyAdmin, async (req, res) => {
   try {
     const foundUser = await User.find();
     res.status(200).send(foundUser);
@@ -306,7 +298,9 @@ router.get("/all-details", verifyAdmin, async (req, res) => {
     res.status(400).send(err.message);
   }
 });
-router.get("/", verifyAdmin, async (req, res) => {
+
+// GET ALL USERS SHOWING ONLY ISACTIVATED & ISBLOCKED STATUS
+router.get("/activatedBlockedDetails", verifyAdmin, async (req, res) => {
   try {
     const foundUser = await User.find({}, "isActivated isBlocked");
     res.status(200).send(foundUser);
@@ -314,6 +308,8 @@ router.get("/", verifyAdmin, async (req, res) => {
     res.status(400).send(err.message);
   }
 });
+
+// GET ALL USERS WITH NON_EMPTY DOWNLINES
 router.get("/users-with-downlines", verifyAdmin, async (req, res) => {
   try {
     const foundUser = await User.find({ downline: { $ne: [] } }, "downline");
@@ -323,6 +319,8 @@ router.get("/users-with-downlines", verifyAdmin, async (req, res) => {
     res.status(400).send(err.message);
   }
 });
+
+// CREATE A PLEDGE
 router.patch(
   "/wantToInvest",
   verifyRequest,
@@ -339,6 +337,7 @@ router.patch(
     try {
       // INPUTS
       const { _id: id, email, investAmt, pledge, username } = req.body;
+      // CHECK IF INVEST AMT IS GREATER THAN LAST INVEST AMT
       if (pledge > investAmt) {
         return res
           .status(400)
@@ -391,6 +390,8 @@ router.patch(
     }
   }
 );
+
+// EDIT PASSWORD
 router.patch(
   "/password/:id",
   verifyRequest,
@@ -419,38 +420,6 @@ router.patch(
     );
   }
 );
-router.patch(
-  "/message",
-  celebrate({
-    [Segments.BODY]: Joi.object().keys({
-      username: Joi.string().required(),
-      email: Joi.string().email().required(),
-      text: Joi.string().required(),
-    }),
-  }),
-  async (req, res) => {
-    const { email, username, text } = req.body;
-    try {
-      const postTelegram = complaintsTelegram.sendMessage(
-        "@splash_cash247",
-        `email:${email}
-        username:${username}
-        message: ${text}.`,
-        {
-          disableWebPagePreview: true,
-          disableNotification: true,
-        }
-      );
-      res
-        .status(200)
-        .send(
-          "Your Message Have been sent,We will write back to your email shortly.You can also get to us on WhatsApp."
-        );
-    } catch (error) {
-      res.status(400).send(error.message);
-    }
-  }
-);
 
 router.post(
   "/post-a-match",
@@ -473,6 +442,8 @@ router.post(
     }
   }
 );
+
+// POST PLEDGE TO TELEGRAM
 router.post(
   "/post-pledge",
   verifyAdmin,
@@ -499,6 +470,8 @@ router.post(
     }
   }
 );
+
+// POST A CONFIRMATION TO TELEGRAM
 router.post(
   "/post-a-confirmation",
   verifyAdmin,
@@ -515,7 +488,7 @@ router.post(
       const { gher_name, pher_name } = req.body;
       const postTelegrm = await PostToTelegram.sendMessage(
         telegramHandle,
-        `${pher_name}, your payment to ${gher_name} has been received and confirmed.Thanks for investing in SPLASHCASH,Get ready to be splashed. `,
+        `${pher_name}, your payment to ${gher_name} has been received and confirmed. `,
         {
           disableWebPagePreview: true,
           disableNotification: true,
@@ -527,6 +500,8 @@ router.post(
     }
   }
 );
+
+// POST A NEW USER TO TELEGRAM
 router.post(
   "/post-new-user",
   verifyAdmin,
@@ -543,7 +518,7 @@ router.post(
       const { new_user } = req.body;
       const postTelegram = await PostToTelegram.sendMessage(
         telegramHandle,
-        `${new_user} have been Successfully registered, Please proceed to pay activation fee to your guider.`,
+        `${new_user} have been Successfully registered.`,
         {
           disableWebPagePreview: true,
           disableNotification: true,
@@ -555,6 +530,8 @@ router.post(
     }
   }
 );
+
+// POST A NEW USER TO TELEGRAM
 router.post(
   "/post-activated-user",
   verifyAdmin,
@@ -571,7 +548,7 @@ router.post(
       const { new_user } = req.body;
       const postTelegram = await PostToTelegram.sendMessage(
         telegramHandle,
-        `${new_user} have been Successfully activated, Proceed to splash your cash so that you can be splashed.`,
+        `${new_user} have been Successfully activated.`,
         {
           disableWebPagePreview: true,
           disableNotification: true,

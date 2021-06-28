@@ -29,39 +29,21 @@ const { celebrate, Joi, Segments } = require("celebrate");
 const smsToken = process.env.BULK_SMS_TOKEN;
 const axios = require("axios");
 const telegramHandle = process.env.TELEGRAM_HANDLE;
-const MATCHTOPAY_BOT_TOKEN = process.env.MATCHTOPAY_BOT_TOKEN;
-const POP_BOT_TOKEN = process.env.POP_BOT_TOKEN;
-const CONFIRMPAY_BOT_TOKEN = process.env.CONFIRMPAY_BOT_TOKEN;
-const SUC_ACTIVATED_BOT_TOKEN = process.env.SUC_ACTIVATED_BOT_TOKEN;
-const MATCHTORECEIVE_BOT_TOKEN = process.env.MATCHTORECEIVE_BOT_TOKEN;
 const { TelegramClient } = require("messaging-api-telegram");
-const matchToPayTelegram = new TelegramClient({
-  accessToken: MATCHTOPAY_BOT_TOKEN,
-});
-const matchToReceiveTelegram = new TelegramClient({
-  accessToken: MATCHTORECEIVE_BOT_TOKEN,
-});
-const successActivatedTelegram = new TelegramClient({
-  accessToken: SUC_ACTIVATED_BOT_TOKEN,
-});
-const popTelegram = new TelegramClient({
-  accessToken: POP_BOT_TOKEN,
-});
-const confirmPayTelegram = new TelegramClient({
-  accessToken: CONFIRMPAY_BOT_TOKEN,
+const PostToTelegram = new TelegramClient({
+  accessToken: process.env.TELEGRAM_BOT_TOKEN,
 });
 //  TEXT FOR CUSTOMERS
-// axios.post(
-//   `https://www.bulksmsnigeria.com/api/v1/sms/create?api_token=${smsToken}from=SplashCash&to=${08039487533}&body=Hello nwadike lynda, Please Check tht your username and password was entered correctly.You have been successfully registered`
-// );
 const sendSMS = (name, number) => {
   axios.post(
-    `https://www.bulksmsnigeria.com/api/v1/sms/create?api_token=${smsToken}from=SplashCash&to=${number}&body=Hello ${name}, You have been matched on SplashCash247, Kindly Check your Dashboard.`
+    `https://www.bulksmsnigeria.com/api/v1/sms/create?api_tok
+    en=${smsToken}from=SplashCash&to=${number}&body=Hello ${name}, 
+    You have been matched, Kindly Check your Dashboard.`
   );
 };
 
 const postTelegram = (phername, ghername, amount) => {
-  matchToPayTelegram.sendMessage(
+  PostToTelegram.sendMessage(
     telegramHandle,
     `${phername} have been matched to pay ${ghername} an amount of NGN${amount}.Kindly make a payment soon and upload a POP for confirmation `,
     {
@@ -69,7 +51,7 @@ const postTelegram = (phername, ghername, amount) => {
       disableNotification: true,
     }
   );
-  matchToReceiveTelegram.sendMessage(
+  PostToTelegram.sendMessage(
     telegramHandle,
     `${ghername} have been matched to receive an amount of NGN${amount}. Kindly check on your dashboard for confirmation`,
     {
@@ -299,7 +281,7 @@ router.patch(
         }
       }
       const deleteReceipt = await Receipt.findByIdAndDelete(receiptId);
-      const postTelegrm = await confirmPayTelegram.sendMessage(
+      const postTelegrm = await PostToTelegram.sendMessage(
         telegramHandle,
         `${pher_name}, your payment to ${gher_name} has been received and confirmed.Thanks for investing in SPLASHCASH,Get ready to be splashed. `,
         {
@@ -369,7 +351,7 @@ router.patch(
         { new: true, runValidators: true, context: "query" }
       );
       // POST ON TELEGRAM
-      const activationpostTelegram = successActivatedTelegram.sendMessage(
+      const activationpostTelegram = PostToTelegram.sendMessage(
         telegramHandle,
         `${pher_name} have been Successfully activated, Proceed to splash your cash so that you can be splashed.`,
         {
@@ -505,7 +487,7 @@ router.post(
       });
       res.status(200).send("POP Upload Successful!!");
       // POST ON TELEGRAM
-      const activationpostTelegram = await popTelegram.sendMessage(
+      const activationpostTelegram = await PostToTelegram.sendMessage(
         "@splash_cash247",
         `${updateReceipt.pher_name} have paid and successfully uploaded a POP , Please wait to be confirmed.`,
         {

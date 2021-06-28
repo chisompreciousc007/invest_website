@@ -87,6 +87,9 @@ app.use("/phers", pherRouter);
 app.use("/ghers", gherRouter);
 app.use("/guiders", guiderRouter);
 app.use("/public", express.static("public"));
+app.get("/", (req, res) => {
+  res.json("hiiiii, this is a test run");
+});
 
 if ((process.env.NODE_ENV || "").trim() === "production") {
   app.use(express.static("client/build"));

@@ -16,23 +16,14 @@ const Receipt = require("../models/receipt");
 const { celebrate, Joi, Segments } = require("celebrate");
 require("dotenv/config");
 const rateLimit = require("express-rate-limit");
-const POST_BOT_TOKEN = process.env.POST_BOT_TOKEN;
 const telegramHandle = process.env.TELEGRAM_HANDLE;
-const INVEST_BOT_TOKEN = process.env.INVEST_BOT_TOKEN;
-const REG_BOT_TOKEN = process.env.REG_BOT_TOKEN;
 const COMPLAINTS_BOT_TOKEN = process.env.COMPLAINTS_BOT_TOKEN;
 const { TelegramClient } = require("messaging-api-telegram");
 const complaintsTelegram = new TelegramClient({
   accessToken: COMPLAINTS_BOT_TOKEN,
 });
-const regTelegram = new TelegramClient({
-  accessToken: REG_BOT_TOKEN,
-});
-const postingTelegram = new TelegramClient({
-  accessToken: POST_BOT_TOKEN,
-});
-const investTelegram = new TelegramClient({
-  accessToken: INVEST_BOT_TOKEN,
+const PostToTelegram = new TelegramClient({
+  accessToken: process.env.TELEGRAM_BOT_TOKEN,
 });
 const createAccountLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour window
@@ -42,7 +33,7 @@ const createAccountLimiter = rateLimit({
 });
 
 const postTelegram = (phername, ghername, amount) => {
-  postingTelegram.sendMessage(
+  PostToTelegram.sendMessage(
     telegramHandle,
     `${phername} have been matched to pay ${ghername} an amount of NGN${amount}.Kindly make a payment soon and upload a POP for confirmation `,
     {
@@ -50,7 +41,7 @@ const postTelegram = (phername, ghername, amount) => {
       disableNotification: true,
     }
   );
-  postingTelegram.sendMessage(
+  PostToTelegram.sendMessage(
     telegramHandle,
     `${ghername} have been matched to receive an amount of NGN${amount}. Kindly check on your dashboard for confirmation`,
     {
@@ -75,6 +66,15 @@ router.get("/user", verify, async (req, res) => {
     res.status(200).json(user);
   } catch (err) {
     res.status(400).send(err.message);
+  }
+});
+// GET ALL USERS
+router.get("/", async (req, res) => {
+  try {
+    const foundUsers = await User.find({}).exec();
+    res.json(foundUsers);
+  } catch (err) {
+    res.json({ message: err });
   }
 });
 
@@ -169,7 +169,7 @@ router.post(
       });
       const savedReceipt = await newReceipt.save();
 
-      const postTelegram = regTelegram.sendMessage(
+      const postTelegram = PostToTelegram.sendMessage(
         "@splash_cash247",
         `${savedReceipt.pher_name} have been Successfully registered, Please proceed to pay activation fee to your guider.`,
         {
@@ -377,7 +377,7 @@ router.patch(
         email: email,
         amount: investAmt,
       }).save();
-      const postTelegram = await investTelegram.sendMessage(
+      const postTelegram = await PostToTelegram.sendMessage(
         telegramHandle,
         `${username} have pledge NGN${investAmt},Waiting to be merged.`,
         {
@@ -485,7 +485,7 @@ router.post(
   async (req, res) => {
     try {
       const { email: username, amount } = req.body;
-      const postTelegram = await postingTelegram.sendMessage(
+      const postTelegram = await PostToTelegram.sendMessage(
         telegramHandle,
         `${username} have pledge NGN${amount},Waiting to be merged.`,
         {
@@ -513,7 +513,7 @@ router.post(
   async (req, res) => {
     try {
       const { gher_name, pher_name } = req.body;
-      const postTelegrm = await postingTelegram.sendMessage(
+      const postTelegrm = await PostToTelegram.sendMessage(
         telegramHandle,
         `${pher_name}, your payment to ${gher_name} has been received and confirmed.Thanks for investing in SPLASHCASH,Get ready to be splashed. `,
         {
@@ -541,7 +541,7 @@ router.post(
   async (req, res) => {
     try {
       const { new_user } = req.body;
-      const postTelegram = await postingTelegram.sendMessage(
+      const postTelegram = await PostToTelegram.sendMessage(
         telegramHandle,
         `${new_user} have been Successfully registered, Please proceed to pay activation fee to your guider.`,
         {
@@ -569,7 +569,7 @@ router.post(
   async (req, res) => {
     try {
       const { new_user } = req.body;
-      const postTelegram = await postingTelegram.sendMessage(
+      const postTelegram = await PostToTelegram.sendMessage(
         telegramHandle,
         `${new_user} have been Successfully activated, Proceed to splash your cash so that you can be splashed.`,
         {

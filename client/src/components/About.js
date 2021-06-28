@@ -1,93 +1,11 @@
 import React from "react";
+import Footer2 from "./Footer2";
+import Header2 from "./Header2";
 
 function About() {
   return (
     <div>
-      <header className="inner_page_header">
-        <div className="header_top">
-          <div className="container">
-            <div className="row">
-              <div className=" col-sm-3 col-xs-5">
-                <div className="logo">
-                  <a href="/">
-                    <img
-                      src="images/logo.png"
-                      alt="logo"
-                      className="img-responsive"
-                    />
-                  </a>
-                </div>
-              </div>
-              <div className=" col-sm-3 col-xs-1">
-                <div className="header_top_middle"></div>
-              </div>
-              <div className=" col-sm-6 col-xs-6">
-                <div className="header_top_right" style={{ marginTop: "2px" }}>
-                  <ul>
-                    <li>
-                      <a className="btn btn-default" href="/login">
-                        Login
-                      </a>
-                    </li>
-                    <li>
-                      <a className="btn btn-primary" href="/signup=new">
-                        Signup
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="headermenu">
-          <div className="container">
-            <div className="row">
-              <div className="col-sm-12">
-                <nav className="navbar navbar-inverse">
-                  <div className="navbar-header">
-                    <h5>Main Menu</h5>
-                    <button
-                      style={{
-                        position: "absolute",
-                        top: "-89px",
-                        right: "0px",
-                      }}
-                      type="button"
-                      className="navbar-toggle"
-                      data-toggle="collapse"
-                      data-target="#myNavbar"
-                    >
-                      <span className="icon-bar"></span>
-                      <span className="icon-bar"></span>
-                      <span className="icon-bar"></span>
-                    </button>
-                  </div>
-                  <div className="collapse navbar-collapse" id="myNavbar">
-                    <ul className="nav navbar-nav">
-                      <li>
-                        <a href="/">Home</a>
-                      </li>
-                      <li>
-                        <a href="/about">About Us</a>
-                      </li>
-
-                      <li>
-                        <a href="/faq">FAQ</a>
-                      </li>
-
-                      <li>
-                        <a href="/support">Support</a>
-                      </li>
-                    </ul>
-                  </div>
-                </nav>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header2 />
 
       <section className="inner_page_heading">
         <div className="container">
@@ -110,22 +28,21 @@ function About() {
             >
               <div className="row">
                 <div className="col-sm-12">
-                  <h2 className="common_heading">Welcome to Splashcash247</h2>
+                  <h2 className="common_heading">Welcome to OUR WEBSITE</h2>
                 </div>
                 <div className="col-sm-7">
                   <div className="about_left">
                     <p>
-                      SplashCash247 was born in 2020 to give users an amazing,
-                      safe and reliable P2P platform. The ease and features of
-                      the website have enhanced our customer base to significant
-                      level. Our company is managed by proficient personnels
-                      comprising brilliant programmers and engineers. With our
-                      experience in Money Management, we have realized the need
-                      of safe, effective and prompt P2P system. Consequently, we
-                      came up with the advanced technology to make P2P
-                      Investment Secure and accessible to all regardless of
-                      their age, location, budget or technical knowledge. Try
-                      the future digital investment with us now.
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                      Sapiente, repudiandae quibusdam cupiditate eveniet
+                      laboriosam ad voluptate recusandae modi harum suscipit
+                      iusto ipsum, voluptas necessitatibus. Vel vero corrupti
+                      necessitatibus perspiciatis eius. Lorem ipsum dolor sit
+                      amet consectetur adipisicing elit. Sapiente, repudiandae
+                      quibusdam cupiditate eveniet laboriosam ad voluptate
+                      recusandae modi harum suscipit iusto ipsum, voluptas
+                      necessitatibus. Vel vero corrupti necessitatibus
+                      perspiciatis eius.
                     </p>
                   </div>
                 </div>
@@ -151,11 +68,11 @@ function About() {
                       alt="wrkprcsicn1"
                       className="img-responsive"
                     />
-                    <h5>Dedicated and Secure Server</h5>
+                    <h5>Lorem ipsum dolor sit</h5>
                     <p>
-                      We have dedicated servers to ensure the security of your
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit
                       <br />
-                      funds...
+                      ipsum
                     </p>
                   </div>
                 </div>
@@ -168,11 +85,12 @@ function About() {
                       alt="wrkprcsicn1"
                       className="img-responsive"
                     />
-                    <h5>Easy GH/PH</h5>
+                    <h5>Lorem ipsum dolor sit</h5>
                     <p>
-                      It is easy to PH and GH with our simple web design
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit
                       <br />
-                      One Click and start <br /> earning...
+                      Lorem ipsum dolor elit
+                      <br /> lorem
                     </p>
                   </div>
                 </div>
@@ -185,11 +103,11 @@ function About() {
                       alt="wrkprcsicn1"
                       className="img-responsive"
                     />
-                    <h5>24/7 Support</h5>
+                    <h5>Lorem ipsum dolor sit</h5>
                     <p>
-                      We are always available through all our channels
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit
                       <br />
-                      to answer any questions...
+                      Lorem ipsum dolor sit
                     </p>
                   </div>
                 </div>
@@ -202,10 +120,9 @@ function About() {
                       alt="wrkprcsicn1"
                       className="img-responsive"
                     />
-                    <h5>Fast and Reliable Matching</h5>
+                    <h5>Lorem ipsum dolor sit</h5>
                     <p>
-                      Our matching is fast and reliable and runs round the
-                      clock.
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit
                     </p>
                   </div>
                 </div>
@@ -361,46 +278,7 @@ function About() {
           </div>
         </section>
 
-        <footer>
-          <div className="footer_top">
-            <div className="container">
-              <div className="row">
-                <div className="col-sm-2"></div>
-                <div className="col-sm-8">
-                  <div className="footer_menu">
-                    <ul>
-                      <li>
-                        <a href="/">Home</a>
-                      </li>
-                      <li>
-                        <a href="/about">About Us</a>
-                      </li>
-                      <li>
-                        <a href="/faq">Faq</a>
-                      </li>
-                      <li>
-                        <a href="/rules">Terms and Agreement</a>
-                      </li>
-                      <li>
-                        <a href="/support">Support</a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="col-sm-2"></div>
-              </div>
-            </div>
-          </div>
-          <div className="footer_bottom">
-            <div className="container">
-              <div className="row">
-                <div className="col-sm-12">
-                  <h6>© 2020 SplashCash247 Ltd. All Rights Reserved.</h6>
-                </div>
-              </div>
-            </div>
-          </div>
-        </footer>
+        <Footer2 />
       </div>
     </div>
   );

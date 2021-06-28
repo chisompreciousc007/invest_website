@@ -3,37 +3,15 @@ import Error from "./Error";
 import Success from "./Successful";
 import axios from "axios";
 import Spinner from "./Spinner";
+import Footer2 from "./Footer2";
+import Header2 from "./Header2";
 
 function Support() {
-  const [msg, setMsg] = useState({
-    username: "",
-    email: "",
-    text: "",
-  });
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [response, setResponse] = useState(null);
-  const inputHandler = (e) => {
-    e.preventDefault();
-    let key = e.target.name;
-    let value = e.target.value;
-    setMsg((prev) => ({ ...prev, [key]: value }));
-  };
-  const submitHandler = async (e) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      const textt = await axios.patch("/users/message", msg);
-      setResponse(textt.data);
-      setLoading(false);
-      setSuccess(true);
-    } catch (error) {
-      setResponse(error.response.data);
-      setLoading(false);
-      setError(true);
-    }
-  };
+
   return (
     <div>
       {loading && <Spinner />}
@@ -55,91 +33,7 @@ function Support() {
           }}
         />
       )}
-      <header className="inner_page_header">
-        <div className="header_top">
-          <div className="container">
-            <div className="row">
-              <div className=" col-sm-3 col-xs-5">
-                <div className="logo">
-                  <a href="/">
-                    <img
-                      src="images/logo.png"
-                      alt="logo"
-                      className="img-responsive"
-                    />
-                  </a>
-                </div>
-              </div>
-              <div className=" col-sm-3 col-xs-1">
-                <div className="header_top_middle"></div>
-              </div>
-              <div className=" col-sm-6 col-xs-6">
-                <div className="header_top_right" style={{ marginTop: "2px" }}>
-                  <ul>
-                    <li>
-                      <a className="btn btn-default" href="/login">
-                        Login
-                      </a>
-                    </li>
-                    <li>
-                      <a className="btn btn-primary" href="/signup=new">
-                        Signup
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="headermenu">
-          <div className="container">
-            <div className="row">
-              <div className="col-sm-12">
-                <nav className="navbar navbar-inverse">
-                  <div className="navbar-header">
-                    <h5>Main Menu</h5>
-                    <button
-                      style={{
-                        position: "absolute",
-                        top: "-89px",
-                        right: "0px",
-                      }}
-                      type="button"
-                      className="navbar-toggle"
-                      data-toggle="collapse"
-                      data-target="#myNavbar"
-                    >
-                      <span className="icon-bar"></span>
-                      <span className="icon-bar"></span>
-                      <span className="icon-bar"></span>
-                    </button>
-                  </div>
-                  <div className="collapse navbar-collapse" id="myNavbar">
-                    <ul className="nav navbar-nav">
-                      <li>
-                        <a href="/">Home</a>
-                      </li>
-                      <li>
-                        <a href="/about">About Us</a>
-                      </li>
-
-                      <li>
-                        <a href="/faq">FAQ</a>
-                      </li>
-
-                      <li>
-                        <a href="/support">Support</a>
-                      </li>
-                    </ul>
-                  </div>
-                </nav>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header2 />
 
       <section className="inner_page_heading">
         <div className="container">
@@ -180,19 +74,19 @@ function Support() {
                       E-mail:<span style={{ color: "white" }}> </span>
                     </h5>
                     <p>
-                      <big> Support@splashcash247.com</big>
+                      <big> Support@example.com</big>
                     </p>
                     <h5 style={{ display: "inline-flex" }}>
                       WhatsApp:<span style={{ color: "white" }}> </span>
                     </h5>
                     <p>
-                      <big> 09067306222</big>
+                      <big> +1234567890</big>
                     </p>
                     <h5 style={{ display: "inline-flex" }}>
                       Telegram:<span style={{ color: "white" }}> </span>
                     </h5>
                     <p>
-                      <big> https://t.me/joinchat/ReH8v1QQcJrKnMnvIo51-A</big>
+                      <big> https://t.me</big>
                     </p>
                   </div>
                 </div>
@@ -211,9 +105,8 @@ function Support() {
             <div className="row">
               <form
                 name="mainform"
-                onSubmit={submitHandler}
-                // action="https://formspree.io/f/meqpaepz"
-                // method="POST"
+                action="https://formspree.io/f/meqpaepz"
+                method="POST"
               >
                 <div className="col-sm-12 col-xs-12">
                   {" "}
@@ -224,7 +117,6 @@ function Support() {
                         <i className="fa fa-user"></i>
 
                         <input
-                          onChange={inputHandler}
                           placeholder="Username"
                           type="text"
                           name="username"
@@ -242,10 +134,9 @@ function Support() {
                         <i className="fa fa-envelope"></i>
 
                         <input
-                          onChange={inputHandler}
                           placeholder="Your Email"
                           type="email"
-                          name="email"
+                          name="reply_to"
                           size="30"
                           className="inpts"
                           required
@@ -258,7 +149,6 @@ function Support() {
                       <i className="fa  fa-list-alt"></i>
 
                       <textarea
-                        onChange={inputHandler}
                         style={{ paddingTop: "5px" }}
                         placeholder="Your Message"
                         name="text"
@@ -364,46 +254,7 @@ function Support() {
         </div>
       </section>
 
-      <footer>
-        <div className="footer_top">
-          <div className="container">
-            <div className="row">
-              <div className="col-sm-2"></div>
-              <div className="col-sm-8">
-                <div className="footer_menu">
-                  <ul>
-                    <li>
-                      <a href="/">Home</a>
-                    </li>
-                    <li>
-                      <a href="/about">About Us</a>
-                    </li>
-                    <li>
-                      <a href="/faq">Faq</a>
-                    </li>
-                    <li>
-                      <a href="/rules">Terms and Agreement</a>
-                    </li>
-                    <li>
-                      <a href="/support">Support</a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div className="col-sm-2"></div>
-            </div>
-          </div>
-        </div>
-        <div className="footer_bottom">
-          <div className="container">
-            <div className="row">
-              <div className="col-sm-12">
-                <h6>© 2020 SplashCash247 Ltd. All Rights Reserved.</h6>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer2 />
     </div>
   );
 }

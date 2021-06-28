@@ -1,36 +1,30 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
 
-export default function MainHeader() {
-  const history = useHistory();
-  const logout = () => {
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    history.push("/login");
-  };
+function Header2() {
   return (
-    <>
+    <header className="inner_page_header">
       <div className="header_top">
         <div className="container">
           <div className="row">
-            <div className="col-md-4 col-sm-6 col-xs-5">
+            <div className=" col-sm-3 col-xs-5">
               <div className="logo">
-                <a href="/dashboard">LOGO HERE</a>
-                <ul></ul>
+                <a href="/">LOGO HERE</a>
               </div>
             </div>
-            <div className="col-md-5 col-sm-8 col-xs-3">
+            <div className=" col-sm-3 col-xs-1">
               <div className="header_top_middle"></div>
             </div>
-            <div className="col-md-3 col-sm-4 col-xs-3">
-              <div className="header_top_right">
+            <div className=" col-sm-6 col-xs-6">
+              <div className="header_top_right" style={{ marginTop: "2px" }}>
                 <ul>
                   <li>
-                    <a
-                      className="btn btn-default"
-                      href="/login"
-                      onClick={logout}
-                    >
-                      Logout
+                    <a className="btn btn-default" href="/login">
+                      Login
+                    </a>
+                  </li>
+                  <li>
+                    <a className="btn btn-primary" href="/signup=new">
+                      Signup
                     </a>
                   </li>
                 </ul>
@@ -39,6 +33,7 @@ export default function MainHeader() {
           </div>
         </div>
       </div>
+
       <div className="headermenu">
         <div className="container">
           <div className="row">
@@ -47,6 +42,11 @@ export default function MainHeader() {
                 <div className="navbar-header">
                   <h5>Main Menu</h5>
                   <button
+                    style={{
+                      position: "absolute",
+                      top: "-89px",
+                      right: "0px",
+                    }}
                     type="button"
                     className="navbar-toggle"
                     data-toggle="collapse"
@@ -65,6 +65,7 @@ export default function MainHeader() {
                     <li>
                       <a href="/about">About Us</a>
                     </li>
+
                     <li>
                       <a href="/faq">FAQ</a>
                     </li>
@@ -79,6 +80,8 @@ export default function MainHeader() {
           </div>
         </div>
       </div>
-    </>
+    </header>
   );
 }
+
+export default Header2;

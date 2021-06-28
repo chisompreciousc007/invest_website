@@ -4,6 +4,7 @@ import { useHistory, Link } from "react-router-dom";
 import Spinner from "./Spinner";
 import Error from "./Error";
 import Footer from "./Footer";
+import Footer2 from "./Footer2";
 import Header from "./Header";
 import { UserContext } from "./UserContext";
 import NavBar from "./NavBar";

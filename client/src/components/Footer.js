@@ -169,7 +169,7 @@ function Footer() {
           <div className="container">
             <div className="row">
               <div className="col-sm-12">
-                <h6>© 2020 Splashcash247. All Rights Reserved.</h6>
+                <h6>© 2020 All Rights Reserved.</h6>
               </div>
             </div>
           </div>

@@ -1,4 +1,6 @@
 import React from "react";
+import Header2 from "./Header2";
+import Footer2 from "./Footer2";
 function Home() {
   return (
     <div>
@@ -8,13 +10,7 @@ function Home() {
             <div className="row">
               <div className=" col-sm-3 col-xs-5">
                 <div className="logo">
-                  <a href="/">
-                    <img
-                      src="images/logo.png"
-                      alt="logo"
-                      className="img-responsive"
-                    />
-                  </a>
+                  <a href="/">LOGO HERE</a>
                 </div>
               </div>
               <div className=" col-sm-6 col-xs-1">
@@ -93,17 +89,17 @@ function Home() {
               <div className="col-sm-12">
                 <div className="index_banner_content">
                   <h2>
-                    Make Money with P2P Investment
+                    Lorem ipsum dolor sit
                     <span>
                       <p style={{ color: "#FFD700" }}>
                         {" "}
-                        <span>GET FINANCIAL STABILITY</span>
+                        <span>Lorem ipsum dolor sit</span>
                       </p>
                     </span>
                   </h2>
                   <p>
                     {" "}
-                    It’s easy - Register, Invest and Start earning Non-Stop.
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit
                   </p>
                   <span>
                     <br />
@@ -150,14 +146,11 @@ function Home() {
               <div className="col-sm-6">
                 <div className="about_left">
                   <p>
-                    SplashCash247 is a P2P online investment platform for
-                    financial growth. We offer you a smart and easy way to
-                    invest your money, by funding other investors and you inturn
-                    get funded on/before 48 hours with 50% return on your
-                    investment amount.We can guarantee that your investment will
-                    make constant profits because we have the best money
-                    management system. Join our platform for a journey of
-                    financial freedom.
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Sapiente, repudiandae quibusdam cupiditate eveniet
+                    laboriosam ad voluptate recusandae modi harum suscipit iusto
+                    ipsum, voluptas necessitatibus. Vel vero corrupti
+                    necessitatibus perspiciatis eius.
                   </p>
                 </div>
               </div>
@@ -297,7 +290,8 @@ function Home() {
           </div>
         </div>
       </section>
-      <footer>
+      <Footer2 />
+      {/* <footer>
         <div className="footer_top">
           <div className="container">
             <div className="row">
@@ -336,7 +330,7 @@ function Home() {
             </div>
           </div>
         </div>
-      </footer>
+      </footer>*/}
     </div>
   );
 }

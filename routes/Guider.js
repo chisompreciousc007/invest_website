@@ -4,7 +4,7 @@ const Guider = require("../models/guider");
 const User = require("../models/user");
 const { celebrate, Joi, Segments } = require("celebrate");
 const verifyAdmin = require("../verifyAdmin");
-
+const isEmpty = (val) => val == null || !(Object.keys(val) || val).length;
 // CREATE USER
 router.post(
   "/",
@@ -17,7 +17,7 @@ router.post(
   async (req, res) => {
     try {
       const foundUser = await User.findOne({ email: req.body.email });
-      if (foundUser.length < 1) {
+      if (isEmpty(foundUser)) {
         return res.status(400).send("Email not Found!");
       }
       const savedGuider = await new Guider({
@@ -42,7 +42,7 @@ router.delete(
   async (req, res) => {
     try {
       const foundGuider = await Guider.findOne({ email: req.body.email });
-      if (foundUser.length < 1) {
+      if (isEmpty(foundGuider)) {
         return res.status(400).send("Guider not Found!");
       }
       const reversedGuider = await Guider.findOneAndDelete({

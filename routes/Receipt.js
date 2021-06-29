@@ -33,6 +33,9 @@ const { TelegramClient } = require("messaging-api-telegram");
 const PostToTelegram = new TelegramClient({
   accessToken: process.env.TELEGRAM_BOT_TOKEN,
 });
+
+// FUNCTION TO CHECK EMPTY OBJECT/ARRAY
+const isEmpty = (val) => val == null || !(Object.keys(val) || val).length;
 //  TEXT FOR CUSTOMERS
 const sendSMS = (name, number) => {
   axios.post(
@@ -566,9 +569,9 @@ router.get("/automatch-1DayGher", verifyAdmin, async (req, res) => {
           updatedAt: 1,
         })
         .exec();
-      if (!gherSorted.length)
+      if (isEmpty(gherSorted))
         return res.status(200).send("Empty Gher Collection");
-      if (!pherSorted.length)
+      if (isEmpty(pherSorted))
         return res.status(200).send("Empty Pher Collection");
       var {
         amount: firstGherAmt,
@@ -700,9 +703,9 @@ router.get("/automatch-4DayGher", verifyAdmin, async (req, res) => {
           updatedAt: 1,
         })
         .exec();
-      if (!gherSorted.length)
+      if (isEmpty(gherSorted))
         return res.status(200).send("Empty Gher Collection");
-      if (!pherSorted.length)
+      if (isEmpty(pherSorted))
         return res.status(200).send("Empty Pher Collection");
       var {
         amount: firstGherAmt,
@@ -840,9 +843,9 @@ router.get("/automatch-7DayGher", verifyAdmin, async (req, res) => {
           updatedAt: 1,
         })
         .exec();
-      if (!gherSorted.length)
+      if (isEmpty(gherSorted))
         return res.status(200).send("Empty Gher Collection");
-      if (!pherSorted.length)
+      if (isEmpty(pherSorted))
         return res.status(200).send("Empty Pher Collection");
       var {
         amount: firstGherAmt,
@@ -973,9 +976,9 @@ router.get("/automatch-outGher", verifyAdmin, async (req, res) => {
           updatedAt: 1,
         })
         .exec();
-      if (!gherSorted.length)
+      if (isEmpty(gherSorted))
         return res.status(200).send("Empty Gher Collection");
-      if (!pherSorted.length)
+      if (isEmpty(pherSorted))
         return res.status(200).send("Empty Pher Collection");
       var {
         amount: firstGherAmt,
@@ -1107,7 +1110,7 @@ router.get(
             updatedAt: 1,
           })
           .exec();
-        if (!pherSorted.length)
+        if (isEmpty(pherSorted))
           return res.status(200).send("Empty Pher Collection");
         var {
           amount: firstPherAmt,

@@ -92,7 +92,7 @@ function Dashboard() {
                       Hello, {name},
                       <span>
                         Your referral link:{" "}
-                        {`${window.location.origin}/signup=${username}`}
+                        {`https://splashcash247.com/signup=${username}`}
                       </span>
                     </h4>
                   </div>

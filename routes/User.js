@@ -156,14 +156,14 @@ router.post(
       });
       const savedReceipt = await newReceipt.save();
 
-      const postTelegram = PostToTelegram.sendMessage(
-        telegramHandle,
-        `${savedReceipt.pher_name} have been Successfully registered, Please proceed to pay activation fee to your guider.`,
-        {
-          disableWebPagePreview: true,
-          disableNotification: true,
-        }
-      );
+      // const postTelegram = PostToTelegram.sendMessage(
+      //   telegramHandle,
+      //   `${savedReceipt.pher_name} have been Successfully registered, Please proceed to pay activation fee to your guider.`,
+      //   {
+      //     disableWebPagePreview: true,
+      //     disableNotification: true,
+      //   }
+      // );
 
       // UPDATE GUIDER MaTCH ARRAY
       const editGuider = User.findOneAndUpdate(
@@ -177,7 +177,7 @@ router.post(
         },
         { new: true, runValidators: true, context: "query" }
       );
-      const postTelegramPromise = await postTelegram;
+      // const postTelegramPromise = await postTelegram;
       const editGuiderPromise = await editGuider;
       res.status(200).send(savedUser);
     } catch (err) {
